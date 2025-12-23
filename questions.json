@@ -1,0 +1,658 @@
+[
+  {
+    "id": "SAA-001",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "IAM",
+    "question": "Which feature lets you grant temporary permissions to access AWS resources?",
+    "choices": ["IAM Users", "IAM Groups", "IAM Roles", "Resource Tags"],
+    "answer": 2,
+    "explanation": "IAM Roles provide temporary credentials and are commonly assumed by services/users."
+  },
+  {
+    "id": "SAA-002",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "IAM",
+    "question": "What is the best practice for the AWS account root user?",
+    "choices": ["Use it daily", "Disable it", "Enable MFA and avoid using it", "Share it with admins"],
+    "answer": 2,
+    "explanation": "Best practice: enable MFA on root and use it only for rare account tasks."
+  },
+  {
+    "id": "SAA-003",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "KMS",
+    "question": "Which AWS service manages encryption keys used to encrypt data in AWS services?",
+    "choices": ["AWS KMS", "AWS Shield", "Amazon Inspector", "AWS Budgets"],
+    "answer": 0,
+    "explanation": "AWS KMS manages keys and integrates with many AWS services for encryption."
+  },
+  {
+    "id": "SAA-004",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "S3",
+    "question": "Which S3 feature prevents objects from being deleted or overwritten for a retention period?",
+    "choices": ["S3 Transfer Acceleration", "S3 Object Lock", "S3 Inventory", "S3 Select"],
+    "answer": 1,
+    "explanation": "S3 Object Lock helps enforce WORM (write once, read many) retention."
+  },
+  {
+    "id": "SAA-005",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "VPC",
+    "question": "Which VPC component acts as a virtual firewall at the instance level?",
+    "choices": ["Network ACL", "Security Group", "Route Table", "Internet Gateway"],
+    "answer": 1,
+    "explanation": "Security Groups are stateful and apply at the ENI/instance level."
+  },
+  {
+    "id": "SAA-006",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "VPC",
+    "question": "Which VPC component is stateless and filters traffic at the subnet boundary?",
+    "choices": ["Security Group", "Network ACL", "VPC Peering", "NAT Gateway"],
+    "answer": 1,
+    "explanation": "Network ACLs are stateless and operate at the subnet level."
+  },
+  {
+    "id": "SAA-007",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "CloudWatch",
+    "question": "Which service records AWS API calls for auditing and compliance?",
+    "choices": ["CloudWatch", "CloudTrail", "Config", "X-Ray"],
+    "answer": 1,
+    "explanation": "CloudTrail logs API activity (who did what, when, and from where)."
+  },
+  {
+    "id": "SAA-008",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "CloudFront",
+    "question": "To block common web exploits (like SQL injection) in front of a CloudFront distribution, what should you use?",
+    "choices": ["AWS WAF", "AWS KMS", "AWS Config", "Amazon EBS"],
+    "answer": 0,
+    "explanation": "AWS WAF integrates with CloudFront (and ALB/API Gateway) to filter malicious HTTP requests."
+  },
+  {
+    "id": "SAA-009",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "RDS",
+    "question": "Where should you store database credentials securely with automatic rotation support?",
+    "choices": ["S3 Standard", "Hardcode in app config", "AWS Secrets Manager", "CloudWatch Logs"],
+    "answer": 2,
+    "explanation": "Secrets Manager is designed for secrets storage and rotation workflows."
+  },
+  {
+    "id": "SAA-010",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "S3",
+    "question": "How do you restrict S3 access so only CloudFront can read objects privately?",
+    "choices": ["Make the bucket public", "Use an Origin Access Control/Identity with bucket policy", "Use S3 website hosting", "Disable Block Public Access"],
+    "answer": 1,
+    "explanation": "Use CloudFront OAC/OAI + a bucket policy to keep S3 private."
+  },
+
+  {
+    "id": "SAA-011",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "ELB",
+    "question": "Which load balancer feature helps route traffic to healthy targets only?",
+    "choices": ["Sticky sessions", "Health checks", "Path rewriting", "TLS termination"],
+    "answer": 1,
+    "explanation": "Health checks detect unhealthy targets so traffic stops routing to them."
+  },
+  {
+    "id": "SAA-012",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "Auto Scaling",
+    "question": "What AWS feature automatically replaces unhealthy EC2 instances in a fleet?",
+    "choices": ["EC2 Spot", "Auto Scaling Group", "Elastic Beanstalk", "AWS Batch"],
+    "answer": 1,
+    "explanation": "ASGs can perform health checks and replace unhealthy instances."
+  },
+  {
+    "id": "SAA-013",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "RDS",
+    "question": "Which RDS option provides automatic failover to a standby in another AZ?",
+    "choices": ["Read Replica", "Multi-AZ", "Reserved Instances", "RDS Proxy"],
+    "answer": 1,
+    "explanation": "Multi-AZ is for HA and automatic failover across AZs."
+  },
+  {
+    "id": "SAA-014",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "Route 53",
+    "question": "Which Route 53 policy routes traffic to the endpoint with the lowest latency?",
+    "choices": ["Weighted", "Latency-based", "Geolocation", "Failover"],
+    "answer": 1,
+    "explanation": "Latency-based routing selects the region/endpoint with the lowest latency."
+  },
+  {
+    "id": "SAA-015",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "S3",
+    "question": "Which S3 feature replicates objects automatically to another region?",
+    "choices": ["S3 CRR", "S3 Select", "S3 Object Lambda", "S3 Glacier"],
+    "answer": 0,
+    "explanation": "Cross-Region Replication (CRR) replicates objects to another region."
+  },
+  {
+    "id": "SAA-016",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "EBS",
+    "question": "EBS volumes are replicated within which scope by default?",
+    "choices": ["Across regions", "Across AZs", "Within a single AZ", "Across accounts"],
+    "answer": 2,
+    "explanation": "EBS is AZ-scoped; it replicates within the same AZ for durability."
+  },
+  {
+    "id": "SAA-017",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "DynamoDB",
+    "question": "Which DynamoDB feature provides multi-region, active-active replication?",
+    "choices": ["DAX", "Global Tables", "Streams", "TTL"],
+    "answer": 1,
+    "explanation": "DynamoDB Global Tables supports multi-region active-active replication."
+  },
+  {
+    "id": "SAA-018",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "SQS",
+    "question": "Which service decouples components by buffering messages for later processing?",
+    "choices": ["SNS", "SQS", "CloudFront", "EFS"],
+    "answer": 1,
+    "explanation": "SQS is a message queue used to decouple and buffer workloads."
+  },
+  {
+    "id": "SAA-019",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "Lambda",
+    "question": "What happens if an SQS-triggered Lambda cannot process a message repeatedly?",
+    "choices": ["Message disappears immediately", "Message is moved to a DLQ (if configured)", "Queue is deleted", "Lambda shuts down permanently"],
+    "answer": 1,
+    "explanation": "After retries/max receive count, messages can go to a DLQ if configured."
+  },
+  {
+    "id": "SAA-020",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "CloudFront",
+    "question": "Which CloudFront feature helps keep content available if the primary origin fails?",
+    "choices": ["Origin failover", "Geo restriction only", "Signed URLs only", "Cache invalidations"],
+    "answer": 0,
+    "explanation": "Origin failover can route requests to a secondary origin if the primary fails."
+  },
+
+  {
+    "id": "SAA-021",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "CloudFront",
+    "question": "What is the main benefit of CloudFront for global users?",
+    "choices": ["Cheaper EC2", "Lower latency via edge caching", "More durable EBS", "Faster RDS writes"],
+    "answer": 1,
+    "explanation": "CloudFront caches content at edge locations, reducing latency for users."
+  },
+  {
+    "id": "SAA-022",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "S3",
+    "question": "Which S3 feature lets you retrieve only a portion of an object using SQL-like queries?",
+    "choices": ["S3 Select", "S3 CRR", "S3 Object Lock", "S3 Batch Operations"],
+    "answer": 0,
+    "explanation": "S3 Select can query subsets of data from an object (like CSV/JSON) to reduce data transfer."
+  },
+  {
+    "id": "SAA-023",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "EFS",
+    "question": "Which storage is best for a shared POSIX file system across multiple EC2 instances?",
+    "choices": ["EBS", "EFS", "Instance Store", "S3 Standard"],
+    "answer": 1,
+    "explanation": "EFS is a managed NFS file system that can be mounted by many instances."
+  },
+  {
+    "id": "SAA-024",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "EC2",
+    "question": "Which feature increases network throughput for supported EC2 instance types?",
+    "choices": ["Placement Groups", "Enhanced Networking", "EBS Snapshots", "AMI Copy"],
+    "answer": 1,
+    "explanation": "Enhanced networking (ENA) improves packet per second and throughput."
+  },
+  {
+    "id": "SAA-025",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "ELB",
+    "question": "Which load balancer is best for HTTP/HTTPS with path-based routing?",
+    "choices": ["ALB", "NLB", "GWLB", "Classic Load Balancer only"],
+    "answer": 0,
+    "explanation": "ALB supports Layer 7 routing features like host/path-based routing."
+  },
+  {
+    "id": "SAA-026",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "DynamoDB",
+    "question": "Which DynamoDB feature accelerates read-heavy workloads with in-memory caching?",
+    "choices": ["DAX", "Streams", "TTL", "Global Secondary Index"],
+    "answer": 0,
+    "explanation": "DynamoDB Accelerator (DAX) is an in-memory cache for read performance."
+  },
+  {
+    "id": "SAA-027",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "RDS",
+    "question": "What is the main purpose of an RDS Read Replica?",
+    "choices": ["Automatic failover", "Scale reads and offload reporting queries", "Encrypt the database", "Reduce storage costs"],
+    "answer": 1,
+    "explanation": "Read replicas are for scaling reads, not for automatic HA failover."
+  },
+  {
+    "id": "SAA-028",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "EBS",
+    "question": "Which EBS volume type is generally best for general-purpose SSD workloads with tunable performance?",
+    "choices": ["st1", "sc1", "gp3", "Glacier Instant Retrieval"],
+    "answer": 2,
+    "explanation": "gp3 provides good baseline performance and can be provisioned for higher IOPS/throughput."
+  },
+  {
+    "id": "SAA-029",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "SQS",
+    "question": "Which SQS feature reduces empty receives by waiting for messages before returning a response?",
+    "choices": ["Long polling", "Dead-letter queue", "FIFO ordering", "Message deduplication"],
+    "answer": 0,
+    "explanation": "Long polling waits up to the configured time for messages, reducing empty responses and cost."
+  },
+  {
+    "id": "SAA-030",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "SQS",
+    "question": "Which SQS type preserves message order and supports exactly-once processing?",
+    "choices": ["Standard", "FIFO", "Delayed", "Priority"],
+    "answer": 1,
+    "explanation": "SQS FIFO provides ordering and exactly-once processing (within FIFO semantics)."
+  },
+
+  {
+    "id": "SAA-031",
+    "domainId": "D4",
+    "domain": "Design Cost-Optimized Architectures",
+    "section": "EC2",
+    "question": "Which EC2 pricing model offers the biggest discount for interruptible workloads?",
+    "choices": ["On-Demand", "Reserved Instances", "Savings Plans only", "Spot Instances"],
+    "answer": 3,
+    "explanation": "Spot Instances are discounted but can be interrupted when capacity is needed."
+  },
+  {
+    "id": "SAA-032",
+    "domainId": "D4",
+    "domain": "Design Cost-Optimized Architectures",
+    "section": "S3",
+    "question": "Which S3 storage class is best for rarely accessed data with milliseconds retrieval?",
+    "choices": ["S3 Standard", "S3 Standard-IA", "S3 Glacier Deep Archive", "S3 One Zone-IA (always best)"],
+    "answer": 1,
+    "explanation": "Standard-IA is for infrequently accessed data with low storage cost and millisecond access."
+  },
+  {
+    "id": "SAA-033",
+    "domainId": "D4",
+    "domain": "Design Cost-Optimized Architectures",
+    "section": "S3",
+    "question": "Which S3 feature automatically moves objects between storage tiers based on access patterns?",
+    "choices": ["S3 Intelligent-Tiering", "S3 Select", "S3 Object Lock", "S3 Transfer Acceleration"],
+    "answer": 0,
+    "explanation": "Intelligent-Tiering optimizes cost by moving objects between access tiers."
+  },
+  {
+    "id": "SAA-034",
+    "domainId": "D4",
+    "domain": "Design Cost-Optimized Architectures",
+    "section": "CloudWatch",
+    "question": "Which CloudWatch feature notifies you when a metric crosses a threshold?",
+    "choices": ["CloudWatch Alarms", "CloudWatch Events only", "CloudWatch Logs only", "CloudWatch Dashboards only"],
+    "answer": 0,
+    "explanation": "CloudWatch Alarms watch metrics and can trigger actions/notifications when thresholds are breached."
+  },
+  {
+    "id": "SAA-035",
+    "domainId": "D4",
+    "domain": "Design Cost-Optimized Architectures",
+    "section": "Auto Scaling",
+    "question": "For unpredictable spiky traffic, which approach avoids paying for idle EC2 capacity most effectively?",
+    "choices": ["Run one very large instance", "Use Auto Scaling Group with policies", "Use Dedicated Hosts", "Disable scaling and accept downtime"],
+    "answer": 1,
+    "explanation": "Auto Scaling matches capacity to demand, reducing idle cost while maintaining availability."
+  },
+  {
+    "id": "SAA-036",
+    "domainId": "D4",
+    "domain": "Design Cost-Optimized Architectures",
+    "section": "RDS",
+    "question": "Which approach can reduce RDS connection overhead for spiky Lambda traffic?",
+    "choices": ["Increase instance size always", "RDS Proxy", "Disable backups", "Use Multi-AZ only"],
+    "answer": 1,
+    "explanation": "RDS Proxy pools and reuses connections, reducing overhead in bursty workloads."
+  },
+  {
+    "id": "SAA-037",
+    "domainId": "D4",
+    "domain": "Design Cost-Optimized Architectures",
+    "section": "EBS",
+    "question": "Which action can reduce EBS snapshot storage costs over time?",
+    "choices": ["Turn off encryption", "Delete old/unused snapshots", "Use larger volumes", "Disable backups forever"],
+    "answer": 1,
+    "explanation": "Deleting unused snapshots reduces storage costs."
+  },
+  {
+    "id": "SAA-038",
+    "domainId": "D4",
+    "domain": "Design Cost-Optimized Architectures",
+    "section": "S3",
+    "question": "Which storage class is typically the lowest cost for long-term archival with hours retrieval?",
+    "choices": ["S3 Standard", "S3 Glacier Flexible Retrieval", "S3 Glacier Deep Archive", "S3 Standard-IA"],
+    "answer": 2,
+    "explanation": "Deep Archive is designed for lowest-cost archival with slower retrieval."
+  },
+  {
+    "id": "SAA-039",
+    "domainId": "D4",
+    "domain": "Design Cost-Optimized Architectures",
+    "section": "CloudFront",
+    "question": "How can CloudFront reduce costs for a global audience?",
+    "choices": ["By increasing RDS IOPS", "By caching content at the edge to reduce origin load and transfer", "By replacing IAM", "By disabling TLS"],
+    "answer": 1,
+    "explanation": "Edge caching reduces origin requests and can reduce backend load and data transfer."
+  },
+  {
+    "id": "SAA-040",
+    "domainId": "D4",
+    "domain": "Design Cost-Optimized Architectures",
+    "section": "EC2",
+    "question": "Which commitment generally lowers compute cost for steady-state usage over 1–3 years?",
+    "choices": ["On-Demand only", "Reserved Instances or Savings Plans", "Always Spot", "Always Dedicated Hosts"],
+    "answer": 1,
+    "explanation": "Reservations/Savings Plans provide discounts for committed usage."
+  },
+
+  {
+    "id": "SAA-041",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "IAM",
+    "question": "In IAM evaluation, what happens if a request matches an explicit Deny and an Allow?",
+    "choices": ["Allow wins", "Deny wins", "It depends on the service", "The request is retried"],
+    "answer": 1,
+    "explanation": "Explicit Deny always overrides Allow in IAM policy evaluation."
+  },
+  {
+    "id": "SAA-042",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "VPC",
+    "question": "What enables private connectivity from a VPC to supported AWS services without internet?",
+    "choices": ["Internet Gateway", "VPC Endpoints", "VPC Peering", "Public Subnet"],
+    "answer": 1,
+    "explanation": "VPC endpoints (Gateway/Interface) provide private access to AWS services."
+  },
+  {
+    "id": "SAA-043",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "KMS",
+    "question": "Which S3 server-side encryption option uses KMS-managed keys?",
+    "choices": ["SSE-S3", "SSE-KMS", "Client-side only", "Unencrypted"],
+    "answer": 1,
+    "explanation": "SSE-KMS uses AWS KMS keys to encrypt S3 objects."
+  },
+  {
+    "id": "SAA-044",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "EFS",
+    "question": "EFS offers high availability primarily by being accessible across what?",
+    "choices": ["Multiple regions by default", "Multiple AZs in a region", "Only one AZ", "Only one subnet"],
+    "answer": 1,
+    "explanation": "EFS is a regional service and is designed to be accessible across multiple AZs."
+  },
+  {
+    "id": "SAA-045",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "SQS",
+    "question": "What is the main difference between SQS Standard and FIFO?",
+    "choices": ["Standard is encrypted, FIFO is not", "FIFO preserves order and supports exactly-once processing", "FIFO is faster for unlimited throughput always", "Standard requires VPC endpoints"],
+    "answer": 1,
+    "explanation": "FIFO preserves ordering and avoids duplicates (within FIFO semantics)."
+  },
+  {
+    "id": "SAA-046",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "VPC",
+    "question": "Which design improves throughput between EC2 instances with low network latency needs?",
+    "choices": ["Spread Placement Group", "Cluster Placement Group", "Use only public IPs", "Disable security groups"],
+    "answer": 1,
+    "explanation": "Cluster placement groups provide low-latency, high-throughput networking in a single AZ."
+  },
+  {
+    "id": "SAA-047",
+    "domainId": "D4",
+    "domain": "Design Cost-Optimized Architectures",
+    "section": "S3",
+    "question": "To reduce storage costs for objects with known lifecycle, what should you use?",
+    "choices": ["S3 Lifecycle rules", "S3 Inventory only", "CloudTrail", "IAM Policy Simulator"],
+    "answer": 0,
+    "explanation": "Lifecycle rules can transition objects to cheaper classes or expire them automatically."
+  },
+  {
+    "id": "SAA-048",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "Lambda",
+    "question": "Which Lambda feature provides a built-in HTTPS endpoint without API Gateway?",
+    "choices": ["Lambda Function URLs", "Lambda Layers", "Lambda@Edge only", "Provisioned Concurrency"],
+    "answer": 0,
+    "explanation": "Lambda Function URLs expose a native HTTPS endpoint for a function."
+  },
+  {
+    "id": "SAA-049",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "CloudWatch",
+    "question": "Which service provides alarms based on metrics like CPUUtilization?",
+    "choices": ["CloudTrail", "CloudWatch", "Artifact", "KMS"],
+    "answer": 1,
+    "explanation": "CloudWatch provides metrics, alarms, and dashboards."
+  },
+  {
+    "id": "SAA-050",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "IAM",
+    "question": "Which IAM feature sets the maximum permissions an IAM role/user can have (as a boundary)?",
+    "choices": ["Security Groups", "Permission Boundaries", "VPC Endpoints", "Route Tables"],
+    "answer": 1,
+    "explanation": "Permission boundaries define the maximum permissions identity-based policies can grant."
+  },
+
+  {
+    "id": "SAA-051",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "DynamoDB",
+    "question": "Which DynamoDB capacity mode is easiest for unpredictable traffic without capacity planning?",
+    "choices": ["Provisioned", "On-demand", "Reserved", "Spot"],
+    "answer": 1,
+    "explanation": "On-demand capacity scales automatically and avoids manual capacity planning."
+  },
+  {
+    "id": "SAA-052",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "SQS",
+    "question": "What does the SQS Visibility Timeout control?",
+    "choices": ["How long messages are stored", "How long a received message is hidden from other consumers", "How long long polling waits", "Maximum message size"],
+    "answer": 1,
+    "explanation": "Visibility timeout hides a message after receive so another consumer doesn’t process it simultaneously."
+  },
+  {
+    "id": "SAA-053",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "CloudFront",
+    "question": "Which AWS service provides DDoS protection that commonly protects CloudFront by default (Standard)?",
+    "choices": ["AWS Shield", "AWS Glue", "AWS Batch", "AWS Snowball"],
+    "answer": 0,
+    "explanation": "AWS Shield Standard helps protect against common DDoS attacks and is included for CloudFront."
+  },
+  {
+    "id": "SAA-054",
+    "domainId": "D4",
+    "domain": "Design Cost-Optimized Architectures",
+    "section": "Lambda",
+    "question": "For short-lived, event-driven tasks, which compute option can be cost-effective?",
+    "choices": ["Always-on EC2", "Lambda", "Dedicated Hosts", "Biggest EC2 only"],
+    "answer": 1,
+    "explanation": "Lambda can be cost-effective for sporadic workloads because you pay per execution."
+  },
+  {
+    "id": "SAA-055",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "EC2",
+    "question": "Which EC2 feature is the recommended way to define instance configuration for an Auto Scaling Group today?",
+    "choices": ["Launch Template", "Launch Configuration only", "AMI Copy", "Placement Group"],
+    "answer": 0,
+    "explanation": "Launch Templates are the modern, recommended way to define ASG instance configuration."
+  },
+  {
+    "id": "SAA-056",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "RDS",
+    "question": "Aurora is designed to replicate storage across how many AZs (typical design)?",
+    "choices": ["1", "2", "3", "6 regions"],
+    "answer": 2,
+    "explanation": "Aurora typically replicates storage across 3 AZs for durability."
+  },
+  {
+    "id": "SAA-057",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "S3",
+    "question": "Which setting helps ensure all S3 uploads are encrypted automatically?",
+    "choices": ["Disable versioning", "Default encryption", "Transfer Acceleration", "Requester Pays"],
+    "answer": 1,
+    "explanation": "Default encryption ensures objects are encrypted when written to the bucket."
+  },
+  {
+    "id": "SAA-058",
+    "domainId": "D4",
+    "domain": "Design Cost-Optimized Architectures",
+    "section": "CloudWatch",
+    "question": "Which action can reduce CloudWatch Logs costs?",
+    "choices": ["Increase log retention to never expire", "Set retention policies and filter what you log", "Turn off encryption always", "Send logs to more log groups"],
+    "answer": 1,
+    "explanation": "Retention policies and logging only what you need help reduce log storage/ingest costs."
+  },
+  {
+    "id": "SAA-059",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "S3",
+    "question": "For large file uploads to S3, which feature improves reliability and throughput?",
+    "choices": ["S3 Multipart Upload", "S3 Object Lock", "S3 Static Website Hosting", "S3 Batch Operations only"],
+    "answer": 0,
+    "explanation": "Multipart upload uploads parts in parallel and can retry parts independently."
+  },
+  {
+    "id": "SAA-060",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "VPC",
+    "question": "What provides outbound internet access for private subnets without inbound internet access?",
+    "choices": ["Internet Gateway", "NAT Gateway", "VPC Endpoint only", "Route 53 Resolver"],
+    "answer": 1,
+    "explanation": "A NAT Gateway allows instances in private subnets to initiate outbound connections to the internet."
+  },
+
+  {
+    "id": "SAA-061",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "IAM",
+    "question": "Which IAM policy type is attached directly to an AWS resource like an S3 bucket?",
+    "choices": ["Identity-based policy", "Resource-based policy", "Session policy only", "Permission boundary only"],
+    "answer": 1,
+    "explanation": "Resource-based policies are attached to resources (e.g., S3 bucket policy)."
+  },
+  {
+    "id": "SAA-062",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "ELB",
+    "question": "Which ALB capability helps route traffic to different target groups based on URL path?",
+    "choices": ["Layer 4 routing", "Path-based routing", "BGP routing", "NAT translation"],
+    "answer": 1,
+    "explanation": "ALB supports Layer 7 features like host- and path-based routing."
+  },
+  {
+    "id": "SAA-063",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "RDS",
+    "question": "Which RDS feature enables point-in-time recovery within the backup retention window?",
+    "choices": ["Manual snapshots only", "Automated backups", "Read replicas", "Security groups"],
+    "answer": 1,
+    "explanation": "Automated backups (with transaction logs) enable point-in-time recovery."
+  },
+  {
+    "id": "SAA-064",
+    "domainId": "D4",
+    "domain": "Design Cost-Optimized Architectures",
+    "section": "RDS",
+    "question": "Which choice can reduce cost for dev/test databases that are not used 24/7?",
+    "choices": ["Run Multi-AZ always", "Use the largest instance", "Right-size and stop/start where supported", "Disable monitoring"],
+    "answer": 2,
+    "explanation": "Right-sizing and stopping non-prod resources where possible reduces cost."
+  },
+  {
+    "id": "SAA-065",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "VPC",
+    "question": "Which is the most secure way to allow EC2 to access S3 without hardcoding keys?",
+    "choices": ["Store keys in code", "Use an IAM Role attached to the instance", "Share root credentials", "Put keys in a public S3 bucket"],
+    "answer": 1,
+    "explanation": "Attach an IAM role to the instance so it receives temporary credentials automatically."
+  }
+]

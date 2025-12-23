@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FlipTheSAA</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="header">
+      <div class="brand">
+        <div class="logo">SAA</div>
+        <div>
+          <div class="title">SAA Practice</div>
+          <div class="subtitle">Static HTML/CSS/JS • Local persistence • JSON questions</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="resetBtn" class="btn btn-ghost" type="button">Reset</button>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <section class="card">
+        <h2>Setup</h2>
+
+        <div class="grid">
+          <label class="field">
+            <span>Mode</span>
+            <select id="modeSelect">
+              <option value="practice">Practice (instant feedback)</option>
+              <option value="review">Review (instant feedback)</option>
+              <option value="timed">Timed Exam (130 min, no instant feedback)</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Domain</span>
+            <select id="domainSelect"></select>
+          </label>
+
+          <label class="field">
+            <span>Section</span>
+            <select id="sectionSelect"></select>
+          </label>
+        </div>
+
+        <div id="sectionButtons" class="chips"></div>
+
+        <div class="actions">
+          <button id="startBtn" class="btn btn-primary" type="button">Start / Resume</button>
+          <button id="newSessionBtn" class="btn" type="button">Start Fresh (new shuffle)</button>
+        </div>
+
+        <p class="hint" id="hintText"></p>
+      </section>
+
+      <section class="card" id="quizCard" hidden>
+        <div class="quiz-top">
+          <div class="progress">
+            <div id="progressText" class="progress-text"></div>
+            <div id="metaText" class="meta"></div>
+          </div>
+
+          <div class="right-side">
+            <div id="timer" class="timer" hidden></div>
+            <div id="scoreMini" class="score-mini"></div>
+          </div>
+        </div>
+
+        <div id="questionBox" class="question-box"></div>
+
+        <div class="nav">
+          <button id="prevBtn" class="btn" type="button">Prev</button>
+          <button id="nextBtn" class="btn" type="button">Next</button>
+          <button id="submitBtn" class="btn btn-primary" type="button">Submit</button>
+        </div>
+
+        <div id="jumpGrid" class="jump-grid"></div>
+
+        <div id="resultBox" class="result" hidden></div>
+      </section>
+
+      <footer class="footer">
+        <div>Tip: deploy these files to S3 + CloudFront. Keep the bucket private and use OAC.</div>
+      </footer>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
