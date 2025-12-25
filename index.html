@@ -21,48 +21,95 @@
           <div class="subtitle">Static HTML/CSS/JS • Local persistence • JSON questions</div>
         </div>
       </div>
-      <div class="header-actions">
-        <button id="viewPerformanceBtn" class="btn btn-secondary" type="button">📊 Performance</button>
-        <button id="resetBtn" class="btn btn-ghost" type="button">Reset</button>
-      </div>
+      <nav class="header-nav" id="headerNav">
+        <button class="nav-hamburger" id="navHamburger" type="button" aria-label="Menu">☰</button>
+        <div class="nav-menu" id="navMenu">
+          <button class="nav-tab active" data-tab="home" type="button">🏠 Home</button>
+          <button class="nav-tab" data-tab="practice" type="button">📝 Practice Questions</button>
+          <button class="nav-tab" data-tab="performance" type="button">📊 Performance</button>
+          <button class="nav-tab" data-tab="presentations" type="button">📄 Presentations</button>
+          <button class="nav-tab" data-tab="reset" type="button">🔄 Reset</button>
+        </div>
+      </nav>
     </header>
 
     <main class="wrap">
-      <section class="card">
-        <h2>Setup</h2>
+      <!-- ===== HOME SECTION ===== -->
+      <section class="page-section active" id="homeSection">
+        <div class="card home-card">
+          <h1 class="home-title">Welcome to FlipTheSAA</h1>
+          <p class="home-intro">
+            Your comprehensive AWS Solutions Architect Associate (SAA-C03) exam preparation platform.
+            Practice, learn, and track your progress toward certification success.
+          </p>
 
-        <div class="grid">
-          <label class="field">
-            <span>Mode</span>
-            <select id="modeSelect">
-              <option value="practice">Practice (instant feedback)</option>
-              <option value="review">Review (instant feedback)</option>
-              <option value="timed">Timed Exam (130 min, no instant feedback)</option>
-            </select>
-          </label>
+          <div class="features-grid">
+            <div class="feature-box">
+              <div class="feature-icon">📝</div>
+              <h3>Practice Questions</h3>
+              <p>Access exam-like questions covering all SAA-C03 domains</p>
+            </div>
+            <div class="feature-box">
+              <div class="feature-icon">⏱️</div>
+              <h3>Two Study Modes</h3>
+              <p><strong>Review Mode:</strong> Instant feedback for learning<br>
+                 <strong>Timed Mode:</strong> 130-minute exam simulation</p>
+            </div>
+            <div class="feature-box">
+              <div class="feature-icon">📊</div>
+              <h3>Performance Tracking</h3>
+              <p>Track your progress, identify weak areas, and monitor improvement trends</p>
+            </div>
+            <div class="feature-box">
+              <div class="feature-icon">📄</div>
+              <h3>Study Materials</h3>
+              <p>Access presentation slides covering key AWS concepts and services</p>
+            </div>
+          </div>
 
-          <label class="field">
-            <span>Domain</span>
-            <select id="domainSelect"></select>
-          </label>
-
-          <label class="field">
-            <span>Section</span>
-            <select id="sectionSelect"></select>
-          </label>
+          <div class="home-cta">
+            <button id="ctaStartBtn" class="btn btn-primary btn-large">Start Practicing →</button>
+            <p class="hint">All progress is saved locally in your browser</p>
+          </div>
         </div>
-
-        <div id="sectionButtons" class="chips"></div>
-
-        <div class="actions">
-          <button id="startBtn" class="btn btn-primary" type="button">Start / Resume</button>
-          <button id="newSessionBtn" class="btn" type="button">Start Fresh (new shuffle)</button>
-        </div>
-
-        <p class="hint" id="hintText"></p>
       </section>
 
-      <section class="card" id="quizCard" hidden>
+      <!-- ===== PRACTICE QUESTIONS SECTION ===== -->
+      <section class="page-section" id="practiceSection">
+        <section class="card">
+          <h2>Setup</h2>
+
+          <div class="grid">
+            <label class="field">
+              <span>Mode</span>
+              <select id="modeSelect">
+                <option value="review">Review (instant feedback)</option>
+                <option value="timed">Timed Exam (130 min, no instant feedback)</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span>Domain</span>
+              <select id="domainSelect"></select>
+            </label>
+
+            <label class="field">
+              <span>Section</span>
+              <select id="sectionSelect"></select>
+            </label>
+          </div>
+
+          <div id="sectionButtons" class="chips"></div>
+
+          <div class="actions">
+            <button id="startBtn" class="btn btn-primary" type="button">Start / Resume</button>
+            <button id="newSessionBtn" class="btn" type="button">Start Fresh (new shuffle)</button>
+          </div>
+
+          <p class="hint" id="hintText"></p>
+        </section>
+
+        <section class="card" id="quizCard" hidden>
         <div class="quiz-top">
           <div class="progress">
             <div id="progressText" class="progress-text"></div>
@@ -86,14 +133,15 @@
         <div id="jumpGrid" class="jump-grid"></div>
 
         <div id="resultBox" class="result" hidden></div>
+        </section>
       </section>
 
-      <!-- Performance Dashboard -->
-      <section class="card" id="performanceCard" style="display: none;">
-        <div class="perf-header">
-          <h2>📊 Performance Dashboard</h2>
-          <button id="closePerformanceBtn" class="btn btn-ghost" type="button">✕ Close</button>
-        </div>
+      <!-- ===== PERFORMANCE SECTION ===== -->
+      <section class="page-section" id="performanceSection">
+        <section class="card" id="performanceCard">
+          <div class="perf-header">
+            <h2>📊 Performance Dashboard</h2>
+          </div>
 
         <!-- Summary Stats -->
         <div class="perf-summary">
@@ -132,11 +180,22 @@
           <h3>Score Trend (Last 10 Attempts)</h3>
           <div id="scoreTrend" class="trend-chart"></div>
         </div>
+        </section>
       </section>
 
-      <footer class="footer">
-        <div>Tip: deploy these files to S3 + CloudFront. Keep the bucket private and use OAC.</div>
-      </footer>
+      <!-- ===== PRESENTATIONS SECTION ===== -->
+      <section class="page-section" id="presentationsSection">
+        <div class="card presentations-card">
+          <h2>📄 Study Presentations</h2>
+          <p class="hint">Review presentation slides covering AWS SAA concepts and services</p>
+
+          <div class="presentations-list">
+            <!-- Populated dynamically by JavaScript -->
+          </div>
+        </div>
+      </section>
+
+      
     </main>
 
     <script src="app.js"></script>

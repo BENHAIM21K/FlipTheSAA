@@ -70,6 +70,11 @@ let QUESTIONS = []; // Array of all question objects loaded from questions.json
 let QMAP = new Map(); // Fast lookup: questionId → question object
 let timerInterval = null; // Reference to the running timer (for cleanup)
 
+// Navigation state
+let currentTab = 'home'; // Current active tab
+let quizPausedState = null; // Stores timer state when paused: { remainingSeconds, pausedAt }
+let navigationLocked = false; // Prevents rapid tab switching
+
 // ============================================================================
 // DOM REFERENCES - Cache all HTML element references for performance
 // ============================================================================
@@ -80,7 +85,7 @@ const domainSelect = document.getElementById("domainSelect"); // Dropdown: D1, D
 const sectionSelect = document.getElementById("sectionSelect"); // Dropdown: EC2, S3, IAM, etc. or ALL
 const startBtn = document.getElementById("startBtn"); // "Start" or "Resume" button
 const newSessionBtn = document.getElementById("newSessionBtn"); // "Start Fresh" button
-const resetBtn = document.getElementById("resetBtn"); // "Reset" button (clears all data)
+// const resetBtn = document.getElementById("resetBtn"); // REMOVED - now handled by navigation tab
 const hintText = document.getElementById("hintText"); // Help text below dropdowns
 
 // Quiz card elements (shown during active quiz)
@@ -1748,15 +1753,13 @@ function renderPerformanceDashboard() {
     const history = getSessionHistory();
     const performanceCard = document.getElementById('performanceCard');
 
-    // Show the dashboard card
-    performanceCard.style.display = 'block';
+    // Visibility now controlled by page-section.active class (via switchTab)
 
     // If no history, show empty state
     if (!history.sessions || history.sessions.length === 0) {
       performanceCard.innerHTML = `
         <div class="perf-header">
           <h2>📊 Performance Dashboard</h2>
-          <button id="closePerformanceBtn" class="btn btn-ghost" type="button">✕ Close</button>
         </div>
         <div class="perf-empty">
           <div class="perf-empty-icon">📈</div>
@@ -1764,8 +1767,6 @@ function renderPerformanceDashboard() {
           <div class="perf-empty-hint">Complete a quiz to start tracking your progress</div>
         </div>
       `;
-
-      // ✅ No need to attach listener here - already handled by document-level event delegation (line 1694-1701)
 
       console.info('[SAA Info] Performance dashboard shown (empty state)');
       return;
@@ -2072,6 +2073,288 @@ function renderScoreTrend(history) {
 }
 
 // ============================================================================
+// NAVIGATION FUNCTIONS - Tab switching and state management
+// ============================================================================
+
+/**
+ * WHAT IT DOES: Switches between navigation tabs and manages content visibility
+ *
+ * WHY WE NEED IT: Handles tab navigation while preserving quiz state and
+ * managing timer pause/resume for timed mode. This is the core of the new
+ * navigation system.
+ */
+function switchTab(tabName) {
+  safeOperation('Switch Tab', () => {
+    // === HANDLE RESET TAB ===
+    if (tabName === 'reset') {
+      if (confirm("Reset will clear your saved progress (order, answers, timer). Continue?")) {
+        console.info('[SAA Info] User initiated reset from navigation');
+        stopTimer();
+        clearState();
+        location.reload();
+      }
+      return;
+    }
+
+    // === CHECK QUIZ STATE ===
+    const state = normalizeStateForRuntime(loadState());
+    const hasActiveTimedQuiz = state &&
+                                state.session &&
+                                !state.session.completed &&
+                                state.session.mode === 'timed';
+
+    const leavingTimedQuiz = currentTab === 'practice' && hasActiveTimedQuiz;
+    const returningToTimedQuiz = tabName === 'practice' && hasActiveTimedQuiz && currentTab !== 'practice';
+
+    // === LEAVING TIMED QUIZ: PAUSE TIMER ===
+    if (leavingTimedQuiz) {
+      console.info('[SAA Info] Leaving timed quiz, pausing timer');
+
+      stopTimer();
+
+      const remaining = getRemainingSec(state.session);
+      quizPausedState = {
+        remainingSeconds: remaining,
+        pausedAt: nowMs()
+      };
+
+      console.info(`[SAA Info] Timer paused at ${formatClock(remaining)}`);
+    }
+
+    // === UPDATE NAVIGATION STATE ===
+    const previousTab = currentTab;
+    currentTab = tabName;
+
+    // Update tab button active states
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      const tabId = tab.getAttribute('data-tab');
+      if (tabId === tabName) {
+        tab.classList.add('active');
+      } else {
+        tab.classList.remove('active');
+      }
+    });
+
+    // === UPDATE SECTION VISIBILITY ===
+    document.querySelectorAll('.page-section').forEach(section => {
+      section.classList.remove('active');
+    });
+
+    const sectionMap = {
+      'home': 'homeSection',
+      'practice': 'practiceSection',
+      'performance': 'performanceSection',
+      'presentations': 'presentationsSection'
+    };
+
+    const targetSection = document.getElementById(sectionMap[tabName]);
+    if (targetSection) {
+      targetSection.classList.add('active');
+    }
+
+    // === RETURNING TO TIMED QUIZ: SHOW RESUME OVERLAY ===
+    if (returningToTimedQuiz) {
+      console.info('[SAA Info] Returning to paused timed quiz');
+      showTimerResumeOverlay(state);
+    } else if (tabName === 'practice' && state && state.session && !state.session.completed) {
+      renderQuiz(state);
+    }
+
+    // === TAB-SPECIFIC RENDERING ===
+    if (tabName === 'performance') {
+      renderPerformanceDashboard();
+    }
+
+    if (tabName === 'presentations') {
+      renderPresentations();
+    }
+
+    // === MOBILE: CLOSE MENU ===
+    const navMenu = document.getElementById('navMenu');
+    if (navMenu && navMenu.classList.contains('open')) {
+      navMenu.classList.remove('open');
+    }
+
+    console.info(`[SAA Info] Switched from '${previousTab}' to '${tabName}'`);
+  }, undefined);
+}
+
+/**
+ * WHAT IT DOES: Debounced version of switchTab to prevent rapid clicking issues
+ */
+function switchTabDebounced(tabName) {
+  if (navigationLocked) {
+    console.info('[SAA Info] Navigation locked, ignoring click');
+    return;
+  }
+
+  navigationLocked = true;
+  switchTab(tabName);
+
+  setTimeout(() => {
+    navigationLocked = false;
+  }, 300);
+}
+
+/**
+ * WHAT IT DOES: Shows overlay when returning to a paused timed quiz
+ */
+function showTimerResumeOverlay(state) {
+  safeOperation('Show Timer Resume Overlay', () => {
+    const quizCard = document.getElementById('quizCard');
+    if (quizCard) {
+      quizCard.classList.add('quiz-blur');
+    }
+
+    let displayTime;
+    if (quizPausedState && quizPausedState.remainingSeconds !== undefined) {
+      displayTime = formatClock(quizPausedState.remainingSeconds);
+    } else {
+      displayTime = formatClock(getRemainingSec(state.session));
+    }
+
+    const overlay = document.createElement('div');
+    overlay.className = 'quiz-paused-overlay';
+    overlay.id = 'quizPausedOverlay';
+    overlay.innerHTML = `
+      <div class="quiz-paused-content">
+        <h3>⏸️ Quiz Paused</h3>
+        <p>Your timed exam is paused. Time will resume when you click the button below.</p>
+        <div class="timer-display">${displayTime}</div>
+        <button id="resumeQuizBtn" class="btn btn-primary btn-large">▶️ Resume Exam</button>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    document.getElementById('resumeQuizBtn').addEventListener('click', () => {
+      resumeTimedQuiz(state);
+    });
+
+    console.info('[SAA Info] Timer resume overlay displayed');
+  }, undefined);
+}
+
+/**
+ * WHAT IT DOES: Resumes a paused timed quiz
+ */
+function resumeTimedQuiz(state) {
+  safeOperation('Resume Timed Quiz', () => {
+    const overlay = document.getElementById('quizPausedOverlay');
+    if (overlay) {
+      overlay.remove();
+    }
+
+    const quizCard = document.getElementById('quizCard');
+    if (quizCard) {
+      quizCard.classList.remove('quiz-blur');
+    }
+
+    if (quizPausedState && quizPausedState.pausedAt) {
+      const pauseDuration = nowMs() - quizPausedState.pausedAt;
+
+      state.session.startedAtMs += pauseDuration;
+
+      const pauseSeconds = Math.floor(pauseDuration / 1000);
+      console.info(`[SAA Info] Adjusted timer for ${pauseSeconds}s pause duration`);
+
+      persistRuntimeState(state);
+
+      quizPausedState = null;
+    }
+
+    startTimer(state);
+
+    renderQuiz(state);
+
+    console.info('[SAA Info] Timed quiz resumed successfully');
+  }, undefined);
+}
+
+/**
+ * WHAT IT DOES: Renders the presentations list with embedded PDF viewers
+ */
+function renderPresentations() {
+  safeOperation('Render Presentations', () => {
+    const presentationsListEl = document.querySelector('.presentations-list');
+
+    if (!presentationsListEl) {
+      console.warn('[SAA Warning] Presentations list element not found');
+      return;
+    }
+
+    const presentations = [
+      {
+        filename: 'קבוצת למידה SAA v1.pdf',
+        title: 'IAM, EC2 & Storage Fundamentals',
+        description: 'SAA Study Group Session 1'
+      },
+      {
+        filename: 'קבוצת למידה SAA v2.pdf',
+        title: 'High Availability, Load Balancing & Databases',
+        description: 'SAA Study Group Session 2'
+      },
+      {
+        filename: 'קבוצת למידה SAA v3.pdf',
+        title: 'Route 53 & S3 Basics',
+        description: 'SAA Study Group Session 3'
+      },
+      {
+        filename: 'קבוצת למידה SAA v4.pdf',
+        title: 'Advanced S3, Security & Global Delivery',
+        description: 'SAA Study Group Session 4'
+      },
+      {
+        filename: 'קבוצת למידה SAA v5.pdf',
+        title: 'Integration, Messaging, Containers & Serverless',
+        description: 'SAA Study Group Session 5'
+      },
+      {
+        filename: 'קבוצת למידה SAA v6.pdf',
+        title: 'Data, Analytics & Machine Learning on AWS',
+        description: 'SAA Study Group Session 6'
+      },
+      {
+        filename: 'קבוצת למידה SAA v7.pdf',
+        title: 'Monitoring, IAM Advanced & Cloud Security',
+        description: 'SAA Study Group Session 7'
+      },
+      {
+        filename: 'קבוצת למידה SAA v8.pdf',
+        title: 'VPC Networking & DR',
+        description: 'SAA Study Group Session 8'
+      }
+    ];
+
+    const html = presentations.map((pres, index) => {
+      const pdfPath = `Presentations/${encodeURIComponent(pres.filename)}`;
+
+      return `
+        <div class="presentation-item" data-presentation-index="${index}">
+          <h3 class="presentation-header">${escapeHtml(pres.title)}</h3>
+          <embed
+            src="${pdfPath}#toolbar=1&navpanes=1&scrollbar=1&view=FitH"
+            type="application/pdf"
+            class="presentation-embed"
+            aria-label="${escapeHtml(pres.title)}"
+          />
+          <noscript>
+            <div class="presentation-fallback">
+              <p>📄 Your browser doesn't support embedded PDFs.</p>
+              <p><a href="${pdfPath}" download="${escapeHtml(pres.filename)}">⬇️ Download ${escapeHtml(pres.title)}</a></p>
+            </div>
+          </noscript>
+        </div>
+      `;
+    }).join('');
+
+    presentationsListEl.innerHTML = html;
+
+    console.info('[SAA Info] Rendered', presentations.length, 'presentations');
+  }, undefined);
+}
+
+// ============================================================================
 // INITIALIZATION - App startup and question loading
 // ============================================================================
 
@@ -2184,11 +2467,7 @@ async function init() {
 
   // ===== STEP 2: Setup UI =====
 
-  // Force UI to only allow Review + Timed modes
-  modeSelect.innerHTML = `
-    <option value="review">Review</option>
-    <option value="timed">Timed</option>
-  `;
+  // Mode select already configured in HTML (Review + Timed only)
 
   // Hide section chips/buttons (legacy UI, user chooses only from dropdown)
   if (sectionButtons) sectionButtons.style.display = "none";
@@ -2231,8 +2510,8 @@ async function init() {
 
     ensureModeRulesUI();
 
-    // Show the quiz card
-    quizCard.hidden = false;
+    // Navigate to practice tab to show the quiz
+    switchTab('practice');
 
     // If session was completed, show results. Otherwise, resume quiz.
     if (s.completed) {
@@ -2243,7 +2522,10 @@ async function init() {
       renderQuiz(existing);
     }
   } else {
-    console.info('[SAA Info] No previous session found, showing setup screen');
+    console.info('[SAA Info] No previous session found, showing home page');
+    // Initialize to home tab
+    currentTab = 'home';
+    switchTab('home');
   }
 
   console.info('[SAA Info] Initialization complete');
@@ -2262,6 +2544,77 @@ async function init() {
 modeSelect.addEventListener("change", () => {
   ensureModeRulesUI();
 });
+
+// ============================================================================
+// NAVIGATION EVENT LISTENERS
+// ============================================================================
+
+/**
+ * TAB CLICK HANDLER
+ * Uses event delegation on document for all nav tabs
+ */
+document.addEventListener('click', (e) => {
+  const navTab = e.target.closest('.nav-tab');
+  if (navTab) {
+    const tabName = navTab.getAttribute('data-tab');
+    if (tabName) {
+      switchTabDebounced(tabName);
+    }
+  }
+});
+
+/**
+ * HAMBURGER MENU TOGGLE (Mobile)
+ */
+document.addEventListener('click', (e) => {
+  const hamburger = e.target.closest('.nav-hamburger');
+  if (hamburger) {
+    e.stopPropagation();
+    const navMenu = document.getElementById('navMenu');
+    if (navMenu) {
+      navMenu.classList.toggle('open');
+    }
+  }
+});
+
+/**
+ * HOME PAGE CTA BUTTON
+ */
+document.addEventListener('click', (e) => {
+  if (e.target && e.target.id === 'ctaStartBtn') {
+    switchTab('practice');
+  }
+});
+
+/**
+ * CLOSE MOBILE MENU ON OUTSIDE CLICK
+ */
+document.addEventListener('click', (e) => {
+  const navMenu = document.getElementById('navMenu');
+  const hamburger = e.target.closest('.nav-hamburger');
+  const isInsideMenu = e.target.closest('.nav-menu');
+
+  if (navMenu &&
+      navMenu.classList.contains('open') &&
+      !hamburger &&
+      !isInsideMenu) {
+    navMenu.classList.remove('open');
+  }
+});
+
+/**
+ * ORIENTATION CHANGE HANDLER (Mobile)
+ */
+window.addEventListener('orientationchange', () => {
+  const navMenu = document.getElementById('navMenu');
+  if (navMenu && navMenu.classList.contains('open')) {
+    navMenu.classList.remove('open');
+  }
+});
+
+// ============================================================================
+// EXISTING EVENT LISTENERS
+// ============================================================================
 
 /**
  * DOMAIN DROPDOWN CHANGE
@@ -2310,17 +2663,10 @@ newSessionBtn.addEventListener("click", () => {
 });
 
 /**
- * RESET BUTTON
- * Clears all saved progress and reloads the page (with confirmation)
+ * OLD RESET BUTTON LISTENER - REMOVED
+ * Reset is now handled by navigation tab via switchTab('reset')
  */
-resetBtn.addEventListener("click", () => {
-  if (confirm("Reset will clear your saved progress (order, answers, timer). Continue?")) {
-    console.info('[SAA Info] User initiated reset, clearing all data');
-    stopTimer();
-    clearState();
-    location.reload();
-  }
-});
+// DELETED: resetBtn listener - element no longer exists (replaced with nav tab)
 
 /**
  * PREVIOUS BUTTON
@@ -2394,27 +2740,12 @@ submitBtn.addEventListener("click", () => {
 });
 
 /**
- * VIEW PERFORMANCE BUTTON
- * Opens the performance dashboard showing historical analytics
+ * OLD PERFORMANCE BUTTON LISTENERS - REMOVED
+ * Performance is now accessed via navigation tabs
+ * These listeners are no longer needed
  */
-document.getElementById('viewPerformanceBtn').addEventListener('click', () => {
-  safeOperation('Open Performance Dashboard', () => {
-    renderPerformanceDashboard();
-  }, undefined);
-});
-
-/**
- * CLOSE PERFORMANCE BUTTON
- * Closes the performance dashboard (event delegated since button recreated)
- */
-document.addEventListener('click', (e) => {
-  if (e.target && e.target.id === 'closePerformanceBtn') {
-    const performanceCard = document.getElementById('performanceCard');
-    if (performanceCard) {
-      performanceCard.style.display = 'none';
-    }
-  }
-});
+// DELETED: viewPerformanceBtn listener - now handled by switchTab()
+// DELETED: closePerformanceBtn listener - no longer needed (tab navigation)
 
 // ============================================================================
 // APP STARTUP
