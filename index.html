@@ -7,6 +7,12 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <!-- Loading overlay for initial questions fetch -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+      <div class="loader"></div>
+      <p>Loading questions...</p>
+    </div>
+
     <header class="header">
       <div class="brand">
         <div class="logo">SAA</div>
@@ -16,6 +22,7 @@
         </div>
       </div>
       <div class="header-actions">
+        <button id="viewPerformanceBtn" class="btn btn-secondary" type="button">📊 Performance</button>
         <button id="resetBtn" class="btn btn-ghost" type="button">Reset</button>
       </div>
     </header>
@@ -79,6 +86,52 @@
         <div id="jumpGrid" class="jump-grid"></div>
 
         <div id="resultBox" class="result" hidden></div>
+      </section>
+
+      <!-- Performance Dashboard -->
+      <section class="card" id="performanceCard" style="display: none;">
+        <div class="perf-header">
+          <h2>📊 Performance Dashboard</h2>
+          <button id="closePerformanceBtn" class="btn btn-ghost" type="button">✕ Close</button>
+        </div>
+
+        <!-- Summary Stats -->
+        <div class="perf-summary">
+          <div class="stat-box">
+            <div class="stat-value" id="totalAttempts">0</div>
+            <div class="stat-label">Total Attempts</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" id="avgScore">0</div>
+            <div class="stat-label">Average Score</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" id="passRate">0%</div>
+            <div class="stat-label">Pass Rate</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" id="improvement">+0</div>
+            <div class="stat-label">Trend</div>
+          </div>
+        </div>
+
+        <!-- Domain Performance Bars -->
+        <div class="perf-section">
+          <h3>Domain Performance</h3>
+          <div id="domainBars" class="perf-bars"></div>
+        </div>
+
+        <!-- Weak Areas List -->
+        <div class="perf-section">
+          <h3>Questions to Review</h3>
+          <div id="weakAreas" class="weak-list"></div>
+        </div>
+
+        <!-- Score Trend Chart -->
+        <div class="perf-section">
+          <h3>Score Trend (Last 10 Attempts)</h3>
+          <div id="scoreTrend" class="trend-chart"></div>
+        </div>
       </section>
 
       <footer class="footer">
