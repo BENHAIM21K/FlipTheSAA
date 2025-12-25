@@ -100,6 +100,82 @@ body {
 .title { font-weight: 800; letter-spacing: 0.2px; }
 .subtitle { color: var(--muted); font-size: 12px; margin-top: 2px; }
 
+/* ============================================================================
+   NAVIGATION TABS
+   ============================================================================ */
+
+.header-nav {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.nav-tab {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 600;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.nav-tab:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-tab.active {
+  color: var(--text);
+  background: rgba(78, 161, 255, 0.12);
+  border-color: rgba(78, 161, 255, 0.35);
+}
+
+.nav-tab.active:hover {
+  background: rgba(78, 161, 255, 0.18);
+  border-color: rgba(78, 161, 255, 0.45);
+}
+
+.nav-hamburger {
+  display: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+  transition: all 0.2s ease;
+}
+
+.nav-hamburger:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.nav-menu {
+  display: flex;
+  gap: 4px;
+}
+
+/* ============================================================================
+   PAGE SECTIONS - Tab content visibility control
+   ============================================================================ */
+
+.page-section {
+  display: none;
+  animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.page-section.active {
+  display: block;
+}
+
 .wrap { max-width: 980px; margin: 0 auto; padding: 18px; }
 
 .card {
@@ -113,6 +189,94 @@ body {
 }
 
 h2 { margin: 0 0 12px 0; font-size: 18px; }
+
+/* ============================================================================
+   HOME PAGE
+   ============================================================================ */
+
+.home-card {
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.home-title {
+  font-size: 36px;
+  font-weight: 800;
+  margin: 0 0 16px 0;
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.home-intro {
+  font-size: 16px;
+  color: var(--muted);
+  margin: 0 0 32px 0;
+  line-height: 1.6;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.feature-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.feature-box:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.feature-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+  line-height: 1;
+}
+
+.feature-box h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  color: var(--text);
+}
+
+.feature-box p {
+  font-size: 14px;
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.home-cta {
+  margin-top: 32px;
+}
+
+.btn-large {
+  padding: 16px 40px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.home-cta .hint {
+  margin-top: 12px;
+  font-size: 13px;
+}
 
 .grid {
   display: grid;
@@ -807,6 +971,96 @@ select {
 
 /* Mobile responsive design */
 @media (max-width: 860px) {
+  /* ==== MOBILE NAVIGATION ==== */
+  .header {
+    flex-wrap: wrap;
+    padding: 14px 16px;
+  }
+
+  .brand {
+    flex: 1;
+  }
+
+  /* Show hamburger, hide desktop nav */
+  .nav-hamburger {
+    display: block;
+  }
+
+  .nav-menu {
+    display: none;
+    position: absolute;
+    top: 65px;
+    right: 16px;
+    left: 16px;
+    flex-direction: column;
+    background: var(--card);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    padding: 8px;
+    box-shadow: var(--shadow-lg);
+    z-index: 9999;
+    animation: slideDown 0.2s ease;
+  }
+
+  .nav-menu.open {
+    display: flex;
+  }
+
+  .nav-tab {
+    width: 100%;
+    text-align: left;
+    padding: 14px 16px;
+    font-size: 16px;
+    border-radius: 8px;
+  }
+
+  /* Home page mobile */
+  .home-title {
+    font-size: 28px;
+  }
+
+  .home-intro {
+    font-size: 15px;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .feature-icon {
+    font-size: 32px;
+  }
+
+  .feature-box {
+    padding: 20px;
+  }
+
+  .btn-large {
+    width: 100%;
+    padding: 16px 24px;
+  }
+
+  /* Presentations mobile */
+  .presentation-embed {
+    height: 500px;
+  }
+
+  .presentation-header {
+    font-size: 18px;
+  }
+
+  /* Pause overlay mobile */
+  .quiz-paused-content {
+    padding: 32px 24px;
+    margin: 0 16px;
+  }
+
+  .quiz-paused-content .timer-display {
+    font-size: 40px;
+  }
+
+  /* ==== EXISTING MOBILE STYLES ==== */
   .grid { grid-template-columns: 1fr; }
   .jump-grid {
     grid-template-columns: repeat(5, 1fr);
@@ -917,4 +1171,138 @@ select {
 .jump.wrong {
   border-color: #ef4444 !important;
   box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.25) inset;
+}
+
+/* ============================================================================
+   PRESENTATIONS SECTION
+   ============================================================================ */
+
+.presentations-card {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.presentations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  margin-top: 20px;
+}
+
+.presentation-item {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.02);
+  transition: all 0.2s ease;
+}
+
+.presentation-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.presentation-header {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 16px 0;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.presentation-embed {
+  width: 100%;
+  height: 600px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.presentation-fallback {
+  padding: 60px 20px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  color: var(--muted);
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.presentation-fallback p {
+  margin: 8px 0;
+}
+
+.presentation-fallback a {
+  color: var(--accent-primary);
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.presentation-fallback a:hover {
+  text-decoration: underline;
+  color: var(--accent-secondary);
+}
+
+/* ============================================================================
+   TIMER PAUSE/RESUME OVERLAY (Timed Mode)
+   ============================================================================ */
+
+.quiz-paused-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 14, 26, 0.90);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9998;
+  animation: fadeInUp 0.3s ease;
+}
+
+.quiz-paused-content {
+  background: var(--card);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 40px;
+  text-align: center;
+  max-width: 420px;
+  box-shadow: var(--shadow-lg);
+  animation: popIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.quiz-paused-content h3 {
+  font-size: 28px;
+  margin: 0 0 12px 0;
+  color: var(--text);
+  font-weight: 800;
+}
+
+.quiz-paused-content p {
+  font-size: 15px;
+  color: var(--muted);
+  margin: 0 0 24px 0;
+  line-height: 1.5;
+}
+
+.quiz-paused-content .timer-display {
+  font-size: 48px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-primary);
+  margin: 20px 0;
+  letter-spacing: 2px;
+}
+
+.quiz-blur {
+  filter: blur(8px);
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.5;
 }
