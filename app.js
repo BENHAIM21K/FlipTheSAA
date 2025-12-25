@@ -58,6 +58,7 @@ const MAX_HISTORY_SESSIONS = 50; // Keep most recent 50 sessions (FIFO)
 const EXAM_DURATION_SEC = 130 * 60; // 130 minutes = 7800 seconds (AWS exam time)
 const EXAM_TOTAL_QUESTIONS = 65; // Standard AWS SAA exam question count
 const EXAM_SCORED_QUESTIONS = 50; // Only 50 of 65 questions count (like real exam)
+const REVIEW_MAX_QUESTIONS = 50; // Maximum questions in review mode
 
 const POINTS_PER_SCORED_QUESTION = 20; // 50 questions × 20 points = 1000 max
 const PASSING_SCORE = 720; // 720/1000 = 72% passing threshold
@@ -782,19 +783,48 @@ function createNewSession(filters, forceFresh) {
   // Build new session
   let list = filteredQuestions(filters);
 
-  // Timed mode: use full pool and enforce 65
+  // Generate seed for deterministic shuffling
+  const seed = `${key}::${nowMs()}`;
+
+  // Timed mode: use full pool and select 65 random questions
   if (filters.mode === "timed") {
     list = QUESTIONS;
-    if (list.length !== EXAM_TOTAL_QUESTIONS) {
+
+    // Ensure we have at least 65 questions
+    if (list.length < EXAM_TOTAL_QUESTIONS) {
       throw new Error(
-        `Timed mode requires exactly ${EXAM_TOTAL_QUESTIONS} questions in questions.json (currently: ${list.length}).`
+        `Timed mode requires at least ${EXAM_TOTAL_QUESTIONS} questions (currently: ${list.length}).`
       );
+    }
+
+    // If more than 65 questions, randomly select 65 using seeded subset
+    // This ensures questions are picked from throughout the pool (not just first 65)
+    if (list.length > EXAM_TOTAL_QUESTIONS) {
+      const questionIds = list.map(q => q.id);
+      const selectedIds = pickSeededSubset(
+        questionIds,
+        EXAM_TOTAL_QUESTIONS,
+        seed + "::timedSelection"
+      );
+      list = selectedIds.map(id => QMAP.get(id));
+    }
+  }
+
+  // Review mode: limit to 50 questions max
+  // Use RANDOM selection (not first 50 or last 50)
+  if (filters.mode === "review") {
+    if (list.length > REVIEW_MAX_QUESTIONS) {
+      const questionIds = list.map(q => q.id);
+      const selectedIds = pickSeededSubset(
+        questionIds,
+        REVIEW_MAX_QUESTIONS,
+        seed + "::reviewSelection"
+      );
+      list = selectedIds.map(id => QMAP.get(id));
     }
   }
 
   if (list.length === 0) throw new Error("No questions match your filters.");
-
-  const seed = `${key}::${nowMs()}`;
   const order = seededShuffle(list.map((q) => q.id), seed);
 
   const session = {
@@ -2472,11 +2502,15 @@ async function init() {
   // Hide section chips/buttons (legacy UI, user chooses only from dropdown)
   if (sectionButtons) sectionButtons.style.display = "none";
 
-  // Warn if question count doesn't match exam requirements
-  if (QUESTIONS.length !== EXAM_TOTAL_QUESTIONS) {
-    const msg = `Note: You currently have ${QUESTIONS.length} questions. Timed mode requires exactly ${EXAM_TOTAL_QUESTIONS}.`;
+  // Inform user about question count
+  if (QUESTIONS.length < EXAM_TOTAL_QUESTIONS) {
+    const msg = `Warning: You have ${QUESTIONS.length} questions. Timed mode requires at least ${EXAM_TOTAL_QUESTIONS}.`;
     hintText.textContent = msg;
     console.warn(`[SAA Warning] ${msg}`);
+  } else if (QUESTIONS.length > EXAM_TOTAL_QUESTIONS) {
+    const msg = `You have ${QUESTIONS.length} questions. Timed mode will randomly select ${EXAM_TOTAL_QUESTIONS} per session.`;
+    hintText.textContent = msg;
+    console.info(`[SAA Info] ${msg}`);
   }
 
   // Build dropdown options from loaded questions

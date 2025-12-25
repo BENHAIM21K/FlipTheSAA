@@ -654,5 +654,155 @@
     "choices": ["Store keys in code", "Use an IAM Role attached to the instance", "Share root credentials", "Put keys in a public S3 bucket"],
     "answer": 1,
     "explanation": "Attach an IAM role to the instance so it receives temporary credentials automatically."
+  },
+   {
+    "id": "SAA-066",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "IAM",
+    "question": "A company has just set up a new AWS account for production workloads and wants to follow best practices for privileged access. Which practice should be mandated for the root user account?",
+    "choices": [
+      "Use the root account only for initial setup and never share credentials.",
+      "Create an IAM user for all day-to-day operations and delete the root account immediately.",
+      "Set a strong password policy for all IAM users, but the root account password can be simple since it's rarely used.",
+      "Configure Multi-Factor Authentication (MFA) only for critical IAM users, as the root account is already inherently secure."
+    ],
+    "answer": 0,
+    "explanation": "Root is the most privileged identity, so it should be tightly controlled and used only when absolutely necessary; never share it and keep it for account-level tasks."
+  },
+  {
+    "id": "SAA-067",
+    "domainId": "D4",
+    "domain": "Design Cost-Optimized Architectures",
+    "section": "EC2",
+    "question": "A company must run a critical, stateful database application with stable capacity 24/7 for the next three years and wants the best cost savings. Which EC2 purchasing option provides the greatest savings for this steady-state workload?",
+    "choices": [
+      "On-Demand Instances, due to the flexibility of paying per second.",
+      "Spot Instances, leveraging up to 90% discount for non-critical workloads.",
+      "Reserved Instances (3-year term, All Upfront payment).",
+      "Capacity Reservations, ensuring capacity in a specific AZ for any duration."
+    ],
+    "answer": 2,
+    "explanation": "A 3-year All Upfront Reserved Instance provides the largest discount for predictable, always-on workloads while keeping capacity stable."
+  },
+  {
+    "id": "SAA-068",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "Security Groups",
+    "question": "An EC2 instance security group allows inbound HTTP (port 80), but client connections time out and outbound rules are default. Based on security group fundamentals, what is the most likely cause?",
+    "choices": [
+      "The default Network ACL (NACL) is implicitly denying the inbound connection.",
+      "The default outbound rule in the security group is denying the return traffic.",
+      "The inbound security group rule is configured incorrectly or traffic is being blocked before reaching the instance, resulting in a timeout.",
+      "The application server is not running, resulting in a connection refused error."
+    ],
+    "answer": 2,
+    "explanation": "Security groups are stateful, so return traffic is allowed automatically; a timeout usually indicates the request never successfully reaches a listening service (routing/NACL/host firewall/app issue) rather than an outbound SG problem."
+  },
+  {
+    "id": "SAA-069",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "ALB",
+    "question": "An Application Load Balancer (ALB) distributes traffic across two Availability Zones for high availability. How is cross-zone load balancing configured by default on an ALB, and what is the pricing impact?",
+    "choices": [
+      "Disabled by default, and inter-AZ data transfer is charged if enabled.",
+      "Enabled by default, and there are no additional charges for this cross-zone regional data transfer behavior on ALB.",
+      "Enabled by default, but inter-AZ data transfer is charged if enabled.",
+      "Disabled by default, but there are no charges for inter-AZ data transfer."
+    ],
+    "answer": 1,
+    "explanation": "ALBs use cross-zone load balancing by default, and ALB does not add a specific cross-zone data transfer fee for this behavior."
+  },
+  {
+    "id": "SAA-070",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "SQS",
+    "question": "A payment system requires messages to be processed in the exact order received and must prevent duplicate processing. Which Amazon SQS queue type meets these requirements?",
+    "choices": [
+      "SQS Standard Queue with short polling.",
+      "SQS Standard Queue with long polling.",
+      "SQS FIFO Queue.",
+      "Amazon SNS topic fan-out pattern."
+    ],
+    "answer": 2,
+    "explanation": "SQS FIFO provides ordered message processing and supports exactly-once processing semantics (with deduplication) for correctly designed consumers."
+  },
+  {
+    "id": "SAA-071",
+    "domainId": "D4",
+    "domain": "Design Cost-Optimized Architectures",
+    "section": "S3",
+    "question": "A media company stores video data in S3: frequent access for 30 days, rare access from day 30 to 90 (but fast retrieval), then long-term archive after 90 days where hours of retrieval time is acceptable. Which lifecycle transition is most cost-effective while meeting access needs?",
+    "choices": [
+      "Standard for 30 days -> transition to S3 Standard-IA for 60 days -> transition to S3 Glacier Flexible Retrieval after 90 days.",
+      "S3 Intelligent-Tiering -> S3 Glacier Deep Archive after 90 days.",
+      "S3 One Zone-IA for 30 days -> S3 Standard-IA for 60 days -> S3 Glacier Instant Retrieval.",
+      "Use S3 Glacier Instant Retrieval immediately as retrieval latency is low."
+    ],
+    "answer": 0,
+    "explanation": "Standard fits frequent access, Standard-IA fits infrequent-but-fast retrieval, and Glacier Flexible Retrieval fits long-term archiving with hour-level retrieval latency."
+  },
+  {
+    "id": "SAA-072",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "VPC",
+    "question": "VPC flow logs show outbound traffic from a private subnet instance is ACCEPTED, but the inbound return traffic is REJECTED at the subnet level. Assuming security groups are correct, what should be checked and modified to allow the connection to succeed?",
+    "choices": [
+      "The EC2 instance security group, because security groups are stateless.",
+      "The NACL outbound rules for the private subnet, because NACLs are stateful.",
+      "The NACL inbound rules for the private subnet, ensuring the ephemeral port range is explicitly allowed.",
+      "The NACL outbound rules for the public subnet, ensuring port 443 is explicitly allowed."
+    ],
+    "answer": 2,
+    "explanation": "NACLs are stateless, so you must explicitly allow return traffic on ephemeral ports in the inbound NACL rules for the subnet."
+  },
+  {
+    "id": "SAA-073",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "Aurora",
+    "question": "A company uses Aurora MySQL in us-east-1 and needs cross-region expansion to eu-west-1 with very low RTO for failover (under 1 minute) and low-latency global reads. Which Aurora feature best meets both needs?",
+    "choices": [
+      "RDS Multi-AZ deployment.",
+      "Aurora cross-region read replicas.",
+      "Aurora Serverless deployment in eu-west-1.",
+      "Aurora Global Database."
+    ],
+    "answer": 3,
+    "explanation": "Aurora Global Database is designed for low-latency cross-region reads and fast disaster recovery with promoted secondary regions."
+  },
+  {
+    "id": "SAA-074",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "Monitoring",
+    "question": "An admin wants immediate alerts when someone attempts to terminate a production EC2 instance, a history of configuration changes, and a graph of average CPU over time. Which three AWS services meet these requirements, respectively?",
+    "choices": [
+      "CloudWatch (CPU), CloudTrail (API calls/history), AWS Config (configuration history).",
+      "Trusted Advisor (security), CloudWatch (CPU), S3 (history).",
+      "CloudWatch (CPU), CloudTrail (configuration history), CloudWatch Logs (API calls).",
+      "GuardDuty (alerts), EventBridge (history), AWS Config (CPU)."
+    ],
+    "answer": 0,
+    "explanation": "CloudWatch provides metrics and graphs, CloudTrail records API activity such as termination attempts, and AWS Config tracks configuration changes over time."
+  },
+  {
+    "id": "SAA-075",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "Serverless",
+    "question": "Users upload large images to S3, and a serverless microservice must generate thumbnails and analyze metadata immediately after each upload. What is the most appropriate serverless pattern to trigger the processing?",
+    "choices": [
+      "Configure S3 event notifications to invoke an AWS Lambda function directly.",
+      "Use AWS Batch to run the thumbnail job based on a scheduled CloudWatch Event.",
+      "Configure S3 event notifications to publish to an SNS topic, which then triggers the microservice running on Fargate tasks.",
+      "Use a single EC2 instance with a user data script running the thumbnail application."
+    ],
+    "answer": 0,
+    "explanation": "S3 event notifications can directly trigger Lambda on object creation, providing a fully serverless, scalable event-driven pipeline."
   }
 ]
