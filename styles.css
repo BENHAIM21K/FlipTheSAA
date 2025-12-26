@@ -381,6 +381,35 @@ select {
   border-color: rgba(255, 90, 122, 0.45);
 }
 
+/* Pause/Resume Button */
+.btn-pause {
+  padding: 0.5rem 0.75rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  margin-right: 8px;
+}
+
+.btn-pause:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-pause:active {
+  transform: translateY(0);
+}
+
+/* Pause button only visible when timer is visible */
+.timer[hidden] ~ .btn-pause,
+.btn-pause[hidden] {
+  display: none;
+}
+
 .score-mini { color: var(--muted); font-size: 12px; text-align: right; margin-top: 6px; }
 
 .question-box { margin-top: 10px; }
@@ -408,6 +437,13 @@ select {
 }
 .choice.correct { border-color: rgba(59,208,127,0.65); background: rgba(59,208,127,0.14); }
 .choice.wrong { border-color: rgba(255,90,122,0.65); background: rgba(255,90,122,0.14); }
+
+/* Disabled state for choices when paused */
+.choice.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
 
 .feedback {
   margin-top: 12px;
@@ -589,6 +625,21 @@ select {
   right: -4px;
   font-size: 10px;
   line-height: 1;
+}
+
+/* Disabled state for jump grid buttons when paused */
+.jump-grid button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Override other states when disabled */
+.jump-grid button:disabled:hover,
+.jump-grid button:disabled.current {
+  opacity: 0.5;
+  transform: none;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
 }
 
 .result {
@@ -1252,7 +1303,7 @@ select {
    ============================================================================ */
 
 .quiz-paused-overlay {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
@@ -1263,6 +1314,7 @@ select {
   align-items: center;
   justify-content: center;
   z-index: 9998;
+  border-radius: inherit;
   animation: fadeInUp 0.3s ease;
 }
 
@@ -1305,4 +1357,69 @@ select {
   pointer-events: none;
   user-select: none;
   opacity: 0.5;
+}
+
+/* Manual Pause Overlay (triggered by pause button) */
+.quiz-manually-paused-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 500px;
+  background: rgba(10, 14, 26, 0.95);
+  backdrop-filter: blur(12px);
+  border: 2px solid rgba(102, 126, 234, 0.5);
+  border-radius: 16px;
+  padding: 2rem;
+  z-index: 9999;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  /* Animation removed - instant centered appearance */
+}
+
+.quiz-manually-paused-overlay .paused-content {
+  text-align: center;
+}
+
+.quiz-manually-paused-overlay h3 {
+  margin: 0 0 1rem 0;
+  color: #667eea;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.quiz-manually-paused-overlay p {
+  margin: 0.5rem 0 1.5rem 0;
+  color: #94a3b8;
+  font-size: 1rem;
+}
+
+.quiz-manually-paused-overlay .timer-display {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #fbbf24;
+  margin: 1rem 0;
+  font-family: 'Courier New', monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 2px;
+}
+
+/* Backdrop blur for manual pause */
+.quiz-manually-paused #questionBox {
+  filter: blur(4px);
+  pointer-events: none;
+}
+
+/* Disable navigation buttons when manually paused */
+.quiz-manually-paused .nav button {
+  pointer-events: none;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* But keep pause button clickable */
+.quiz-manually-paused #pauseBtn {
+  pointer-events: auto;
+  opacity: 1;
+  cursor: pointer;
 }
