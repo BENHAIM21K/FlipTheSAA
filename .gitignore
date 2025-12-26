@@ -1,9 +1,35 @@
-# OS junk
+# OS-specific files
 .DS_Store
 Thumbs.db
+Desktop.ini
+.AppleDouble
+.LSOverride
+._*
 
-# VS Code
+# IDE/Editor folders
 .vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
 
-# Live Server (sometimes)
+# Vim swap files
+*.swp
+*.swo
+*~
+
+# Claude AI (LOCAL CONFIGURATION - DO NOT COMMIT)
+.claude/
+
+# Logs
 *.log
+
+# Temporary and backup files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Optional: Uncomment if you add environment files later
+# .env
+# .env.local
+# .env.*.local
