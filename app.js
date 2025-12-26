@@ -73,7 +73,7 @@ let timerInterval = null; // Reference to the running timer (for cleanup)
 
 // Navigation state
 let currentTab = 'home'; // Current active tab
-let quizPausedState = null; // Stores timer state when paused: { remainingSeconds, pausedAt }
+let quizPausedState = null; // Stores timer state when paused: { pausedAt: timestamp, frozenTime: remaining seconds }
 let navigationLocked = false; // Prevents rapid tab switching
 
 // ============================================================================
@@ -266,6 +266,18 @@ function clearState() {
   safeOperation('Clear State from localStorage', () => {
     localStorage.removeItem(STATE_KEY);
     console.info('[SAA Info] State cleared from localStorage');
+  }, undefined);
+}
+
+/**
+ * WHAT IT DOES: Clears ALL data including quiz state AND performance history
+ * WHY IT EXISTS: Provides complete "start over" functionality for reset
+ */
+function clearAllData() {
+  safeOperation('Clear All Data from localStorage', () => {
+    localStorage.removeItem(STATE_KEY);     // Clear quiz state
+    localStorage.removeItem(HISTORY_KEY);   // Clear performance history
+    console.info('[SAA Info] All data cleared from localStorage (state + history)');
   }, undefined);
 }
 
@@ -698,7 +710,12 @@ function getRemainingSec(session) {
  */
 function updateTimerUI(state) {
   const session = state.session;
-  const remaining = getRemainingSec(session);
+
+  // If paused, show frozen time instead of calculated time
+  const remaining = quizPausedState && quizPausedState.frozenTime !== undefined
+    ? quizPausedState.frozenTime
+    : getRemainingSec(session);
+
   timerEl.textContent = `Time left: ${formatClock(remaining)}`;
 
   // Add warning class when time is low (< 5 minutes)
@@ -985,6 +1002,9 @@ function renderJumpGrid(state) {
   // Ensure flaggedQuestions exists (backward compatibility)
   const flagged = Array.isArray(session.flaggedQuestions) ? session.flaggedQuestions : [];
 
+  // Check if paused for disabling jump buttons
+  const isPaused = quizPausedState !== null;
+
   jumpGrid.innerHTML = session.questionIds
     .map((qid, idx) => {
       const ans = session.answers[qid];
@@ -1007,7 +1027,10 @@ function renderJumpGrid(state) {
       // Add flag emoji for flagged questions in Timed mode
       const flagBadge = (session.mode === "timed" && isFlagged) ? '<span class="flag-badge">🚩</span>' : '';
 
-      return `<button type="button" class="${cls.filter(Boolean).join(" ")}" data-idx="${idx}">${idx + 1}${flagBadge}</button>`;
+      // Disable button if paused
+      const disabled = isPaused ? 'disabled' : '';
+
+      return `<button type="button" ${disabled} class="${cls.filter(Boolean).join(" ")}" data-idx="${idx}">${idx + 1}${flagBadge}</button>`;
     })
     .join("");
 
@@ -1125,7 +1148,7 @@ function renderQuiz(state) {
   }
 
   // Timer
-  if (session.mode === "timed" && !session.completed) {
+  if (session.mode === "timed" && !session.completed && quizPausedState === null) {
     timerEl.hidden = false;
     startTimer(state);
   } else {
@@ -1133,13 +1156,34 @@ function renderQuiz(state) {
     stopTimer();
   }
 
+  // Pause button (show/hide based on timed mode and completion status)
+  const pauseBtn = document.getElementById('pauseBtn');
+  if (pauseBtn) {
+    if (session.mode === 'timed' && !session.completed) {
+      pauseBtn.hidden = false;
+    } else {
+      pauseBtn.hidden = true;
+    }
+  }
+
+  // Check if paused
+  const isPaused = quizPausedState !== null;
+
   // Controls enable/disable
-  prevBtn.disabled = idx === 0;
-  nextBtn.disabled = idx === session.questionIds.length - 1;
+  if (isPaused) {
+    // Disable all navigation when paused
+    prevBtn.disabled = true;
+    nextBtn.disabled = true;
+    submitBtn.disabled = true;
+  } else {
+    // Normal navigation rules
+    prevBtn.disabled = idx === 0;
+    nextBtn.disabled = idx === session.questionIds.length - 1;
+    submitBtn.disabled = session.completed;
+  }
 
   // Submit button logic
   submitBtn.textContent = session.mode === "timed" ? "End Exam" : "Finish";
-  submitBtn.disabled = session.completed;
 
   // Question box
   const selected = session.answers[q.id];
@@ -1149,6 +1193,8 @@ function renderQuiz(state) {
   // - review: reveal after answer
   // - timed: reveal only after exam submitted
   const revealAnswers = session.mode === "timed" ? session.completed : hasAnswered;
+
+  const isPausedForChoices = quizPausedState !== null;
 
   const choicesHtml = q.choices
     .map((c, i) => {
@@ -1160,8 +1206,13 @@ function renderQuiz(state) {
         if (hasAnswered && selected === i && selected !== q.answer) cls += " wrong";
       }
 
-      const disabledAttr = session.completed ? "aria-disabled='true'" : "";
-      return `<div class="${cls}" data-choice="${i}" ${disabledAttr}>${escapeHtml(c)}</div>`;
+      // Add disabled class when paused
+      if (isPausedForChoices) cls += " disabled";
+
+      // Add aria-disabled for accessibility
+      const ariaDisabled = (session.completed || isPausedForChoices) ? "aria-disabled='true'" : "";
+
+      return `<div class="${cls}" data-choice="${i}" ${ariaDisabled}>${escapeHtml(c)}</div>`;
     })
     .join("");
 
@@ -1243,8 +1294,10 @@ function renderQuiz(state) {
 
   // Flag button HTML (Timed mode only, hidden when completed)
   const flagged = Array.isArray(session.flaggedQuestions) && session.flaggedQuestions.includes(q.id);
+  const isPausedForFlag = quizPausedState !== null;
+  const disabledAttr = isPausedForFlag ? 'disabled' : '';
   const flagBtnHtml = (session.mode === "timed" && !session.completed)
-    ? `<button id="flagBtn" class="btn btn-flag ${flagged ? 'flagged' : ''}">
+    ? `<button id="flagBtn" class="btn btn-flag ${flagged ? 'flagged' : ''}" ${disabledAttr}>
          <span class="flag-icon">${flagged ? '🚩' : '🏳️'}</span> ${flagged ? 'Unflag' : 'Flag for Review'}
        </button>`
     : '';
@@ -1267,12 +1320,14 @@ function renderQuiz(state) {
   const questionBoxListener = (e) => {
     // Handle flag button clicks
     if (e.target.closest("#flagBtn")) {
+      // Don't allow flagging when paused
+      if (quizPausedState !== null) return;
       toggleFlag(state);
       return;
     }
 
     // Handle choice clicks
-    if (session.completed) return;
+    if (session.completed || quizPausedState !== null) return;
 
     const choice = e.target.closest(".choice");
     if (!choice) return;
@@ -2117,10 +2172,17 @@ function switchTab(tabName) {
   safeOperation('Switch Tab', () => {
     // === HANDLE RESET TAB ===
     if (tabName === 'reset') {
-      if (confirm("Reset will clear your saved progress (order, answers, timer). Continue?")) {
-        console.info('[SAA Info] User initiated reset from navigation');
+      const message =
+        "⚠️ RESET WILL DELETE ALL DATA:\n\n" +
+        "• Current quiz progress (questions, answers, timer)\n" +
+        "• Performance history (all past attempts)\n" +
+        "• Statistics and trends\n\n" +
+        "This cannot be undone. Continue?";
+
+      if (confirm(message)) {
+        console.info('[SAA Info] User initiated complete reset (state + history)');
         stopTimer();
-        clearState();
+        clearAllData();  // Clears both STATE_KEY and HISTORY_KEY
         location.reload();
       }
       return;
@@ -2140,15 +2202,28 @@ function switchTab(tabName) {
     if (leavingTimedQuiz) {
       console.info('[SAA Info] Leaving timed quiz, pausing timer');
 
-      stopTimer();
+      // Only pause if not already paused
+      if (!quizPausedState) {
+        stopTimer();
 
-      const remaining = getRemainingSec(state.session);
-      quizPausedState = {
-        remainingSeconds: remaining,
-        pausedAt: nowMs()
-      };
+        // Store frozen time for navigation pause (same as manual pause)
+        const frozenTime = getRemainingSec(state.session);
 
-      console.info(`[SAA Info] Timer paused at ${formatClock(remaining)}`);
+        quizPausedState = {
+          pausedAt: nowMs(),
+          frozenTime: frozenTime
+        };
+
+        // Apply CSS class for visual pause state
+        const quizCard = document.getElementById('quizCard');
+        if (quizCard) {
+          quizCard.classList.add('quiz-manually-paused');
+        }
+
+        console.info('[SAA Info] Timer auto-paused (navigation)');
+      } else {
+        console.info('[SAA Info] Already paused, keeping pause state');
+      }
     }
 
     // === UPDATE NAVIGATION STATE ===
@@ -2182,10 +2257,29 @@ function switchTab(tabName) {
       targetSection.classList.add('active');
     }
 
-    // === RETURNING TO TIMED QUIZ: SHOW RESUME OVERLAY ===
+    // === RETURNING TO TIMED QUIZ: RENDER WITH PAUSE STATE ===
     if (returningToTimedQuiz) {
-      console.info('[SAA Info] Returning to paused timed quiz');
-      showTimerResumeOverlay(state);
+      console.info('[SAA Info] Returning to timed quiz');
+
+      // Guard: Only keep pause state if session exists and is not completed
+      if (quizPausedState && (!state.session || state.session.completed)) {
+        console.info('[SAA Info] Clearing stale pause state (session completed or missing)');
+        quizPausedState = null;
+      }
+
+      // Update pause button icon based on pause state
+      const pauseBtn = document.getElementById('pauseBtn');
+      if (quizPausedState && pauseBtn) {
+        pauseBtn.textContent = '▶️';
+        pauseBtn.title = 'Resume quiz';
+        console.info('[SAA Info] Returning to paused quiz');
+      } else if (pauseBtn) {
+        pauseBtn.textContent = '⏸️';
+        pauseBtn.title = 'Pause quiz';
+      }
+
+      // Render quiz (buttons will be disabled if paused)
+      renderQuiz(state);
     } else if (tabName === 'practice' && state && state.session && !state.session.completed) {
       renderQuiz(state);
     }
@@ -2227,77 +2321,70 @@ function switchTabDebounced(tabName) {
 }
 
 /**
- * WHAT IT DOES: Shows overlay when returning to a paused timed quiz
+ * WHAT IT DOES: Toggles pause state for timed quiz (no overlay)
+ * WHY IT EXISTS: Allows user to pause/resume by clicking pause button
  */
-function showTimerResumeOverlay(state) {
-  safeOperation('Show Timer Resume Overlay', () => {
-    const quizCard = document.getElementById('quizCard');
-    if (quizCard) {
-      quizCard.classList.add('quiz-blur');
-    }
+function togglePause(state) {
+  safeOperation('Toggle Pause', () => {
+    const isPaused = quizPausedState !== null;
 
-    let displayTime;
-    if (quizPausedState && quizPausedState.remainingSeconds !== undefined) {
-      displayTime = formatClock(quizPausedState.remainingSeconds);
-    } else {
-      displayTime = formatClock(getRemainingSec(state.session));
-    }
+    if (isPaused) {
+      // RESUME: Clear pause state and restart timer
+      if (quizPausedState && quizPausedState.pausedAt) {
+        const pauseDuration = nowMs() - quizPausedState.pausedAt;
+        state.session.startedAtMs += pauseDuration;
+        persistRuntimeState(state);
 
-    const overlay = document.createElement('div');
-    overlay.className = 'quiz-paused-overlay';
-    overlay.id = 'quizPausedOverlay';
-    overlay.innerHTML = `
-      <div class="quiz-paused-content">
-        <h3>⏸️ Quiz Paused</h3>
-        <p>Your timed exam is paused. Time will resume when you click the button below.</p>
-        <div class="timer-display">${displayTime}</div>
-        <button id="resumeQuizBtn" class="btn btn-primary btn-large">▶️ Resume Exam</button>
-      </div>
-    `;
-
-    document.body.appendChild(overlay);
-
-    document.getElementById('resumeQuizBtn').addEventListener('click', () => {
-      resumeTimedQuiz(state);
-    });
-
-    console.info('[SAA Info] Timer resume overlay displayed');
-  }, undefined);
-}
-
-/**
- * WHAT IT DOES: Resumes a paused timed quiz
- */
-function resumeTimedQuiz(state) {
-  safeOperation('Resume Timed Quiz', () => {
-    const overlay = document.getElementById('quizPausedOverlay');
-    if (overlay) {
-      overlay.remove();
-    }
-
-    const quizCard = document.getElementById('quizCard');
-    if (quizCard) {
-      quizCard.classList.remove('quiz-blur');
-    }
-
-    if (quizPausedState && quizPausedState.pausedAt) {
-      const pauseDuration = nowMs() - quizPausedState.pausedAt;
-
-      state.session.startedAtMs += pauseDuration;
-
-      const pauseSeconds = Math.floor(pauseDuration / 1000);
-      console.info(`[SAA Info] Adjusted timer for ${pauseSeconds}s pause duration`);
-
-      persistRuntimeState(state);
+        const pauseSeconds = Math.floor(pauseDuration / 1000);
+        console.info(`[SAA Info] Resumed after ${pauseSeconds}s pause`);
+      }
 
       quizPausedState = null;
+      startTimer(state);
+
+      // Remove CSS class to re-enable interactions
+      const quizCard = document.getElementById('quizCard');
+      if (quizCard) {
+        quizCard.classList.remove('quiz-manually-paused');
+      }
+
+      // Update pause button back to pause icon
+      const pauseBtn = document.getElementById('pauseBtn');
+      pauseBtn.textContent = '⏸️';
+      pauseBtn.title = 'Pause quiz';
+
+      // Re-render to enable buttons
+      renderQuiz(state);
+
+      console.info('[SAA Info] Quiz resumed');
+    } else {
+      // PAUSE: Stop timer and set pause state
+      stopTimer();
+
+      // Store frozen time value for display
+      const frozenTime = getRemainingSec(state.session);
+
+      quizPausedState = {
+        pausedAt: nowMs(),
+        frozenTime: frozenTime  // Save the time we paused at
+      };
+
+      // Apply CSS class to visually disable interactions
+      const quizCard = document.getElementById('quizCard');
+      if (quizCard) {
+        quizCard.classList.add('quiz-manually-paused');
+      }
+
+      // Update pause button to resume icon
+      const pauseBtn = document.getElementById('pauseBtn');
+      pauseBtn.textContent = '▶️';
+      pauseBtn.title = 'Resume quiz';
+
+      // Re-render to disable buttons
+      renderQuiz(state);
+
+      console.info('[SAA Info] Quiz paused');
     }
-
-    startTimer(state);
-
-    renderQuiz(state);
-
-    console.info('[SAA Info] Timed quiz resumed successfully');
   }, undefined);
 }
 
@@ -2676,6 +2763,15 @@ startBtn.addEventListener("click", () => {
   ensureModeRulesUI();
 
   safeOperation('Start Quiz', () => {
+    // Clear any existing pause state from previous sessions
+    quizPausedState = null;
+
+    // Remove pause CSS class if it exists
+    const quizCard = document.getElementById('quizCard');
+    if (quizCard) {
+      quizCard.classList.remove('quiz-manually-paused');
+    }
+
     let state = normalizeStateForRuntime(createNewSession(filters, false));
     renderQuiz(state);
   }, undefined);
@@ -2691,6 +2787,15 @@ newSessionBtn.addEventListener("click", () => {
   ensureModeRulesUI();
 
   safeOperation('Start Fresh Quiz', () => {
+    // Clear any existing pause state from previous sessions
+    quizPausedState = null;
+
+    // Remove pause CSS class if it exists
+    const quizCard = document.getElementById('quizCard');
+    if (quizCard) {
+      quizCard.classList.remove('quiz-manually-paused');
+    }
+
     let state = normalizeStateForRuntime(createNewSession(filters, true));
     renderQuiz(state);
   }, undefined);
@@ -2701,6 +2806,22 @@ newSessionBtn.addEventListener("click", () => {
  * Reset is now handled by navigation tab via switchTab('reset')
  */
 // DELETED: resetBtn listener - element no longer exists (replaced with nav tab)
+
+/**
+ * PAUSE/RESUME BUTTON (Timed Mode Only)
+ * Manually pause and resume timed quiz with timer adjustment
+ */
+const pauseBtn = document.getElementById('pauseBtn');
+if (pauseBtn) {
+  pauseBtn.addEventListener('click', () => {
+    safeOperation('Pause/Resume Quiz', () => {
+      const state = normalizeStateForRuntime(loadState());
+      if (!state || !state.session || state.session.completed) return;
+
+      togglePause(state);
+    }, undefined);
+  });
+}
 
 /**
  * PREVIOUS BUTTON
