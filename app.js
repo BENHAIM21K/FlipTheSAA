@@ -84,6 +84,7 @@ let navigationLocked = false; // Prevents rapid tab switching
 const modeSelect = document.getElementById("modeSelect"); // Dropdown: Review or Timed
 const domainSelect = document.getElementById("domainSelect"); // Dropdown: D1, D2, D3, D4, or ALL
 const sectionSelect = document.getElementById("sectionSelect"); // Dropdown: EC2, S3, IAM, etc. or ALL
+const difficultySelect = document.getElementById("difficultySelect"); // Dropdown: Easy, Medium, Hard, or ALL
 const startBtn = document.getElementById("startBtn"); // "Start" or "Resume" button
 const newSessionBtn = document.getElementById("newSessionBtn"); // "Start Fresh" button
 // const resetBtn = document.getElementById("resetBtn"); // REMOVED - now handled by navigation tab
@@ -436,7 +437,8 @@ function getFiltersFromUI() {
   return {
     mode: normalizeMode(modeSelect.value),
     domainId: domainSelect.value,
-    section: sectionSelect.value
+    section: sectionSelect.value,
+    difficulty: difficultySelect.value
   };
 }
 
@@ -462,11 +464,12 @@ function getFiltersFromUI() {
 function sessionKeyFor(filters) {
   const mode = normalizeMode(filters.mode);
 
-  // Timed mode is always the full 65-question exam (no filtering)
-  if (mode === "timed") return "timed::ALL::ALL";
+  // Timed mode sessions are identified by difficulty filter
+  // (domain and section are always ALL in timed mode)
+  if (mode === "timed") return `timed::ALL::ALL::${filters.difficulty || "ALL"}`;
 
-  // Review mode sessions are identified by their domain and section
-  return `review::${filters.domainId}::${filters.section}`;
+  // Review mode sessions are identified by domain + section + difficulty
+  return `review::${filters.domainId}::${filters.section}::${filters.difficulty || "ALL"}`;
 }
 
 /**
@@ -491,7 +494,12 @@ function sessionKeyFor(filters) {
 function filteredQuestions(filters) {
   let list = QUESTIONS;
 
-  // Timed mode: Always use all questions (no filtering)
+  // Apply difficulty filter for both timed and review modes
+  if (filters.difficulty && filters.difficulty !== "ALL") {
+    list = list.filter((q) => q.difficulty === filters.difficulty);
+  }
+
+  // Review mode: Also filter by domain and section
   if (filters.mode !== "timed") {
     // Filter by domain if not "ALL"
     if (filters.domainId !== "ALL") {
@@ -581,6 +589,53 @@ function buildSectionOptions(domainId) {
   // Build <option> tags and update dropdown
   sectionSelect.innerHTML = sections
     .map((s) => `<option value="${s}">${s === "ALL" ? "All sections" : s}</option>`)
+    .join("");
+}
+
+/**
+ * WHAT IT DOES: Populates the difficulty dropdown based on available difficulties
+ * in the current domain/section filter
+ *
+ * WHY WE NEED IT: Shows only relevant difficulties for the selected domain/section,
+ * similar to how sections update based on domain
+ *
+ * HOW IT WORKS:
+ * 1. Filter questions by current domain and section selections
+ * 2. Extract unique difficulty values from filtered questions
+ * 3. Order them as Easy, Medium, Hard
+ * 4. Add "All difficulties" as first option
+ * 5. Populate the difficulty dropdown
+ *
+ * PARAMETERS:
+ * - domainId: Current domain filter ("ALL" or "D1"-"D4")
+ * - section: Current section filter ("ALL" or section name)
+ */
+function buildDifficultyOptions(domainId, section) {
+  // Start with all questions, then filter by domain/section
+  let list = QUESTIONS;
+
+  if (domainId && domainId !== "ALL") {
+    list = list.filter((q) => q.domainId === domainId);
+  }
+
+  if (section && section !== "ALL") {
+    list = list.filter((q) => q.section === section);
+  }
+
+  // Get unique difficulties from the filtered questions
+  const present = new Set(
+    list.map((q) => q.difficulty).filter(d => d)
+  );
+
+  // Order: Easy, Medium, Hard
+  const ordered = ["Easy", "Medium", "Hard"].filter(d => present.has(d));
+
+  // Add "ALL" as first option
+  const difficulties = ["ALL", ...ordered];
+
+  // Build <option> tags and update dropdown
+  difficultySelect.innerHTML = difficulties
+    .map(d => `<option value="${d}">${d === "ALL" ? "All difficulties" : d}</option>`)
     .join("");
 }
 
@@ -766,17 +821,27 @@ function ensureModeRulesUI() {
   const mode = normalizeMode(modeSelect.value);
 
   if (mode === "timed") {
+    // Force domain and section to ALL (disabled in timed mode)
     domainSelect.value = "ALL";
     sectionSelect.value = "ALL";
     domainSelect.disabled = true;
     sectionSelect.disabled = true;
+
+    // Difficulty can be selected in timed mode (enabled)
+    difficultySelect.disabled = false;
+
     hintText.textContent =
-      "Timed mode is always the full 65-question exam (All domains + All sections).";
+      "Timed mode: random 65 questions from all domains and sections. Filter by difficulty if desired. Finish the exam to see results.";
   } else {
+    // Review mode: all filters enabled
     domainSelect.disabled = false;
     sectionSelect.disabled = false;
+    difficultySelect.disabled = false;
+    buildSectionOptions(domainSelect.value);
+    buildDifficultyOptions(domainSelect.value, sectionSelect.value);
+
     hintText.textContent =
-      "Review mode: filter by domain and section. Question order and answers persist on refresh.";
+      "Review mode: filter by domain, section, and difficulty. Question order and answers persist on refresh.";
   }
 }
 
@@ -803,14 +868,15 @@ function createNewSession(filters, forceFresh) {
   // Generate seed for deterministic shuffling
   const seed = `${key}::${nowMs()}`;
 
-  // Timed mode: use full pool and select 65 random questions
+  // Timed mode: select 65 random questions from filtered pool
   if (filters.mode === "timed") {
-    list = QUESTIONS;
+    // list is already filtered by difficulty (line 866)
+    // DO NOT overwrite it with QUESTIONS
 
-    // Ensure we have at least 65 questions
+    // Ensure we have at least 65 questions in the filtered pool
     if (list.length < EXAM_TOTAL_QUESTIONS) {
       throw new Error(
-        `Timed mode requires at least ${EXAM_TOTAL_QUESTIONS} questions (currently: ${list.length}).`
+        `Timed mode requires at least ${EXAM_TOTAL_QUESTIONS} questions (currently: ${list.length}). Try selecting "All difficulties" or choose a different filter.`
       );
     }
 
@@ -2603,6 +2669,7 @@ async function init() {
   // Build dropdown options from loaded questions
   buildDomainOptions();
   buildSectionOptions("ALL");
+  buildDifficultyOptions("ALL", "ALL");
 
   // Apply mode-specific UI rules
   ensureModeRulesUI();
@@ -2623,10 +2690,15 @@ async function init() {
     if (s.mode === "timed") {
       domainSelect.value = "ALL";
       sectionSelect.value = "ALL";
+      // Restore difficulty for timed mode (can be filtered)
+      buildDifficultyOptions("ALL", "ALL");
+      difficultySelect.value = s.difficulty || "ALL";
     } else {
       domainSelect.value = s.domainId;
       buildSectionOptions(s.domainId);
       sectionSelect.value = s.section;
+      buildDifficultyOptions(s.domainId, s.section);
+      difficultySelect.value = s.difficulty || "ALL";
     }
 
     ensureModeRulesUI();
@@ -2744,6 +2816,11 @@ window.addEventListener('orientationchange', () => {
  */
 domainSelect.addEventListener("change", () => {
   buildSectionOptions(domainSelect.value);
+  buildDifficultyOptions(domainSelect.value, sectionSelect.value);
+});
+
+sectionSelect.addEventListener("change", () => {
+  buildDifficultyOptions(domainSelect.value, sectionSelect.value);
 });
 
 /**
