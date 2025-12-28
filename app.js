@@ -678,6 +678,103 @@ function escapeHtml(str) {
 }
 
 // ============================================================================
+// MULTI-ANSWER SUPPORT - Helper functions for questions with multiple correct answers
+// ============================================================================
+
+/**
+ * WHAT IT DOES: Checks if a question has multiple correct answers
+ *
+ * WHY WE NEED IT: Questions can have either single answer (integer) or
+ * multiple answers (array). We need to detect which type to handle selection
+ * and validation correctly.
+ *
+ * PARAMETERS:
+ * - question: Question object with answer field
+ *
+ * RETURNS: Boolean - true if multi-answer, false if single-answer
+ *
+ * EXAMPLES:
+ * - isMultiAnswer({answer: 2}) → false (single answer)
+ * - isMultiAnswer({answer: [1, 2]}) → true (multi-answer)
+ */
+function isMultiAnswer(question) {
+  return Array.isArray(question.answer);
+}
+
+/**
+ * WHAT IT DOES: Validates if user's answer is correct
+ *
+ * WHY WE NEED IT: Handles both single-answer (simple equality) and
+ * multi-answer (array comparison with all-or-nothing logic)
+ *
+ * HOW IT WORKS:
+ * - Single-answer: userAnswer === correctAnswer
+ * - Multi-answer: Arrays must match exactly (same indices, same length)
+ *   User must select ALL correct answers and NO incorrect answers
+ *
+ * PARAMETERS:
+ * - userAnswer: User's selection (integer or array of integers)
+ * - correctAnswer: Correct answer (integer or array of integers)
+ *
+ * RETURNS: Boolean - true if correct, false otherwise
+ *
+ * EXAMPLES:
+ * Single-answer:
+ * - isCorrectAnswer(2, 2) → true
+ * - isCorrectAnswer(1, 2) → false
+ *
+ * Multi-answer (all-or-nothing):
+ * - isCorrectAnswer([1, 2], [1, 2]) → true (exact match)
+ * - isCorrectAnswer([2, 1], [1, 2]) → true (order doesn't matter)
+ * - isCorrectAnswer([1], [1, 2]) → false (missing one answer)
+ * - isCorrectAnswer([1, 2, 3], [1, 2]) → false (extra wrong answer)
+ */
+function isCorrectAnswer(userAnswer, correctAnswer) {
+  // Multi-answer question
+  if (Array.isArray(correctAnswer)) {
+    // User must provide an array
+    if (!Array.isArray(userAnswer)) return false;
+
+    // Must select exact number of answers (all-or-nothing)
+    if (userAnswer.length !== correctAnswer.length) return false;
+
+    // All selected answers must be correct (no extras, no missing)
+    // Sort both arrays to compare regardless of selection order
+    const sortedUser = [...userAnswer].sort((a, b) => a - b);
+    const sortedCorrect = [...correctAnswer].sort((a, b) => a - b);
+    return sortedUser.every((val, idx) => val === sortedCorrect[idx]);
+  }
+
+  // Single-answer question
+  return userAnswer === correctAnswer;
+}
+
+/**
+ * WHAT IT DOES: Checks if a choice index is selected
+ *
+ * WHY WE NEED IT: User selections can be stored as integer (single-answer)
+ * or array (multi-answer). This helper abstracts the check.
+ *
+ * PARAMETERS:
+ * - userAnswer: User's selection (integer or array of integers)
+ * - choiceIndex: Index to check (0-based)
+ *
+ * RETURNS: Boolean - true if selected, false otherwise
+ *
+ * EXAMPLES:
+ * - isChoiceSelected(2, 2) → true (single-answer, exact match)
+ * - isChoiceSelected(2, 1) → false (single-answer, no match)
+ * - isChoiceSelected([1, 2], 1) → true (multi-answer, included)
+ * - isChoiceSelected([1, 2], 3) → false (multi-answer, not included)
+ */
+function isChoiceSelected(userAnswer, choiceIndex) {
+  if (Array.isArray(userAnswer)) {
+    return userAnswer.includes(choiceIndex);
+  }
+  return userAnswer === choiceIndex;
+}
+
+// ============================================================================
 // TIMER FUNCTIONS - Countdown timer for Timed mode
 // ============================================================================
 
@@ -1087,7 +1184,7 @@ function renderJumpGrid(state) {
       // REVIEW only: color green if correct, red if wrong
       if (session.mode !== "timed" && answered) {
         const q = QMAP.get(qid);
-        cls.push(ans === q.answer ? "correct" : "wrong");
+        cls.push(isCorrectAnswer(ans, q.answer) ? "correct" : "wrong");
       }
 
       // Add flag emoji for flagged questions in Timed mode
@@ -1139,7 +1236,7 @@ function computeScore(state) {
     const ans = session.answers[qid];
 
     const answered = ans !== undefined;
-    const correct = answered && ans === q.answer;
+    const correct = answered && isCorrectAnswer(ans, q.answer);
 
     if (answered) answeredTotal++;
     if (correct) correctTotal++;
@@ -1254,6 +1351,7 @@ function renderQuiz(state) {
   // Question box
   const selected = session.answers[q.id];
   const hasAnswered = selected !== undefined;
+  const isMulti = isMultiAnswer(q);
 
   // Reveal logic:
   // - review: reveal after answer
@@ -1265,11 +1363,19 @@ function renderQuiz(state) {
   const choicesHtml = q.choices
     .map((c, i) => {
       let cls = "choice";
-      if (selected === i) cls += " selected";
+
+      // Check if this choice is selected (works for both single and multi-answer)
+      if (isChoiceSelected(selected, i)) cls += " selected";
 
       if (revealAnswers) {
-        if (i === q.answer) cls += " correct";
-        if (hasAnswered && selected === i && selected !== q.answer) cls += " wrong";
+        // Mark correct answers (may be multiple)
+        if (isMulti) {
+          if (q.answer.includes(i)) cls += " correct";
+          if (hasAnswered && isChoiceSelected(selected, i) && !q.answer.includes(i)) cls += " wrong";
+        } else {
+          if (i === q.answer) cls += " correct";
+          if (hasAnswered && selected === i && selected !== q.answer) cls += " wrong";
+        }
       }
 
       // Add disabled class when paused
@@ -1284,7 +1390,9 @@ function renderQuiz(state) {
 
   const feedbackHtml = revealAnswers
     ? (() => {
-        const correctText = `Correct answer: ${q.choices[q.answer]}`;
+        const correctText = isMultiAnswer(q)
+          ? `Correct answers: ${q.answer.map(idx => q.choices[idx]).join(', ')}`
+          : `Correct answer: ${q.choices[q.answer]}`;
 
         // Build enhanced explanation sections (optional fields)
         let enhancedHtml = '';
@@ -1342,9 +1450,11 @@ function renderQuiz(state) {
           `;
         }
 
-        const isCorrect = selected === q.answer;
+        const isCorrect = isCorrectAnswer(selected, q.answer);
         const boxCls = `feedback ${isCorrect ? "good" : "bad"}`;
-        const yourText = `Your answer: ${q.choices[selected]}`;
+        const yourText = Array.isArray(selected)
+          ? `Your answers: ${selected.map(idx => q.choices[idx]).join(', ')}`
+          : `Your answer: ${q.choices[selected]}`;
 
         return `
           <div class="${boxCls}">
@@ -1400,7 +1510,40 @@ function renderQuiz(state) {
 
     const choiceIdx = Number(choice.getAttribute("data-choice"));
     if (!isNaN(choiceIdx)) {
-      session.answers[q.id] = choiceIdx;
+      const isMulti = isMultiAnswer(q);
+      const requiredCount = isMulti ? q.answer.length : 1;
+
+      if (isMulti) {
+        // Multi-answer: toggle selection
+        let currentSelection = session.answers[q.id];
+
+        // Initialize as empty array if not set
+        if (!Array.isArray(currentSelection)) {
+          currentSelection = [];
+        }
+
+        // Check if already selected
+        const alreadySelected = currentSelection.includes(choiceIdx);
+
+        if (alreadySelected) {
+          // Deselect: remove from array
+          currentSelection = currentSelection.filter(idx => idx !== choiceIdx);
+        } else {
+          // Select: add to array (only if under limit)
+          if (currentSelection.length < requiredCount) {
+            currentSelection = [...currentSelection, choiceIdx];
+          } else {
+            // Already at max selections, do nothing (ignore click)
+            return;
+          }
+        }
+
+        session.answers[q.id] = currentSelection;
+      } else {
+        // Single-answer: overwrite selection (existing behavior)
+        session.answers[q.id] = choiceIdx;
+      }
+
       state.session = session;
       persistRuntimeState(state);
       renderQuiz(state);
@@ -1422,10 +1565,17 @@ function buildTimedReviewHtml(state) {
       const ans = session.answers[qid];
 
       const status =
-        ans === undefined ? "Unanswered ❌" : ans === q.answer ? "Correct ✅" : "Incorrect ❌";
+        ans === undefined ? "Unanswered ❌" : isCorrectAnswer(ans, q.answer) ? "Correct ✅" : "Incorrect ❌";
 
-      const yourAnswer = ans === undefined ? "—" : q.choices[ans];
-      const correctAnswer = q.choices[q.answer];
+      const yourAnswer = ans === undefined
+        ? "—"
+        : Array.isArray(ans)
+          ? ans.map(idx => q.choices[idx]).join(', ')
+          : q.choices[ans];
+
+      const correctAnswer = isMultiAnswer(q)
+        ? q.answer.map(idx => q.choices[idx]).join(', ')
+        : q.choices[q.answer];
 
       return `
         <details style="margin-top:10px; padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.03);">
@@ -1635,7 +1785,7 @@ function recordSessionToHistory(state) {
       if (!q) continue;
 
       const userAnswer = session.answers[qid];
-      const correct = userAnswer !== undefined && userAnswer === q.answer;
+      const correct = userAnswer !== undefined && isCorrectAnswer(userAnswer, q.answer);
 
       // Track by domain
       if (!domainScores[q.domainId]) {
