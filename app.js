@@ -1016,6 +1016,7 @@ function createNewSession(filters, forceFresh) {
     questionIds: order,
     answers: {}, // { [id]: choiceIndex }
     flaggedQuestions: [], // Array of question IDs flagged for review (Timed mode only)
+    checkedQuestions: new Set(), // Question IDs where user clicked "Check Answer" (Review mode only)
     currentIndex: 0,
     createdAtMs: nowMs(),
     completed: false
@@ -1030,12 +1031,13 @@ function createNewSession(filters, forceFresh) {
     session.scoredIds = new Set(scored);
   }
 
-  // Convert Set to array for storage
+  // Convert Sets to arrays for storage
   const state = {
     sessionKey: key,
     session: {
       ...session,
-      scoredIds: session.scoredIds ? Array.from(session.scoredIds) : null
+      scoredIds: session.scoredIds ? Array.from(session.scoredIds) : null,
+      checkedQuestions: Array.from(session.checkedQuestions)
     }
   };
 
@@ -1070,6 +1072,13 @@ function normalizeStateForRuntime(state) {
     }
   }
 
+  // Convert checkedQuestions from array to Set (for both timed and review modes)
+  if (Array.isArray(state.session.checkedQuestions)) {
+    state.session.checkedQuestions = new Set(state.session.checkedQuestions);
+  } else if (!(state.session.checkedQuestions instanceof Set)) {
+    state.session.checkedQuestions = new Set();
+  }
+
   return state;
 }
 
@@ -1082,6 +1091,7 @@ function persistRuntimeState(state) {
     sessionKey: state.sessionKey,
     session: {
       ...s,
+      checkedQuestions: Array.from(s.checkedQuestions || []),
       scoredIds:
         s.mode === "timed"
           ? Array.from(s.scoredIds instanceof Set ? s.scoredIds : [])
@@ -1181,10 +1191,15 @@ function renderJumpGrid(state) {
         cls.push("flagged");
       }
 
-      // REVIEW only: color green if correct, red if wrong
+      // REVIEW only: color green if correct, red if wrong (only after checking or completing)
       if (session.mode !== "timed" && answered) {
-        const q = QMAP.get(qid);
-        cls.push(isCorrectAnswer(ans, q.answer) ? "correct" : "wrong");
+        const isQuestionChecked = session.checkedQuestions?.has(qid);
+        const shouldReveal = session.completed || isQuestionChecked;
+
+        if (shouldReveal) {
+          const q = QMAP.get(qid);
+          cls.push(isCorrectAnswer(ans, q.answer) ? "correct" : "wrong");
+        }
       }
 
       // Add flag emoji for flagged questions in Timed mode
@@ -1238,8 +1253,13 @@ function computeScore(state) {
     const answered = ans !== undefined;
     const correct = answered && isCorrectAnswer(ans, q.answer);
 
-    if (answered) answeredTotal++;
-    if (correct) correctTotal++;
+    // In review mode: only count checked questions OR all questions if exam completed
+    const shouldCount = session.mode === "timed"
+      ? true  // Timed mode: count all questions
+      : (session.completed || session.checkedQuestions?.has(qid));  // Review: only checked questions
+
+    if (answered && shouldCount) answeredTotal++;
+    if (correct && shouldCount) correctTotal++;
 
     if (session.mode === "timed") {
       if (session.scoredIds && session.scoredIds.has(qid)) {
@@ -1354,11 +1374,15 @@ function renderQuiz(state) {
   const isMulti = isMultiAnswer(q);
 
   // Reveal logic:
-  // - review: reveal after answer
   // - timed: reveal only after exam submitted
-  const revealAnswers = session.mode === "timed" ? session.completed : hasAnswered;
+  // - review: reveal after clicking "Check Answer" OR after completing entire review
+  const revealAnswers = session.mode === "timed"
+    ? session.completed
+    : (session.completed || session.checkedQuestions?.has(q.id));
 
   const isPausedForChoices = quizPausedState !== null;
+  const isChecked = session.mode !== "timed" && session.checkedQuestions?.has(q.id);
+  const isDisabled = isPausedForChoices || isChecked;
 
   const choicesHtml = q.choices
     .map((c, i) => {
@@ -1378,15 +1402,32 @@ function renderQuiz(state) {
         }
       }
 
-      // Add disabled class when paused
-      if (isPausedForChoices) cls += " disabled";
+      // Add disabled class when paused OR checked
+      if (isDisabled) cls += " disabled";
 
       // Add aria-disabled for accessibility
-      const ariaDisabled = (session.completed || isPausedForChoices) ? "aria-disabled='true'" : "";
+      const ariaDisabled = (session.completed || isDisabled) ? "aria-disabled='true'" : "";
 
       return `<div class="${cls}" data-choice="${i}" ${ariaDisabled}>${escapeHtml(c)}</div>`;
     })
     .join("");
+
+  // Check Answer button (review mode only)
+  let checkButtonHtml = '';
+  if (session.mode !== "timed") {
+    const isChecked = session.checkedQuestions?.has(q.id);
+    const canCheck = hasAnswered && !isChecked && !session.completed;
+
+    checkButtonHtml = `
+      <button
+        id="checkAnswerBtn"
+        class="check-answer-btn ${canCheck ? '' : 'disabled'}"
+        ${!canCheck ? 'disabled' : ''}
+      >
+        ${isChecked ? '✓ Checked' : 'Check Answer'}
+      </button>
+    `;
+  }
 
   const feedbackHtml = revealAnswers
     ? (() => {
@@ -1483,6 +1524,7 @@ function renderQuiz(state) {
     <div class="q-tags">${escapeHtml(q.domain)} • ${escapeHtml(q.section)} • ${escapeHtml(q.id)}</div>
     ${flagBtnHtml}
     <div class="choices">${choicesHtml}</div>
+    ${checkButtonHtml}
     ${feedbackHtml}
   `;
 
@@ -1502,8 +1544,26 @@ function renderQuiz(state) {
       return;
     }
 
+    // Handle Check Answer button clicks (review mode only)
+    if (e.target.closest("#checkAnswerBtn")) {
+      // Only allow if answered and not already checked
+      if (!hasAnswered || session.checkedQuestions?.has(q.id)) return;
+
+      // Mark as checked
+      if (!session.checkedQuestions) {
+        session.checkedQuestions = new Set();
+      }
+      session.checkedQuestions.add(q.id);
+
+      // Save and re-render to show feedback
+      state.session = session;
+      persistRuntimeState(state);
+      renderQuiz(state);
+      return;
+    }
+
     // Handle choice clicks
-    if (session.completed || quizPausedState !== null) return;
+    if (session.completed || quizPausedState !== null || isChecked) return;
 
     const choice = e.target.closest(".choice");
     if (!choice) return;

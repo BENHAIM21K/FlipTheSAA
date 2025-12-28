@@ -445,6 +445,35 @@ select {
   pointer-events: none;
 }
 
+/* Check Answer button (review mode only) */
+.check-answer-btn {
+  margin-top: 16px;
+  padding: 12px 24px;
+  border-radius: 10px;
+  border: 1px solid rgba(78, 161, 255, 0.55);
+  background: rgba(78, 161, 255, 0.12);
+  color: rgba(78, 161, 255, 1);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.check-answer-btn:hover:not(.disabled) {
+  background: rgba(78, 161, 255, 0.2);
+  border-color: rgba(78, 161, 255, 0.7);
+  transform: translateY(-1px);
+}
+
+.check-answer-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.5);
+}
+
 .feedback {
   margin-top: 12px;
   padding: 12px;
@@ -614,7 +643,7 @@ select {
   background: rgba(78,161,255,0.08);
 }
 .jump.answered {
-  border-color: rgba(59,208,127,0.45);
+  border-color: rgba(78,161,255,0.45);
   animation: popIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
