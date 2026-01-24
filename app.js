@@ -1315,8 +1315,7 @@ function renderQuiz(state) {
 
   progressText.textContent = `Question ${idx + 1} / ${session.questionIds.length} • Mode: ${session.mode.toUpperCase()}`;
 
-  const tags = `${q.domainId} • ${q.section}`;
-  metaText.textContent = `Tags: ${tags}`;
+  metaText.textContent = ''; // Tags removed to increase difficulty
 
   // Score mini: REVIEW -> only show Answered; TIMED -> show Answered; show Final only when completed
   const s = computeScore(state);
@@ -1497,12 +1496,35 @@ function renderQuiz(state) {
           ? `Your answers: ${selected.map(idx => q.choices[idx]).join(', ')}`
           : `Your answer: ${q.choices[selected]}`;
 
+        // Build choice explanations HTML for wrong answers
+        let choiceExplanationsHtml = '';
+        if (q.choiceExplanations) {
+          const wrongChoices = [];
+          Object.entries(q.choiceExplanations).forEach(([idx, explanation]) => {
+            wrongChoices.push(`
+              <div class="choice-exp">
+                <strong>${escapeHtml(q.choices[idx])}:</strong> ${escapeHtml(explanation)}
+              </div>
+            `);
+          });
+
+          if (wrongChoices.length > 0) {
+            choiceExplanationsHtml = `
+              <div class="choice-explanations">
+                <div class="choice-exp-title">Why other answers are incorrect:</div>
+                ${wrongChoices.join('')}
+              </div>
+            `;
+          }
+        }
+
         return `
           <div class="${boxCls}">
             <div class="status">${isCorrect ? "Correct ✅" : "Incorrect ❌"}</div>
             <div class="exp">${escapeHtml(yourText)}</div>
             <div class="exp">${escapeHtml(correctText)}</div>
             <div class="exp">${escapeHtml(q.explanation)}</div>
+            ${choiceExplanationsHtml}
             ${enhancedHtml}
           </div>
         `;
@@ -1521,7 +1543,7 @@ function renderQuiz(state) {
 
   questionBox.innerHTML = `
     <div class="q-title">${escapeHtml(q.question)}</div>
-    <div class="q-tags">${escapeHtml(q.domain)} • ${escapeHtml(q.section)} • ${escapeHtml(q.id)}</div>
+    <div class="q-tags">${escapeHtml(q.domain)} • ${escapeHtml(q.id)}</div>
     ${flagBtnHtml}
     <div class="choices">${choicesHtml}</div>
     ${checkButtonHtml}
@@ -1637,6 +1659,26 @@ function buildTimedReviewHtml(state) {
         ? q.answer.map(idx => q.choices[idx]).join(', ')
         : q.choices[q.answer];
 
+      // Build choice explanations HTML
+      let choiceExpsHtml = '';
+      if (q.choiceExplanations) {
+        const wrongChoices = Object.entries(q.choiceExplanations)
+          .map(([idx, exp]) => {
+            const choiceText = q.choices[idx];
+            return `<div style="margin-top:4px;"><strong>${escapeHtml(choiceText)}:</strong> ${escapeHtml(exp)}</div>`;
+          })
+          .join('');
+
+        if (wrongChoices) {
+          choiceExpsHtml = `
+            <div style="margin-top:8px;">
+              <div style="font-weight:600; margin-bottom:4px;">Why other answers are incorrect:</div>
+              ${wrongChoices}
+            </div>
+          `;
+        }
+      }
+
       return `
         <details style="margin-top:10px; padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.03);">
           <summary style="cursor:pointer; font-weight:700;">
@@ -1653,6 +1695,7 @@ function buildTimedReviewHtml(state) {
             <div style="color: rgba(233,237,245,0.9);">
               Explanation: ${escapeHtml(q.explanation)}
             </div>
+            ${choiceExpsHtml}
           </div>
         </details>
       `;

@@ -33,3 +33,21 @@ Desktop.ini
 # .env
 # .env.local
 # .env.*.local
+
+# Node.js
+node_modules/
+package.json
+package-lock.json
+
+# Generated files and temporary data
+generation-progress.json
+*-backup.json
+*-with-explanations.json
+questions-backup.json
+questions-with-explanations.json
+
+# Utility scripts (local development tools)
+generate-choice-explanations.js
+verify-explanations.js
+EXPLANATION-GENERATION.md
+QUICK-START.md
