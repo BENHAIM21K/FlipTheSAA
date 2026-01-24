@@ -12476,5 +12476,1486 @@
       "2": "Relational databases are not designed for full-text search and aggregations at scale over log data, and a single table approach would create performance bottlenecks as log volume grows, lacking the distributed indexing and search optimization that OpenSearch provides.",
       "3": "This storage class is designed for long-term archival with retrieval times of 12-48 hours, making it completely unsuitable for near real-time search requirements that need responses within seconds to minutes."
     }
+  },
+  {
+    "id": "SAA-586",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "Secrets Manager",
+    "question": "A company is developing a web application that connects to an Amazon RDS MySQL database. The application currently stores the database credentials in a configuration file on the Amazon EC2 instances. The security team has raised concerns about this approach and wants a more secure solution that can automatically rotate the database credentials without requiring application changes.\n\nWhich AWS service should the solutions architect recommend to meet these requirements?",
+    "choices": [
+      "AWS Systems Manager Parameter Store with standard parameters",
+      "AWS Secrets Manager",
+      "AWS Key Management Service (AWS KMS)",
+      "Amazon S3 with server-side encryption"
+    ],
+    "answer": 1,
+    "explanation": "AWS Secrets Manager is designed to store, manage, and automatically rotate database credentials and other secrets, with native integration for Amazon RDS.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "Parameter Store standard parameters can store credentials but do not provide built-in automatic rotation functionality for database credentials.",
+      "2": "AWS KMS is used for encryption key management, not for storing or rotating application secrets like database credentials.",
+      "3": "Amazon S3 is an object storage service and is not designed for secure credential management or automatic rotation of secrets."
+    }
+  },
+  {
+    "id": "SAA-587",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "S3 Replication",
+    "question": "A company stores critical business documents in an Amazon S3 bucket in the us-east-1 region. The compliance team requires that all objects must be automatically replicated to a different AWS region to protect against regional failures. The solution should ensure that any new objects uploaded to the source bucket are copied to the destination bucket without manual intervention.\n\nWhich S3 feature should the solutions architect configure to meet this requirement?",
+    "choices": [
+      "S3 Transfer Acceleration",
+      "S3 Cross-Region Replication (CRR)",
+      "S3 Lifecycle policies",
+      "S3 Versioning only"
+    ],
+    "answer": 1,
+    "explanation": "S3 Cross-Region Replication (CRR) automatically replicates objects across buckets in different AWS regions, providing disaster recovery protection against regional failures.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "S3 Transfer Acceleration speeds up uploads to S3 using CloudFront edge locations but does not replicate data to another region.",
+      "2": "S3 Lifecycle policies manage object transitions between storage classes or deletion but do not replicate objects to other regions.",
+      "3": "S3 Versioning preserves multiple versions of objects in the same bucket but does not copy objects to a different region."
+    }
+  },
+  {
+    "id": "SAA-588",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "ElastiCache",
+    "question": "A company runs a web application that displays product information from an Amazon RDS MySQL database. The application experiences high read traffic during business hours, causing slow response times for users. The product data changes infrequently throughout the day. A solutions architect needs to improve the application's read performance with minimal changes to the existing architecture.\n\nWhich solution will MOST effectively improve read performance?",
+    "choices": [
+      "Migrate the database from Amazon RDS MySQL to Amazon DynamoDB",
+      "Add an Amazon ElastiCache cluster in front of the database to cache frequently accessed data",
+      "Enable Multi-AZ deployment for the Amazon RDS instance",
+      "Increase the storage size of the Amazon RDS instance"
+    ],
+    "answer": 1,
+    "explanation": "Amazon ElastiCache is designed to cache frequently accessed data in memory, reducing database read load and improving response times for read-heavy workloads with infrequently changing data.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "Migrating to DynamoDB requires significant application changes and is not necessary when the issue is read performance that can be solved with caching.",
+      "2": "Multi-AZ deployment provides high availability and automatic failover, but does not improve read performance for the primary database.",
+      "3": "Increasing storage size does not improve read performance. Storage size affects data capacity, not query response times or throughput."
+    }
+  },
+  {
+    "id": "SAA-589",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "Secrets Manager",
+    "question": "A company is developing a web application that connects to an Amazon RDS MySQL database. The application runs on Amazon EC2 instances and currently stores the database credentials in a configuration file on each instance. The security team has raised concerns about this approach and wants a more secure solution for managing database credentials.\n\nWhich AWS service should the solutions architect recommend to securely store and manage the database credentials?",
+    "choices": [
+      "Store the credentials in an Amazon S3 bucket with server-side encryption enabled",
+      "Store the credentials in AWS Secrets Manager with automatic rotation enabled",
+      "Store the credentials in AWS Systems Manager Parameter Store as a standard parameter",
+      "Store the credentials in an encrypted Amazon EBS volume attached to each EC2 instance"
+    ],
+    "answer": 1,
+    "explanation": "AWS Secrets Manager is designed specifically for storing and managing secrets like database credentials, with built-in automatic rotation capabilities for RDS databases.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "S3 is not designed for secrets management. It lacks automatic rotation and requires additional application logic to retrieve credentials securely.",
+      "2": "Parameter Store standard parameters do not support automatic rotation. While SecureString parameters can encrypt values, Secrets Manager is purpose-built for credentials.",
+      "3": "Storing credentials on EBS volumes still keeps them on the instances, which doesn't address the security concern and doesn't provide centralized management or rotation."
+    }
+  },
+  {
+    "id": "SAA-590",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "Secrets Manager",
+    "question": "A company is developing a web application that connects to an Amazon RDS MySQL database. The application runs on Amazon EC2 instances and currently stores database credentials in a configuration file on each instance. The security team has raised concerns about this approach and wants to implement a more secure method for managing database credentials.\n\nWhich AWS service should the solutions architect recommend to securely store and manage the database credentials?",
+    "choices": [
+      "AWS Systems Manager Parameter Store with standard parameters",
+      "AWS Secrets Manager",
+      "Amazon S3 with server-side encryption",
+      "AWS CloudHSM"
+    ],
+    "answer": 1,
+    "explanation": "AWS Secrets Manager is designed specifically for storing, managing, and rotating secrets like database credentials securely with built-in integration for RDS.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "Parameter Store standard parameters can store credentials but lack automatic rotation capabilities and native RDS integration that Secrets Manager provides.",
+      "2": "S3 is an object storage service not designed for secrets management. It lacks automatic rotation and secure retrieval mechanisms for credentials.",
+      "3": "CloudHSM is for hardware-based key management and cryptographic operations, not for storing and managing application secrets like database credentials."
+    }
+  },
+  {
+    "id": "SAA-591",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "Secrets Manager",
+    "question": "A company is developing a web application that connects to an Amazon RDS MySQL database. The application runs on Amazon EC2 instances. Currently, the database credentials are stored in a configuration file on each EC2 instance. The security team has raised concerns about this approach and wants a more secure method to manage the database credentials. The solution should also support automatic rotation of credentials without requiring application changes.\n\nWhich AWS service should the solutions architect recommend to meet these requirements?",
+    "choices": [
+      "Store the credentials in AWS Systems Manager Parameter Store with standard parameters",
+      "Store the credentials in AWS Secrets Manager with automatic rotation enabled",
+      "Store the credentials in Amazon S3 with server-side encryption enabled",
+      "Store the credentials in environment variables on the EC2 instances"
+    ],
+    "answer": 1,
+    "explanation": "AWS Secrets Manager is designed to store, manage, and automatically rotate database credentials. It provides native integration with Amazon RDS for automatic credential rotation.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "Parameter Store standard parameters do not support automatic rotation. While SecureString parameters can store secrets, built-in rotation for RDS credentials requires Secrets Manager.",
+      "2": "S3 is an object storage service not designed for secrets management. It lacks automatic credential rotation capabilities and is not suitable for storing database credentials.",
+      "3": "Environment variables on EC2 instances are not secure and do not support automatic rotation. Credentials would still be exposed on the instance and require manual updates."
+    }
+  },
+  {
+    "id": "SAA-592",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "Secrets Manager",
+    "question": "A company is developing a web application that connects to an Amazon RDS MySQL database. The application runs on Amazon EC2 instances and currently stores the database credentials in a configuration file on each instance. The security team has raised concerns about this approach and wants a more secure solution that can also automatically rotate the database credentials on a regular schedule.\n\nWhich AWS service should the solutions architect recommend to meet these requirements?",
+    "choices": [
+      "AWS Systems Manager Parameter Store with standard parameters",
+      "AWS Key Management Service (AWS KMS)",
+      "AWS Secrets Manager",
+      "Amazon S3 with server-side encryption"
+    ],
+    "answer": 2,
+    "explanation": "AWS Secrets Manager is designed to store, retrieve, and automatically rotate database credentials and other secrets securely.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "Parameter Store standard parameters can store secrets but do not provide built-in automatic rotation for database credentials like Secrets Manager does.",
+      "1": "AWS KMS is used for encryption key management, not for storing and rotating application secrets or database credentials.",
+      "3": "Amazon S3 is an object storage service not designed for secure credential management or automatic rotation of secrets."
+    }
+  },
+  {
+    "id": "SAA-593",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "Secrets Manager",
+    "question": "A company is developing a web application that connects to an Amazon RDS MySQL database. The development team currently stores the database credentials in a configuration file within the application code repository. The security team has raised concerns about this practice and wants a more secure solution for managing database credentials.\n\nWhich AWS service should the solutions architect recommend to securely store and manage the database credentials?",
+    "choices": [
+      "AWS Secrets Manager",
+      "Amazon S3 with server-side encryption",
+      "AWS Systems Manager Parameter Store with standard parameters",
+      "AWS Identity and Access Management (IAM) user access keys"
+    ],
+    "answer": 0,
+    "explanation": "AWS Secrets Manager is designed specifically for storing and managing secrets like database credentials, with built-in automatic rotation capabilities for RDS databases.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "1": "S3 is an object storage service, not designed for secrets management. It lacks credential rotation and secure retrieval mechanisms needed for application secrets.",
+      "2": "While Parameter Store can store secrets, it lacks native automatic rotation for RDS credentials. Secrets Manager is purpose-built for database credential management.",
+      "3": "IAM access keys are for authenticating AWS API calls, not for storing database credentials. They cannot be used to connect to RDS databases."
+    }
+  },
+  {
+    "id": "SAA-594",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "IAM Best Practices (Select TWO)",
+    "question": "A startup company is setting up their AWS environment for the first time. The IT administrator wants to follow AWS security best practices when configuring IAM for the development team. The team consists of 10 developers who need similar permissions to access Amazon EC2 and Amazon S3 resources.\n\nWhich TWO actions should the administrator take to follow IAM security best practices? (Choose TWO.)",
+    "choices": [
+      "Share a single IAM user account among all developers to simplify management",
+      "Enable multi-factor authentication (MFA) for all IAM users",
+      "Create an IAM group with the required permissions and add the developers' IAM users to the group",
+      "Use the AWS account root user credentials for daily development tasks",
+      "Create individual IAM users for each developer and attach policies directly to each user account"
+    ],
+    "answer": [
+      1,
+      2
+    ],
+    "explanation": "IAM best practices recommend using groups to assign permissions to users with similar access needs, and enabling MFA for all users to add an extra layer of security.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "Sharing IAM credentials violates AWS security best practices. Each user should have their own unique IAM user account for accountability and auditing purposes.",
+      "3": "Using root user credentials for daily tasks is a serious security risk. AWS strongly recommends locking away root user credentials and using IAM users instead.",
+      "4": "Attaching policies directly to individual users is not a best practice. Using IAM groups simplifies permission management and reduces administrative overhead."
+    }
+  },
+  {
+    "id": "SAA-596",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "Secrets Manager",
+    "question": "A company is developing a new web application that connects to an Amazon RDS MySQL database. The development team currently stores the database credentials in a configuration file on the Amazon EC2 instances running the application. The security team has raised concerns about this approach and wants a more secure solution that can automatically rotate the database credentials without requiring application changes.\n\nWhich AWS service should the solutions architect recommend to meet these requirements?",
+    "choices": [
+      "AWS Secrets Manager",
+      "AWS Systems Manager Parameter Store with standard parameters",
+      "AWS Key Management Service (AWS KMS)",
+      "Amazon S3 with server-side encryption"
+    ],
+    "answer": 0,
+    "explanation": "AWS Secrets Manager is designed to store, manage, and automatically rotate database credentials and other secrets with built-in RDS integration.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "1": "Parameter Store standard parameters can store secrets but do not provide built-in automatic rotation for database credentials like Secrets Manager does.",
+      "2": "AWS KMS is used for encryption key management, not for storing or rotating database credentials. It encrypts data but doesn't manage secrets.",
+      "3": "Amazon S3 is an object storage service. Even with encryption, it doesn't provide automatic credential rotation or secrets management capabilities."
+    }
+  },
+  {
+    "id": "SAA-597",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "Secrets Manager",
+    "question": "A company is developing a web application that connects to an Amazon RDS MySQL database. The development team currently stores the database credentials in a configuration file on the Amazon EC2 instances running the application. The security team has raised concerns about this approach and wants a more secure solution that can automatically rotate the database credentials without requiring application changes.\n\nWhich AWS service should the solutions architect recommend to meet these requirements?",
+    "choices": [
+      "AWS Systems Manager Parameter Store with standard parameters",
+      "Amazon S3 with server-side encryption",
+      "AWS Key Management Service (AWS KMS)",
+      "AWS Secrets Manager"
+    ],
+    "answer": 3,
+    "explanation": "AWS Secrets Manager is designed to store, manage, and automatically rotate database credentials and other secrets with native RDS integration.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "Parameter Store standard parameters can store credentials but do not provide built-in automatic rotation for database credentials like Secrets Manager does.",
+      "1": "Amazon S3 is an object storage service and is not designed for secure credential management or automatic rotation of secrets.",
+      "2": "AWS KMS is used for encryption key management, not for storing and rotating application secrets or database credentials."
+    }
+  },
+  {
+    "id": "SAA-599",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "Secrets Manager",
+    "question": "A company is developing a web application that connects to an Amazon RDS MySQL database. The application runs on Amazon EC2 instances and currently stores the database credentials in a configuration file on each instance. The security team has raised concerns about this approach and wants a more secure method to manage database credentials.\n\nWhich AWS service should the solutions architect recommend to securely store and manage the database credentials?",
+    "choices": [
+      "Store the credentials in an Amazon S3 bucket with server-side encryption enabled",
+      "Store the credentials in AWS Systems Manager Parameter Store as plain text parameters",
+      "Store the credentials in AWS Secrets Manager with automatic rotation enabled",
+      "Store the credentials in an Amazon DynamoDB table with encryption at rest"
+    ],
+    "answer": 2,
+    "explanation": "AWS Secrets Manager is designed specifically for storing and managing secrets like database credentials, with built-in automatic rotation capabilities for RDS databases.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "S3 is not designed for secrets management. It lacks native credential rotation and requires additional application logic to retrieve credentials securely.",
+      "1": "Parameter Store plain text parameters do not encrypt the values. While Parameter Store can use SecureString, it lacks native automatic rotation for RDS credentials.",
+      "3": "DynamoDB is a database service, not a secrets management solution. It lacks native credential rotation and is not designed for this use case."
+    }
+  },
+  {
+    "id": "SAA-600",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "Secrets Manager",
+    "question": "A company is developing a web application that connects to an Amazon RDS MySQL database. The application runs on Amazon EC2 instances and currently stores the database credentials in a configuration file on each instance. The security team has raised concerns about this approach and wants a more secure solution that can also automatically rotate the database credentials.\n\nWhich AWS service should the solutions architect recommend to securely store and manage the database credentials?",
+    "choices": [
+      "AWS Secrets Manager",
+      "Amazon S3 with server-side encryption",
+      "AWS Systems Manager Parameter Store with standard parameters",
+      "AWS Key Management Service (AWS KMS)"
+    ],
+    "answer": 0,
+    "explanation": "AWS Secrets Manager is designed to securely store, retrieve, and automatically rotate credentials for databases including Amazon RDS.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "1": "S3 is an object storage service not designed for credential management. It lacks automatic rotation capabilities and is not suitable for storing application secrets.",
+      "2": "Parameter Store standard parameters can store secrets but do not provide built-in automatic rotation for database credentials like Secrets Manager does.",
+      "3": "KMS is for managing encryption keys, not for storing secrets or credentials. It encrypts data but does not store or rotate database passwords."
+    }
+  },
+  {
+    "id": "SAA-601",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "IAM",
+    "question": "A startup company has recently created an AWS account and needs to grant their development team access to Amazon EC2 and Amazon S3 services. The security team wants to ensure that developers can only perform specific actions on these services and that permissions can be easily managed as the team grows.\n\nWhich AWS service should the solutions architect use to manage access permissions for the development team?",
+    "choices": [
+      "Amazon Cognito",
+      "AWS Directory Service",
+      "AWS IAM (Identity and Access Management)",
+      "Amazon Inspector"
+    ],
+    "answer": 2,
+    "explanation": "AWS IAM enables you to create users, groups, and policies to securely control access to AWS services and resources like EC2 and S3.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "Amazon Cognito is designed for managing user authentication for web and mobile applications, not for managing AWS resource access for internal teams.",
+      "1": "AWS Directory Service is used to connect AWS resources with on-premises Microsoft Active Directory, not for basic AWS resource permission management.",
+      "3": "Amazon Inspector is a security assessment service that scans workloads for vulnerabilities, not a service for managing user permissions."
+    }
+  },
+  {
+    "id": "SAA-602",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "Secrets Manager",
+    "question": "A company is developing a web application that connects to an Amazon RDS MySQL database. The application runs on Amazon EC2 instances. The development team currently stores the database credentials in a configuration file on each EC2 instance. The security team has raised concerns about this approach and wants a more secure solution that can automatically rotate the database credentials without requiring application changes.\n\nWhich AWS service should the solutions architect recommend to meet these requirements?",
+    "choices": [
+      "AWS Secrets Manager",
+      "AWS Systems Manager Parameter Store with standard parameters",
+      "AWS Key Management Service (AWS KMS)",
+      "Amazon S3 with server-side encryption"
+    ],
+    "answer": 0,
+    "explanation": "AWS Secrets Manager is designed to store, manage, and automatically rotate database credentials and other secrets, with native integration for Amazon RDS.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "1": "Parameter Store can store secrets but does not provide built-in automatic rotation for database credentials like Secrets Manager does.",
+      "2": "AWS KMS is for managing encryption keys, not for storing or rotating database credentials and secrets.",
+      "3": "Amazon S3 is object storage and is not designed for secure credential management or automatic rotation of secrets."
+    }
+  },
+  {
+    "id": "SAA-603",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "Secrets Manager",
+    "question": "A company is developing a new web application that connects to an Amazon RDS MySQL database. The development team currently stores the database credentials in a configuration file within the application code repository. The security team has raised concerns about this practice and wants a more secure solution for managing database credentials.\n\nWhich AWS service should the solutions architect recommend to securely store and manage the database credentials?",
+    "choices": [
+      "AWS Secrets Manager",
+      "AWS Systems Manager Parameter Store with standard parameters",
+      "Amazon S3 with server-side encryption",
+      "Amazon DynamoDB with encryption at rest"
+    ],
+    "answer": 0,
+    "explanation": "AWS Secrets Manager is designed specifically for storing and managing secrets like database credentials, with built-in rotation capabilities for RDS databases.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "1": "While Parameter Store can store secrets, Secrets Manager is purpose-built for database credentials with native RDS rotation support and is the recommended choice.",
+      "2": "Amazon S3 is an object storage service, not designed for secrets management. It lacks features like automatic credential rotation and native RDS integration.",
+      "3": "DynamoDB is a NoSQL database service for storing application data, not a secrets management solution. It lacks credential rotation features."
+    }
+  },
+  {
+    "id": "SAA-604",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "Secrets Manager",
+    "question": "A company is developing a web application that connects to an Amazon RDS MySQL database. The application runs on Amazon EC2 instances and currently stores database credentials in a configuration file on each instance. The security team has raised concerns about this approach and wants a more secure solution that can automatically rotate the database credentials without requiring application changes.\n\nWhich AWS service should the solutions architect recommend to securely store and manage the database credentials?",
+    "choices": [
+      "AWS Systems Manager Parameter Store with standard parameters",
+      "Amazon S3 with server-side encryption",
+      "AWS Secrets Manager",
+      "AWS Key Management Service (AWS KMS)"
+    ],
+    "answer": 2,
+    "explanation": "AWS Secrets Manager is designed to store, rotate, and manage secrets like database credentials. It provides built-in automatic rotation for RDS databases.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "Parameter Store can store secrets but does not provide built-in automatic rotation for database credentials like Secrets Manager does.",
+      "1": "S3 is an object storage service, not designed for secrets management. It lacks rotation capabilities and secure credential retrieval mechanisms.",
+      "3": "KMS manages encryption keys, not secrets. It encrypts data but cannot store or rotate database credentials."
+    }
+  },
+  {
+    "id": "SAA-605",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "IAM and S3 Security (Select TWO)",
+    "question": "A startup company is setting up their first AWS environment. They need to store application configuration files in Amazon S3 and want to ensure the data is protected. The security team requires that all data stored in S3 must be encrypted and that access to the S3 bucket should follow the principle of least privilege.\n\nWhich TWO actions should the solutions architect recommend to meet these security requirements? (Choose TWO.)",
+    "choices": [
+      "Enable S3 Transfer Acceleration on the bucket to encrypt data during transfer",
+      "Enable S3 Versioning to automatically encrypt all object versions",
+      "Configure the bucket as a public bucket and use signed URLs for all access",
+      "Configure server-side encryption with Amazon S3 managed keys (SSE-S3) as the default encryption for the bucket",
+      "Create an IAM policy that grants only the specific permissions needed and attach it to the IAM roles or users that require access"
+    ],
+    "answer": [
+      3,
+      4
+    ],
+    "explanation": "SSE-S3 provides encryption at rest for S3 objects. IAM policies with specific permissions implement least privilege access control, granting only necessary permissions.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "S3 Transfer Acceleration improves upload speeds for distant clients but does not provide encryption. HTTPS provides encryption in transit separately.",
+      "1": "S3 Versioning maintains multiple versions of objects for recovery purposes but does not provide encryption functionality.",
+      "2": "Making a bucket public violates the principle of least privilege and exposes data to unauthorized access, which is the opposite of the security requirement."
+    }
+  },
+  {
+    "id": "SAA-607",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "Secrets Manager",
+    "question": "A company is developing a web application that connects to an Amazon RDS MySQL database. The application runs on Amazon EC2 instances and currently stores the database credentials in a configuration file on each instance. The security team has raised concerns about this approach and wants a more secure solution that can automatically rotate the database credentials without requiring application changes.\n\nWhich AWS service should the solutions architect recommend to securely store and manage the database credentials?",
+    "choices": [
+      "AWS Systems Manager Parameter Store with standard parameters",
+      "AWS Secrets Manager",
+      "Amazon S3 with server-side encryption",
+      "AWS Key Management Service (AWS KMS)"
+    ],
+    "answer": 1,
+    "explanation": "AWS Secrets Manager is designed to store, retrieve, and automatically rotate database credentials and other secrets, with native integration for Amazon RDS.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "Parameter Store can store secrets but does not provide built-in automatic rotation for database credentials like Secrets Manager does.",
+      "2": "S3 is an object storage service not designed for secrets management. It lacks automatic credential rotation capabilities.",
+      "3": "KMS manages encryption keys, not secrets or credentials. It encrypts data but does not store or rotate database passwords."
+    }
+  },
+  {
+    "id": "SAA-609",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "S3 Replication",
+    "question": "A company stores critical business documents in an Amazon S3 bucket in the us-east-1 region. The compliance team requires that all objects must be automatically replicated to a different AWS region to protect against regional failures. The solution must ensure that any new objects uploaded to the source bucket are copied to the destination bucket without manual intervention.\n\nWhich solution meets these requirements?",
+    "choices": [
+      "Enable S3 Transfer Acceleration on the source bucket to speed up cross-region transfers",
+      "Create an S3 Lifecycle policy to move objects to another region after 30 days",
+      "Configure S3 Cross-Region Replication (CRR) from the source bucket to a destination bucket in another region",
+      "Use AWS DataSync to periodically copy objects between the two S3 buckets"
+    ],
+    "answer": 2,
+    "explanation": "S3 Cross-Region Replication (CRR) automatically replicates objects to a destination bucket in a different AWS region, providing disaster recovery protection.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "S3 Transfer Acceleration improves upload speeds to S3 using CloudFront edge locations but does not replicate objects to another region.",
+      "1": "S3 Lifecycle policies manage object transitions between storage classes or deletion, but cannot move objects to different regions.",
+      "3": "AWS DataSync requires scheduled or manual execution and is designed for data migration tasks, not automatic real-time replication of S3 objects."
+    }
+  },
+  {
+    "id": "SAA-610",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "S3 Replication",
+    "question": "A company stores critical business documents in an Amazon S3 bucket in the us-east-1 region. The compliance team requires that all objects must be automatically replicated to a different AWS region to protect against regional disasters. The solution must ensure that any new objects uploaded to the source bucket are copied to the destination bucket without manual intervention.\n\nWhich solution meets these requirements?",
+    "choices": [
+      "Enable S3 Transfer Acceleration on the source bucket to speed up transfers to another region",
+      "Create an S3 Lifecycle policy to move objects to another region after 30 days",
+      "Use S3 Intelligent-Tiering to automatically distribute objects across multiple regions",
+      "Configure S3 Cross-Region Replication (CRR) from the source bucket to a destination bucket in another region"
+    ],
+    "answer": 3,
+    "explanation": "S3 Cross-Region Replication (CRR) automatically replicates objects from a source bucket to a destination bucket in a different AWS region, meeting disaster recovery requirements.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "S3 Transfer Acceleration improves upload speeds to a single bucket using CloudFront edge locations. It does not replicate objects to another region.",
+      "1": "S3 Lifecycle policies manage object transitions between storage classes or deletion. They cannot move or copy objects to different regions.",
+      "2": "S3 Intelligent-Tiering automatically moves objects between access tiers within the same bucket to optimize costs. It does not replicate data across regions."
+    }
+  },
+  {
+    "id": "SAA-612",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "S3 Replication",
+    "question": "A company stores critical business documents in an Amazon S3 bucket in the us-east-1 region. The compliance team requires that all objects must be automatically replicated to a different AWS region to protect against regional outages. The solution must replicate all new objects uploaded to the source bucket.\n\nWhich S3 feature should the solutions architect configure to meet this requirement?",
+    "choices": [
+      "S3 Transfer Acceleration",
+      "S3 Versioning only",
+      "S3 Lifecycle policies",
+      "S3 Cross-Region Replication (CRR)"
+    ],
+    "answer": 3,
+    "explanation": "S3 Cross-Region Replication (CRR) automatically replicates objects across S3 buckets in different AWS regions, providing disaster recovery protection against regional failures.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "S3 Transfer Acceleration speeds up uploads to S3 using CloudFront edge locations but does not replicate data to another region for disaster recovery.",
+      "1": "S3 Versioning preserves multiple versions of objects in the same bucket but does not replicate data to another region. Versioning is a prerequisite for replication but not sufficient alone.",
+      "2": "S3 Lifecycle policies automate transitioning objects between storage classes or deleting them, but they do not replicate objects to another region."
+    }
+  },
+  {
+    "id": "SAA-613",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "S3 Replication",
+    "question": "A company stores critical business documents in an Amazon S3 bucket in the us-east-1 region. The compliance team requires that all objects must be automatically replicated to a different AWS region to protect against regional failures. The solution should ensure that any new objects uploaded to the source bucket are copied to the destination bucket without manual intervention.\n\nWhich solution meets these requirements?",
+    "choices": [
+      "Enable S3 Transfer Acceleration on the source bucket to speed up transfers to another region",
+      "Create a Lambda function triggered by S3 events to copy objects to another region",
+      "Configure S3 Cross-Region Replication (CRR) on the source bucket with a destination bucket in another region",
+      "Use S3 Lifecycle policies to move objects to another region after creation"
+    ],
+    "answer": 2,
+    "explanation": "S3 Cross-Region Replication (CRR) automatically replicates objects to a destination bucket in a different AWS region, providing disaster recovery protection.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "S3 Transfer Acceleration improves upload speeds to a single bucket using CloudFront edge locations. It does not replicate objects to another region.",
+      "1": "While Lambda could copy objects, this adds unnecessary complexity. S3 CRR is the native, managed solution designed specifically for this use case.",
+      "3": "S3 Lifecycle policies manage object storage classes and expiration within the same bucket or to Glacier. They cannot replicate objects to another region."
+    }
+  },
+  {
+    "id": "SAA-617",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "S3 Replication (Select TWO)",
+    "question": "A company stores critical business documents in an Amazon S3 bucket in the us-east-1 Region. The compliance team requires that all documents must be replicated to a different AWS Region for disaster recovery purposes. The company also needs to ensure that if objects are accidentally deleted from the source bucket, the replicated copies are preserved in the destination bucket.\n\nWhich two configurations should a solutions architect implement to meet these requirements? (Choose TWO.)",
+    "choices": [
+      "Enable S3 Cross-Region Replication (CRR) on the source bucket",
+      "Enable versioning on both the source and destination buckets",
+      "Enable S3 Same-Region Replication (SRR) on the source bucket",
+      "Configure the replication rule to replicate delete markers",
+      "Enable S3 Transfer Acceleration on the source bucket"
+    ],
+    "answer": [
+      0,
+      1
+    ],
+    "explanation": "S3 Cross-Region Replication (CRR) copies objects to a bucket in a different Region for DR. Versioning must be enabled on both source and destination buckets for replication to work, and it preserves objects even when delete markers are created.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "2": "Same-Region Replication (SRR) copies objects within the same Region, which does not meet the requirement for cross-Region disaster recovery.",
+      "3": "Replicating delete markers would cause deletions to propagate to the destination bucket, which contradicts the requirement to preserve replicated copies when source objects are deleted.",
+      "4": "S3 Transfer Acceleration improves upload speeds to S3 using CloudFront edge locations but does not provide replication or disaster recovery capabilities."
+    }
+  },
+  {
+    "id": "SAA-618",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "S3 Replication (Select TWO)",
+    "question": "A company stores critical business documents in an Amazon S3 bucket in the us-east-1 Region. The compliance team requires that all documents must be replicated to another AWS Region for disaster recovery purposes. The company also needs to ensure that if objects are accidentally deleted from the source bucket, the replicated copies remain intact in the destination bucket.\n\nWhich two configurations should a solutions architect implement to meet these requirements? (Choose TWO.)",
+    "choices": [
+      "Enable S3 Same-Region Replication (SRR) on the source bucket",
+      "Enable S3 Cross-Region Replication (CRR) on the source bucket",
+      "Configure the replication rule to replicate delete markers",
+      "Enable S3 Transfer Acceleration on the source bucket",
+      "Do not enable delete marker replication in the replication rule"
+    ],
+    "answer": [
+      1,
+      4
+    ],
+    "explanation": "S3 Cross-Region Replication (CRR) copies objects to a bucket in a different Region for DR. Disabling delete marker replication ensures deleted objects remain in the destination bucket.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "Same-Region Replication (SRR) copies objects within the same Region, which does not meet the requirement for cross-Region disaster recovery.",
+      "2": "Replicating delete markers would cause deletions in the source bucket to also delete objects in the destination, failing to protect against accidental deletions.",
+      "3": "S3 Transfer Acceleration speeds up uploads to S3 using CloudFront edge locations but does not provide replication or disaster recovery capabilities."
+    }
+  },
+  {
+    "id": "SAA-619",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "S3 Replication",
+    "question": "A media company stores critical video assets in an Amazon S3 bucket in the us-east-1 region. The company wants to protect these assets against regional failures by automatically copying all objects to another AWS region. The solution should maintain the same storage class and object metadata in the destination bucket.\n\nWhich solution meets these requirements with the LEAST operational overhead?",
+    "choices": [
+      "Create an AWS Lambda function triggered by S3 events to copy objects to another region",
+      "Use AWS DataSync to schedule periodic transfers between S3 buckets in different regions",
+      "Configure S3 Cross-Region Replication (CRR) on the source bucket",
+      "Set up an Amazon EventBridge rule to trigger AWS Batch jobs for copying objects"
+    ],
+    "answer": 2,
+    "explanation": "S3 Cross-Region Replication (CRR) automatically and asynchronously copies objects across buckets in different AWS regions, preserving metadata and storage class with minimal operational overhead.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "Lambda functions require custom code development and maintenance, adding significant operational overhead compared to native S3 replication features.",
+      "1": "AWS DataSync is designed for data transfer between on-premises and AWS or between AWS storage services, but CRR is the native, simpler solution for S3-to-S3 cross-region replication.",
+      "3": "Using EventBridge with AWS Batch requires managing compute resources, job definitions, and custom scripts, creating unnecessary complexity for a simple replication requirement."
+    }
+  },
+  {
+    "id": "SAA-620",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "S3 Replication",
+    "question": "A media company stores critical video assets in an Amazon S3 bucket in the us-east-1 region. The company wants to protect these assets against regional failures by automatically copying all objects to another AWS region. The solution should maintain the same object metadata and access control lists (ACLs) as the source objects.\n\nWhich solution meets these requirements with the LEAST operational overhead?",
+    "choices": [
+      "Configure S3 Cross-Region Replication (CRR) on the source bucket to replicate objects to a destination bucket in another region",
+      "Use AWS DataSync to schedule periodic transfers between S3 buckets in different regions",
+      "Create an AWS Lambda function triggered by S3 events to copy objects to another region",
+      "Set up an Amazon EventBridge rule to trigger an AWS Step Functions workflow that copies objects between regions"
+    ],
+    "answer": 0,
+    "explanation": "S3 Cross-Region Replication (CRR) automatically replicates objects between buckets in different AWS regions, preserving metadata and ACLs with minimal operational overhead.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "1": "AWS DataSync is designed for data transfer between on-premises and AWS or between AWS storage services, but CRR is the native, lower-overhead solution for S3-to-S3 replication.",
+      "2": "Lambda functions require custom code development and maintenance, increasing operational overhead compared to native S3 replication features.",
+      "3": "Using EventBridge with Step Functions requires building and maintaining a custom workflow, adding unnecessary complexity when S3 CRR provides this functionality natively."
+    }
+  },
+  {
+    "id": "SAA-623",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "S3 Replication",
+    "question": "A company stores critical business documents in an Amazon S3 bucket in the us-east-1 region. The compliance team requires that all objects must be automatically replicated to a different AWS region to protect against regional failures. The solution must replicate all new objects uploaded to the source bucket.\n\nWhich S3 feature should the solutions architect configure to meet this requirement?",
+    "choices": [
+      "S3 Cross-Region Replication (CRR)",
+      "S3 Transfer Acceleration",
+      "S3 Lifecycle policies",
+      "S3 Versioning only"
+    ],
+    "answer": 0,
+    "explanation": "S3 Cross-Region Replication (CRR) automatically replicates objects across S3 buckets in different AWS regions, providing disaster recovery protection against regional failures.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "1": "S3 Transfer Acceleration speeds up uploads to S3 using CloudFront edge locations but does not replicate data to another region.",
+      "2": "S3 Lifecycle policies automate transitioning objects between storage classes or deleting them, but do not replicate objects to other regions.",
+      "3": "S3 Versioning preserves multiple versions of objects in the same bucket but does not copy objects to another region for disaster recovery."
+    }
+  },
+  {
+    "id": "SAA-625",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "S3 Replication",
+    "question": "A company stores critical business documents in an Amazon S3 bucket in the us-east-1 region. The compliance team requires that all documents must be automatically replicated to a different AWS region to protect against regional failures. The solution should maintain the same storage class as the source objects.\n\nWhich solution meets these requirements with the LEAST operational overhead?",
+    "choices": [
+      "Create a Lambda function triggered by S3 events to copy objects to another region",
+      "Use AWS DataSync to schedule periodic transfers to another region",
+      "Configure S3 Cross-Region Replication (CRR) to automatically replicate objects to a bucket in another region",
+      "Set up an EC2 instance with a cron job to sync objects between buckets using the AWS CLI"
+    ],
+    "answer": 2,
+    "explanation": "S3 Cross-Region Replication (CRR) automatically replicates objects to a destination bucket in a different region with minimal operational overhead.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "Lambda functions require custom code development and maintenance, adding significant operational overhead compared to native S3 replication.",
+      "1": "AWS DataSync is designed for data migration and hybrid scenarios, not for continuous automatic replication. It requires scheduling and more configuration.",
+      "3": "Running an EC2 instance with cron jobs requires managing infrastructure, patching, and monitoring, creating unnecessary operational overhead."
+    }
+  },
+  {
+    "id": "SAA-626",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "ElastiCache",
+    "question": "A company runs a web application that frequently reads the same product information from an Amazon RDS MySQL database. The database is experiencing high CPU utilization due to repetitive read queries for popular products. The application team wants to reduce database load and improve response times for these frequently accessed items.\n\nWhich AWS service should a solutions architect recommend to address this requirement?",
+    "choices": [
+      "Amazon Redshift",
+      "AWS Direct Connect",
+      "Amazon S3 Transfer Acceleration",
+      "Amazon ElastiCache"
+    ],
+    "answer": 3,
+    "explanation": "Amazon ElastiCache is an in-memory caching service that reduces database load by caching frequently accessed data, significantly improving read performance.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "Amazon Redshift is a data warehouse service designed for analytics and reporting workloads, not for caching frequently accessed application data.",
+      "1": "AWS Direct Connect provides dedicated network connections from on-premises to AWS. It does not address database read performance or caching needs.",
+      "2": "S3 Transfer Acceleration speeds up file transfers to S3 buckets over long distances. It does not cache database query results."
+    }
+  },
+  {
+    "id": "SAA-627",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "ElastiCache",
+    "question": "A company runs a web application that frequently reads the same data from an Amazon RDS MySQL database. The database is experiencing high CPU utilization due to repetitive read queries for product catalog information that rarely changes. The solutions architect needs to reduce the database load and improve application response times.\n\nWhich solution will MOST effectively address this requirement?",
+    "choices": [
+      "Create additional read replicas for the RDS database",
+      "Migrate the database to Amazon Aurora MySQL",
+      "Implement Amazon ElastiCache to cache frequently accessed data",
+      "Increase the RDS instance size to handle more queries"
+    ],
+    "answer": 2,
+    "explanation": "Amazon ElastiCache provides an in-memory caching layer that stores frequently accessed data, reducing database load and significantly improving response times for repetitive read queries.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "Read replicas help distribute read traffic but still require database queries. Caching eliminates redundant queries entirely for frequently accessed, rarely changing data.",
+      "1": "Aurora offers better performance than standard MySQL but doesn't address the fundamental issue of repetitive queries. Caching is more effective for static data.",
+      "3": "Scaling up the instance size adds more capacity but doesn't solve the inefficiency of repeatedly querying the same unchanged data. This is a costly approach."
+    }
+  },
+  {
+    "id": "SAA-628",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "ElastiCache",
+    "question": "A company runs a web application that queries an Amazon RDS MySQL database to display product information. The application experiences high read traffic, and users are reporting slow page load times. Analysis shows that the same product queries are being executed repeatedly, causing unnecessary load on the database.\n\nWhich solution will improve the application's read performance with minimal changes to the existing architecture?",
+    "choices": [
+      "Create additional read replicas for the RDS MySQL database",
+      "Migrate the database from RDS MySQL to Amazon DynamoDB",
+      "Enable Multi-AZ deployment for the RDS MySQL database",
+      "Implement Amazon ElastiCache to cache frequently accessed query results"
+    ],
+    "answer": 3,
+    "explanation": "Amazon ElastiCache is designed to cache frequently accessed data in memory, reducing database load and improving response times for repeated queries.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "Read replicas help distribute read traffic but don't eliminate redundant queries. ElastiCache is more efficient for caching repeated identical queries.",
+      "1": "Migrating to DynamoDB requires significant application changes and doesn't address the core issue of repeated queries hitting the database.",
+      "2": "Multi-AZ provides high availability and automatic failover, not performance improvement for read operations."
+    }
+  },
+  {
+    "id": "SAA-629",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "ElastiCache",
+    "question": "A company runs a web application that displays product information from an Amazon RDS MySQL database. The application experiences high read traffic during business hours, causing slow response times. The product data changes infrequently throughout the day. The solutions architect needs to improve the application's read performance without modifying the database schema.\n\nWhich solution will MOST effectively improve the application's read performance?",
+    "choices": [
+      "Create additional read replicas for the RDS MySQL database",
+      "Migrate the database to Amazon DynamoDB with on-demand capacity",
+      "Enable Multi-AZ deployment for the RDS MySQL database",
+      "Implement Amazon ElastiCache to cache frequently accessed product data"
+    ],
+    "answer": 3,
+    "explanation": "Amazon ElastiCache provides in-memory caching that dramatically improves read performance for frequently accessed, infrequently changing data by reducing database load.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "Read replicas help distribute read traffic but still require database queries. ElastiCache provides faster in-memory access for frequently read, static data.",
+      "1": "Migrating to DynamoDB requires significant application changes and schema redesign, which violates the requirement to not modify the database schema.",
+      "2": "Multi-AZ deployment provides high availability and automatic failover, not improved read performance. It does not help with read-heavy workloads."
+    }
+  },
+  {
+    "id": "SAA-630",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "ElastiCache",
+    "question": "A company runs a web application that queries a MySQL database hosted on Amazon RDS. The application frequently retrieves the same product catalog data, which changes only once per day. Users are experiencing slow response times during peak hours due to repeated database queries for this static data.\n\nWhich solution will improve the application's read performance with minimal changes to the existing architecture?",
+    "choices": [
+      "Implement Amazon ElastiCache to store frequently accessed product catalog data",
+      "Migrate the database from Amazon RDS to Amazon DynamoDB for faster reads",
+      "Create additional RDS read replicas and distribute read traffic across them",
+      "Enable Amazon RDS Multi-AZ deployment to handle more read requests"
+    ],
+    "answer": 0,
+    "explanation": "Amazon ElastiCache provides an in-memory caching layer that stores frequently accessed data, reducing database load and improving response times for repeated queries.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "1": "Migrating to DynamoDB requires significant application changes and is not necessary. The issue is repeated queries for static data, which caching solves more efficiently.",
+      "2": "Read replicas help distribute read traffic but still require database queries. Caching eliminates repeated queries entirely for static data, providing better performance improvement.",
+      "3": "Multi-AZ deployment provides high availability through a standby instance for failover, not improved read performance. The standby cannot serve read traffic."
+    }
+  },
+  {
+    "id": "SAA-631",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "ElastiCache (Select TWO)",
+    "question": "A company runs a web application that reads frequently from an Amazon RDS MySQL database. The database is experiencing high read load, causing slow response times for users. The solutions architect needs to implement a caching solution to improve read performance and reduce database load.\n\nWhich TWO actions should the solutions architect take to improve the application's read performance? (Choose TWO.)",
+    "choices": [
+      "Deploy Amazon ElastiCache for Redis between the application and the database to cache frequently accessed data",
+      "Enable RDS Multi-AZ deployment to distribute read traffic across multiple Availability Zones",
+      "Implement Amazon ElastiCache for Memcached to store session data and frequently queried results",
+      "Enable Amazon RDS automated backups with a longer retention period",
+      "Increase the RDS instance storage size to improve read throughput"
+    ],
+    "answer": [
+      0,
+      2
+    ],
+    "explanation": "ElastiCache for Redis and ElastiCache for Memcached are both in-memory caching solutions that reduce database read load by caching frequently accessed data, significantly improving application response times.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "1": "Multi-AZ deployment provides high availability and failover support, not read scaling. Read replicas would help distribute read traffic, but Multi-AZ standby instances do not serve read traffic.",
+      "3": "Automated backups provide data recovery capabilities but do not improve read performance or reduce database load during normal operations.",
+      "4": "Increasing storage size affects storage capacity, not read performance. Storage IOPS and instance class affect performance, but storage size alone does not improve read throughput."
+    }
+  },
+  {
+    "id": "SAA-632",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "ElastiCache",
+    "question": "A company runs a web application that queries an Amazon RDS MySQL database. The application frequently retrieves the same product catalog data, which changes only once per day. Users are experiencing slow response times during peak hours due to repeated database queries for this static data.\n\nWhich solution will improve the application's read performance with minimal changes to the existing architecture?",
+    "choices": [
+      "Create additional RDS read replicas and distribute read traffic across them",
+      "Migrate the database from RDS MySQL to Amazon DynamoDB for faster reads",
+      "Enable Multi-AZ deployment for the RDS database to improve read performance",
+      "Implement Amazon ElastiCache to store frequently accessed product catalog data"
+    ],
+    "answer": 3,
+    "explanation": "Amazon ElastiCache is designed to cache frequently accessed data in-memory, reducing database load and improving read performance for repetitive queries.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "Read replicas help distribute read traffic but still require database queries. Caching eliminates redundant queries for static data that rarely changes.",
+      "1": "Migrating to DynamoDB requires significant application changes and is not minimal effort. The data access pattern suits caching better than a database migration.",
+      "2": "Multi-AZ deployment provides high availability and automatic failover, not improved read performance. The standby instance cannot serve read traffic."
+    }
+  },
+  {
+    "id": "SAA-633",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "ElastiCache",
+    "question": "A company runs a web application that frequently reads the same product information from an Amazon RDS MySQL database. The database is experiencing high read load, causing slow response times for users. The product data changes infrequently, typically only a few times per day.\n\nWhich solution will improve the application's read performance with minimal changes to the existing architecture?",
+    "choices": [
+      "Create multiple read replicas of the RDS database and distribute read traffic across them",
+      "Migrate the database from RDS MySQL to Amazon DynamoDB for faster reads",
+      "Implement Amazon ElastiCache to cache frequently accessed product data",
+      "Increase the RDS instance size to a larger instance type with more CPU and memory"
+    ],
+    "answer": 2,
+    "explanation": "Amazon ElastiCache provides in-memory caching for frequently accessed data, reducing database load and improving response times for read-heavy workloads with infrequently changing data.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "Read replicas help distribute load but add complexity and cost. Caching is more efficient for frequently accessed, rarely changing data.",
+      "1": "Migrating to DynamoDB requires significant application changes and is not a minimal change solution. It also may not be the best fit for relational data.",
+      "3": "Scaling up the instance increases costs without addressing the root cause. Caching is more cost-effective for repetitive read patterns."
+    }
+  },
+  {
+    "id": "SAA-634",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "ElastiCache",
+    "question": "A company runs a web application that reads frequently accessed data from an Amazon RDS MySQL database. The application experiences slow response times during peak hours due to repeated database queries for the same data. The data changes infrequently throughout the day.\n\nWhich solution will improve the application's read performance with minimal changes to the existing architecture?",
+    "choices": [
+      "Implement Amazon ElastiCache to cache frequently accessed data",
+      "Migrate the database to Amazon DynamoDB",
+      "Add a read replica to the RDS MySQL database",
+      "Enable Multi-AZ deployment for the RDS instance"
+    ],
+    "answer": 0,
+    "explanation": "Amazon ElastiCache provides an in-memory caching layer that stores frequently accessed data, reducing database load and significantly improving read performance for data that changes infrequently.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "1": "Migrating to DynamoDB requires significant application changes and doesn't directly address the caching need. This is not a minimal change solution.",
+      "2": "Read replicas help distribute read traffic but still require database queries. Caching eliminates repeated queries entirely for frequently accessed, infrequently changing data.",
+      "3": "Multi-AZ deployment provides high availability and automatic failover, not improved read performance. It's designed for disaster recovery, not performance optimization."
+    }
+  },
+  {
+    "id": "SAA-636",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "ElastiCache",
+    "question": "A company runs a web application that frequently reads the same product information from an Amazon RDS MySQL database. The database is experiencing high read traffic, causing increased latency for users. The product data changes infrequently, typically only a few times per day.\n\nWhich solution will improve the application's read performance with minimal changes to the existing architecture?",
+    "choices": [
+      "Create multiple read replicas for the RDS database and distribute read traffic across them",
+      "Migrate the database from RDS MySQL to Amazon DynamoDB for faster reads",
+      "Implement Amazon ElastiCache to cache frequently accessed product data",
+      "Enable Multi-AZ deployment for the RDS database to handle more read requests"
+    ],
+    "answer": 2,
+    "explanation": "Amazon ElastiCache is ideal for caching frequently accessed, infrequently changing data, reducing database load and improving read latency significantly.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "Read replicas help distribute read traffic but add complexity and cost. Caching is more efficient for data that rarely changes.",
+      "1": "Migrating to DynamoDB requires significant application changes and is not a minimal change solution for this use case.",
+      "3": "Multi-AZ provides high availability and failover capability, not improved read performance. The standby instance does not serve read traffic."
+    }
+  },
+  {
+    "id": "SAA-638",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "CloudFront and S3 Performance (Select TWO)",
+    "question": "A company hosts a popular website that serves static content including images, CSS files, and JavaScript files from an Amazon S3 bucket. Users from around the world are reporting slow page load times. The solutions architect needs to improve the performance for global users while keeping costs reasonable.\n\nWhich TWO actions should the solutions architect take to improve performance? (Choose TWO.)",
+    "choices": [
+      "Configure CloudFront to cache content at edge locations worldwide",
+      "Enable S3 Transfer Acceleration on the bucket",
+      "Enable S3 versioning to improve read performance",
+      "Create an Amazon CloudFront distribution with the S3 bucket as the origin",
+      "Move the S3 bucket to a region closer to the majority of users"
+    ],
+    "answer": [
+      0,
+      3
+    ],
+    "explanation": "CloudFront is a CDN that caches content at edge locations globally, reducing latency for users worldwide. Configuring CloudFront caching at edge locations ensures content is served from locations closest to users.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "1": "S3 Transfer Acceleration improves upload speeds to S3, not download performance for end users accessing static content.",
+      "2": "S3 versioning is for maintaining multiple versions of objects for data protection, not for improving read performance.",
+      "4": "Moving the bucket to one region only helps users near that region and doesn't solve the global performance issue."
+    }
+  },
+  {
+    "id": "SAA-639",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "ElastiCache",
+    "question": "A company runs a web application that retrieves product information from an Amazon RDS MySQL database. The application experiences high read traffic, and users are reporting slow response times during peak hours. Database monitoring shows that the same product queries are being executed repeatedly, causing high CPU utilization on the RDS instance.\n\nWhich solution will improve the application's read performance with minimal changes to the existing architecture?",
+    "choices": [
+      "Implement Amazon ElastiCache to cache frequently accessed product data",
+      "Migrate the database from RDS MySQL to Amazon DynamoDB for better read performance",
+      "Create multiple read replicas of the RDS instance and distribute read traffic across them",
+      "Increase the RDS instance size to handle more concurrent connections"
+    ],
+    "answer": 0,
+    "explanation": "Amazon ElastiCache provides an in-memory caching layer that stores frequently accessed data, reducing database load and improving response times for repeated queries.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "1": "Migrating to DynamoDB requires significant application changes and schema redesign. This is not a minimal change solution and may not be appropriate for relational data.",
+      "2": "Read replicas help distribute read traffic but don't address the inefficiency of repeatedly executing the same queries. Caching is more effective for repeated identical queries.",
+      "3": "Increasing instance size adds cost but doesn't solve the fundamental problem of repeated identical queries hitting the database unnecessarily."
+    }
+  },
+  {
+    "id": "SAA-640",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "ElastiCache",
+    "question": "A company runs a web application that reads frequently from an Amazon RDS MySQL database. The application experiences slow response times during peak hours due to repetitive database queries for the same product catalog data. The data changes infrequently, approximately once per day.\n\nWhich solution will improve the application's read performance with minimal changes to the existing architecture?",
+    "choices": [
+      "Implement Amazon ElastiCache to cache frequently accessed data",
+      "Migrate the database from RDS MySQL to Amazon Aurora MySQL",
+      "Create additional RDS read replicas and distribute read traffic across them",
+      "Enable Multi-AZ deployment for the RDS database"
+    ],
+    "answer": 0,
+    "explanation": "Amazon ElastiCache is designed to cache frequently accessed data in-memory, reducing database load and improving read performance for repetitive queries.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "1": "Aurora offers better performance than MySQL but still requires database queries. Caching is more effective for frequently accessed, rarely changing data.",
+      "2": "Read replicas help distribute read load but still require database queries. Caching eliminates repetitive queries entirely for better performance.",
+      "3": "Multi-AZ provides high availability and failover capability, not improved read performance. It maintains a standby replica for disaster recovery."
+    }
+  },
+  {
+    "id": "SAA-642",
+    "domainId": "D4",
+    "domain": "Design Cost-Optimized Architectures",
+    "section": "S3 Costs",
+    "question": "A company stores product images in Amazon S3 Standard. Analysis shows that images are frequently accessed during the first 30 days after upload, but access drops significantly after that period. The images must remain available for immediate retrieval when needed. The company wants to reduce storage costs while maintaining performance for frequently accessed data.\n\nWhich solution will meet these requirements with the LEAST operational overhead?",
+    "choices": [
+      "Create an S3 Lifecycle policy to transition objects to S3 Glacier Deep Archive after 30 days.",
+      "Manually move objects to S3 Standard-Infrequent Access (S3 Standard-IA) after 30 days using AWS CLI scripts.",
+      "Create an S3 Lifecycle policy to transition objects to S3 Standard-Infrequent Access (S3 Standard-IA) after 30 days.",
+      "Store all objects in S3 One Zone-Infrequent Access (S3 One Zone-IA) from the beginning."
+    ],
+    "answer": 2,
+    "explanation": "S3 Lifecycle policies automate transitions to lower-cost storage classes. S3 Standard-IA provides immediate access at lower cost for infrequently accessed data.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "S3 Glacier Deep Archive does not provide immediate retrieval - it requires hours to restore objects, which doesn't meet the requirement for immediate access.",
+      "1": "Manual scripts require significant operational overhead for scheduling, monitoring, and maintenance. Lifecycle policies automate this process without manual intervention.",
+      "3": "Storing all objects in S3 One Zone-IA from the start would result in higher costs during the first 30 days when objects are frequently accessed, as S3 Standard-IA has retrieval fees."
+    }
+  },
+  {
+    "id": "SAA-644",
+    "domainId": "D4",
+    "domain": "Design Cost-Optimized Architectures",
+    "section": "EC2 Pricing and Cost Optimization (Select TWO)",
+    "question": "A startup company is deploying a new web application on AWS. The application will have predictable baseline traffic during business hours but may experience occasional traffic spikes. The company wants to minimize costs while ensuring the application remains available. The development team has confirmed that the application can tolerate brief interruptions during non-critical batch processing tasks.\n\nWhich TWO strategies should a solutions architect recommend to optimize costs? (Choose TWO.)",
+    "choices": [
+      "Deploy all instances in multiple Availability Zones using Dedicated Hosts",
+      "Use Spot Instances for the batch processing tasks that can tolerate interruptions",
+      "Purchase Reserved Instances with no upfront payment for the unpredictable traffic spikes",
+      "Use On-Demand Instances for all workloads to maintain maximum flexibility",
+      "Use Auto Scaling to automatically adjust capacity based on demand"
+    ],
+    "answer": [
+      1,
+      4
+    ],
+    "explanation": "Spot Instances offer up to 90% discount for fault-tolerant workloads like batch processing. Auto Scaling optimizes costs by matching capacity to actual demand, avoiding over-provisioning.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "Dedicated Hosts are the most expensive EC2 option, designed for licensing compliance or regulatory requirements, not for cost optimization.",
+      "2": "Reserved Instances are designed for predictable, steady-state workloads, not for unpredictable traffic spikes. They require a 1 or 3-year commitment.",
+      "3": "On-Demand Instances for all workloads is not cost-optimized. They are the most expensive option and should only be used when flexibility is required without commitment."
+    }
+  },
+  {
+    "id": "SAA-645",
+    "domainId": "D4",
+    "domain": "Design Cost-Optimized Architectures",
+    "section": "S3 Costs",
+    "question": "A company stores product images in Amazon S3. The images are frequently accessed during the first 30 days after upload but are rarely accessed afterward. The company wants to minimize storage costs while maintaining immediate access to all images when needed.\n\nWhich S3 storage class configuration will meet these requirements MOST cost-effectively?",
+    "choices": [
+      "Store images in S3 Standard and use an S3 Lifecycle policy to transition them to S3 Standard-IA after 30 days",
+      "Store all images in S3 Standard-IA from the beginning",
+      "Store all images in S3 Standard and manually move them to S3 Glacier after 30 days",
+      "Store all images in S3 One Zone-IA from the beginning"
+    ],
+    "answer": 0,
+    "explanation": "S3 Lifecycle policies automatically transition objects to cheaper storage classes like S3 Standard-IA, which provides immediate access at lower cost than S3 Standard for infrequently accessed data.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "1": "S3 Standard-IA has higher retrieval costs. Using it for frequently accessed data in the first 30 days would increase costs unnecessarily.",
+      "2": "Manual movement is operationally inefficient and error-prone. S3 Glacier also has retrieval delays, which doesn't meet the immediate access requirement.",
+      "3": "S3 One Zone-IA stores data in a single AZ with lower durability. Using it for frequently accessed data also incurs higher retrieval costs during the first 30 days."
+    }
+  },
+  {
+    "id": "SAA-647",
+    "domainId": "D4",
+    "domain": "Design Cost-Optimized Architectures",
+    "section": "S3 Costs",
+    "question": "A company stores product images in Amazon S3. The images are frequently accessed during the first 30 days after upload, but after that, they are rarely accessed. However, when the older images are needed, they must be retrieved within seconds. The company wants to minimize storage costs while maintaining quick access to all images.\n\nWhich S3 storage class strategy should a solutions architect recommend?",
+    "choices": [
+      "Store all images in S3 Standard and manually move them to S3 Glacier after 30 days",
+      "Store all images in S3 One Zone-Infrequent Access from the beginning",
+      "Use S3 Lifecycle policies to transition objects from S3 Standard to S3 Standard-Infrequent Access after 30 days",
+      "Store all images in S3 Intelligent-Tiering with no lifecycle policy"
+    ],
+    "answer": 2,
+    "explanation": "S3 Lifecycle policies can automatically transition objects to S3 Standard-IA after 30 days, reducing costs while maintaining millisecond retrieval times.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "S3 Glacier has retrieval times of minutes to hours, not seconds. This does not meet the requirement for immediate access to older images.",
+      "1": "S3 One Zone-IA from the start would not be cost-effective for frequently accessed images in the first 30 days due to retrieval charges.",
+      "3": "S3 Intelligent-Tiering has a monthly monitoring fee per object. When access patterns are predictable (as stated), lifecycle policies are more cost-effective."
+    }
+  },
+  {
+    "id": "SAA-648",
+    "domainId": "D4",
+    "domain": "Design Cost-Optimized Architectures",
+    "section": "S3 Costs",
+    "question": "A company stores product images in Amazon S3. The images are frequently accessed during the first 30 days after upload but are rarely accessed afterward. The company wants to minimize storage costs while maintaining immediate access to all images when needed.\n\nWhich S3 storage class strategy should a solutions architect recommend?",
+    "choices": [
+      "Store all images in S3 Standard and manually move them to S3 Glacier after 30 days",
+      "Store all images in S3 One Zone-Infrequent Access from the beginning",
+      "Store all images in S3 Glacier Instant Retrieval from the beginning",
+      "Store images in S3 Standard and use an S3 Lifecycle policy to transition them to S3 Standard-Infrequent Access after 30 days"
+    ],
+    "answer": 3,
+    "explanation": "S3 Lifecycle policies automate transitions between storage classes. Moving to S3 Standard-IA after 30 days reduces costs while maintaining immediate access.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "Manual movement is operationally inefficient and error-prone. S3 Glacier also requires retrieval requests, not providing immediate access.",
+      "1": "S3 One Zone-IA has higher retrieval costs and is not optimal for frequently accessed data in the first 30 days.",
+      "2": "S3 Glacier Instant Retrieval has higher retrieval costs and is designed for rarely accessed data, making it expensive for frequently accessed images in the first 30 days."
+    }
+  },
+  {
+    "id": "SAA-651",
+    "domainId": "D4",
+    "domain": "Design Cost-Optimized Architectures",
+    "section": "EC2 Pricing",
+    "question": "A startup company is running a development environment on Amazon EC2 instances. The developers work Monday through Friday from 9 AM to 6 PM, and the instances are not needed outside of these hours. The company wants to reduce costs for these development instances while maintaining the ability to start and stop them as needed.\n\nWhich EC2 purchasing option is the MOST cost-effective for this use case?",
+    "choices": [
+      "Reserved Instances with a 1-year term",
+      "Spot Instances",
+      "Dedicated Hosts",
+      "On-Demand Instances with scheduled start/stop"
+    ],
+    "answer": 3,
+    "explanation": "On-Demand Instances with scheduled start/stop is most cost-effective because you only pay for the hours used during business hours, avoiding 24/7 costs.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "Reserved Instances require payment for 24/7 capacity regardless of usage. For instances running only 45 hours per week, this would be more expensive than On-Demand with scheduling.",
+      "1": "Spot Instances can be interrupted by AWS with 2-minute notice, making them unsuitable for development work where developers need consistent access to their environments.",
+      "2": "Dedicated Hosts are the most expensive option, designed for licensing compliance or regulatory requirements, not cost optimization for development workloads."
+    }
+  },
+  {
+    "id": "SAA-652",
+    "domainId": "D4",
+    "domain": "Design Cost-Optimized Architectures",
+    "section": "EC2 Pricing and Cost Optimization (Select TWO)",
+    "question": "A startup company is launching a new web application on AWS. The application will run on Amazon EC2 instances and is expected to have steady, predictable traffic during business hours for at least the next year. The company wants to minimize compute costs while maintaining reliable performance.\n\nWhich TWO purchasing options should the solutions architect recommend to optimize costs? (Choose TWO.)",
+    "choices": [
+      "Use Spot Instances for all production workloads to achieve the lowest possible cost",
+      "Purchase EC2 Reserved Instances with a 1-year term for the baseline capacity",
+      "Use On-Demand Instances exclusively to maintain maximum flexibility",
+      "Purchase a Compute Savings Plan with a 1-year commitment for predictable workloads",
+      "Deploy all instances in multiple Availability Zones using Dedicated Hosts"
+    ],
+    "answer": [
+      1,
+      3
+    ],
+    "explanation": "Reserved Instances and Compute Savings Plans both offer significant discounts (up to 72%) compared to On-Demand pricing for predictable, steady-state workloads with 1-year or 3-year commitments.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "Spot Instances can be interrupted with 2-minute notice, making them unsuitable for production workloads requiring reliable, consistent performance.",
+      "2": "On-Demand Instances provide flexibility but are the most expensive option. For predictable workloads running for a year, commitment-based pricing offers substantial savings.",
+      "4": "Dedicated Hosts are the most expensive EC2 option, designed for licensing compliance or regulatory requirements, not cost optimization for standard workloads."
+    }
+  },
+  {
+    "id": "SAA-654",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "Secrets Manager",
+    "question": "Which AWS service is specifically designed to securely store, rotate, and manage database credentials and API keys?",
+    "choices": [
+      "AWS Systems Manager Parameter Store",
+      "AWS Key Management Service (KMS)",
+      "AWS Secrets Manager",
+      "AWS Identity and Access Management (IAM)"
+    ],
+    "answer": 2,
+    "explanation": "AWS Secrets Manager is purpose-built for storing and automatically rotating secrets like database credentials and API keys.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "Parameter Store can store configuration data and secrets but lacks built-in automatic rotation capabilities for database credentials.",
+      "1": "KMS manages encryption keys used to encrypt data, not the storage and rotation of application secrets like passwords.",
+      "3": "IAM manages user identities and permissions for AWS resources, not the storage of application secrets or credentials."
+    }
+  },
+  {
+    "id": "SAA-654",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "GuardDuty",
+    "question": "A media streaming company runs its video processing workloads on Amazon EC2 instances in multiple AWS accounts. The security team has noticed unusual API activity patterns and suspects that some instances may have been compromised. They need a solution that can automatically detect potential threats such as cryptocurrency mining, unauthorized access attempts, and communication with known malicious IP addresses across all their AWS accounts with minimal operational overhead.\n\nWhich solution should a solutions architect recommend?",
+    "choices": [
+      "Enable Amazon GuardDuty in a delegated administrator account and configure it to monitor all member accounts in the organization.",
+      "Deploy Amazon Inspector agents on all EC2 instances to continuously scan for vulnerabilities and suspicious network activity.",
+      "Enable AWS CloudTrail in each account and create custom CloudWatch Alarms to detect suspicious API patterns based on predefined rules.",
+      "Configure VPC Flow Logs in each account and use Amazon Athena queries to analyze traffic patterns for malicious activity."
+    ],
+    "answer": 0,
+    "explanation": "Amazon GuardDuty uses machine learning to detect threats like cryptocurrency mining and malicious IPs across multiple accounts with minimal setup when configured with AWS Organizations.",
+    "difficulty": "Medium",
+    "choiceExplanations": {
+      "1": "Amazon Inspector focuses on vulnerability assessments and software CVEs, not real-time threat detection like cryptocurrency mining or communication with malicious IP addresses.",
+      "2": "CloudTrail with custom CloudWatch Alarms requires significant manual rule creation and maintenance. It cannot automatically detect cryptocurrency mining or correlate with threat intelligence feeds.",
+      "3": "VPC Flow Logs with Athena requires manual query development and lacks built-in threat intelligence. This approach has high operational overhead and cannot detect account-level threats."
+    }
+  },
+  {
+    "id": "SAA-655",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "Secrets Manager",
+    "question": "Which AWS service is specifically designed to store, rotate, and manage database credentials and API keys securely?",
+    "choices": [
+      "AWS Systems Manager Parameter Store",
+      "AWS Key Management Service (KMS)",
+      "AWS Identity and Access Management (IAM)",
+      "AWS Secrets Manager"
+    ],
+    "answer": 3,
+    "explanation": "AWS Secrets Manager is purpose-built for storing and automatically rotating secrets like database credentials and API keys.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "Parameter Store can store configuration data and secrets but lacks built-in automatic rotation capabilities for database credentials.",
+      "1": "KMS manages encryption keys used to encrypt data, not the storage and rotation of application secrets like passwords.",
+      "2": "IAM manages user identities and permissions for AWS resources, not the storage of application secrets or credentials."
+    }
+  },
+  {
+    "id": "SAA-655",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "GuardDuty",
+    "question": "A media streaming company hosts its video processing workloads on Amazon EC2 instances in multiple AWS accounts. The security team has noticed unusual API activity patterns in their CloudTrail logs and suspects potential cryptocurrency mining attempts on compromised instances. They need an automated solution that can detect these threats across all accounts with minimal operational overhead.\n\nWhich solution should a solutions architect recommend?",
+    "choices": [
+      "Enable Amazon GuardDuty in a delegated administrator account and configure it to monitor all member accounts in the organization.",
+      "Deploy Amazon Inspector agents on all EC2 instances to continuously scan for vulnerabilities and malware signatures.",
+      "Enable AWS Config rules across all accounts to monitor for unauthorized EC2 instance types and trigger AWS Lambda functions for remediation.",
+      "Configure Amazon CloudWatch anomaly detection on CPU utilization metrics and create alarms to notify the security team."
+    ],
+    "answer": 0,
+    "explanation": "GuardDuty uses machine learning to detect cryptocurrency mining and other threats across multiple accounts with minimal setup when configured with AWS Organizations.",
+    "difficulty": "Medium",
+    "choiceExplanations": {
+      "1": "Amazon Inspector assesses vulnerabilities and network exposure but does not detect active cryptocurrency mining or analyze CloudTrail logs for suspicious API activity.",
+      "2": "AWS Config monitors resource configurations but does not detect cryptocurrency mining behavior or analyze API activity patterns for threat detection.",
+      "3": "CloudWatch anomaly detection monitors metrics but cannot identify specific threat patterns like cryptocurrency mining or correlate suspicious API activities across accounts."
+    }
+  },
+  {
+    "id": "SAA-656",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "S3 Replication",
+    "question": "Which Amazon S3 feature automatically replicates objects across different AWS Regions to improve data durability and meet compliance requirements?",
+    "choices": [
+      "S3 Transfer Acceleration",
+      "S3 Versioning",
+      "S3 Lifecycle Policies",
+      "S3 Cross-Region Replication (CRR)"
+    ],
+    "answer": 3,
+    "explanation": "S3 Cross-Region Replication (CRR) automatically replicates objects across AWS Regions for disaster recovery and compliance.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "S3 Transfer Acceleration speeds up uploads using CloudFront edge locations but does not replicate data across regions.",
+      "1": "S3 Versioning keeps multiple versions of objects in the same bucket but does not copy data to other regions.",
+      "2": "S3 Lifecycle Policies automate transitioning objects between storage classes or deleting them, not replicating across regions."
+    }
+  },
+  {
+    "id": "SAA-656",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "Auto Scaling",
+    "question": "A healthcare company runs a patient appointment scheduling application on Amazon EC2 instances behind an Application Load Balancer. The application experiences predictable traffic spikes every weekday morning from 8 AM to 10 AM when patients call to schedule appointments. During these peak hours, the current infrastructure struggles to handle the load, causing slow response times. The company wants to ensure the application can handle the morning traffic surge without over-provisioning resources during off-peak hours. Which solution will MOST effectively address this requirement?",
+    "choices": [
+      "Configure Amazon EC2 Auto Scaling with a target tracking scaling policy based on average CPU utilization of 70%",
+      "Configure Amazon EC2 Auto Scaling with a scheduled scaling action to increase capacity before 8 AM and decrease after 10 AM on weekdays",
+      "Deploy additional EC2 instances manually each morning and terminate them after the peak period",
+      "Migrate the application to AWS Lambda to automatically scale based on incoming requests"
+    ],
+    "answer": 1,
+    "explanation": "Scheduled scaling is ideal for predictable, recurring traffic patterns. It proactively adds capacity before the known peak time, preventing performance issues.",
+    "difficulty": "Medium",
+    "choiceExplanations": {
+      "0": "Target tracking scaling is reactive and adds instances after CPU increases. This causes delays during sudden traffic spikes, resulting in slow response times before new instances are ready.",
+      "2": "Manual scaling is operationally inefficient, error-prone, and doesn't align with AWS best practices for automation. It requires human intervention daily and lacks reliability.",
+      "3": "Migrating to Lambda requires significant application refactoring and may not be suitable for all workloads. The question asks for the most effective solution for the existing EC2-based architecture."
+    }
+  },
+  {
+    "id": "SAA-657",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "ElastiCache",
+    "question": "Which AWS service provides a fully managed in-memory data store that can be used to improve application performance by caching frequently accessed data?",
+    "choices": [
+      "Amazon RDS",
+      "Amazon DynamoDB",
+      "Amazon ElastiCache",
+      "Amazon Redshift"
+    ],
+    "answer": 2,
+    "explanation": "Amazon ElastiCache is a fully managed in-memory caching service that supports Redis and Memcached to improve application performance.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "Amazon RDS is a managed relational database service, not an in-memory caching solution.",
+      "1": "Amazon DynamoDB is a NoSQL database service. While it has DAX for caching, DynamoDB itself is not an in-memory cache.",
+      "3": "Amazon Redshift is a data warehouse service for analytics, not an in-memory caching solution."
+    }
+  },
+  {
+    "id": "SAA-657",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "EC2 Performance",
+    "question": "A genomics research company runs compute-intensive DNA sequencing workloads on Amazon EC2. The application processes large datasets stored locally and requires high sequential read/write throughput to temporary storage during analysis. Each analysis job runs for 2-4 hours and generates approximately 500 GB of intermediate data that is discarded after processing completes. The company wants to optimize storage performance while minimizing costs for this temporary data. Which storage solution should a solutions architect recommend?",
+    "choices": [
+      "Attach an Amazon EBS Provisioned IOPS SSD (io2) volume with 64,000 IOPS",
+      "Use Amazon EFS with Max I/O performance mode mounted to the EC2 instance",
+      "Store temporary data on Amazon S3 with S3 Transfer Acceleration enabled",
+      "Use NVMe-based instance store volumes on a storage-optimized EC2 instance"
+    ],
+    "answer": 3,
+    "explanation": "Instance store volumes provide the highest throughput for temporary data with no additional cost, ideal for ephemeral processing workloads.",
+    "difficulty": "Medium",
+    "choiceExplanations": {
+      "0": "EBS io2 provides high IOPS but is expensive for temporary data that will be discarded. Instance store is included with the instance at no extra cost.",
+      "1": "EFS adds network latency and is designed for shared file access across instances, not optimal for single-instance high-throughput temporary storage.",
+      "2": "S3 is object storage with higher latency than local storage. Transfer Acceleration is for cross-region uploads, not local compute performance."
+    }
+  },
+  {
+    "id": "SAA-658",
+    "domainId": "D4",
+    "domain": "Design Cost-Optimized Architectures",
+    "section": "EC2 Pricing",
+    "question": "Which Amazon EC2 purchasing option provides the LOWEST cost for workloads that can be interrupted?",
+    "choices": [
+      "On-Demand Instances",
+      "Reserved Instances",
+      "Dedicated Hosts",
+      "Spot Instances"
+    ],
+    "answer": 3,
+    "explanation": "Spot Instances offer up to 90% discount compared to On-Demand pricing but can be interrupted by AWS with 2-minute notice.",
+    "difficulty": "Easy",
+    "choiceExplanations": {
+      "0": "On-Demand Instances provide no discount and are billed at full price per hour or second with no commitment.",
+      "1": "Reserved Instances require 1 or 3-year commitments and are designed for steady-state workloads, not interruptible ones.",
+      "2": "Dedicated Hosts are the most expensive option, providing physical servers for compliance or licensing requirements."
+    }
+  },
+  {
+    "id": "SAA-658",
+    "domainId": "D4",
+    "domain": "Design Cost-Optimized Architectures",
+    "section": "Cost Optimization",
+    "question": "A healthcare analytics company runs batch processing jobs on Amazon EMR clusters. The jobs process patient data reports every night between 2 AM and 6 AM, and the processing time varies between 2 to 4 hours depending on data volume. The company wants to reduce costs while maintaining reliable job completion. The EMR clusters currently use On-Demand instances for both master and core nodes. Which approach provides the MOST cost-effective solution while ensuring job reliability?",
+    "choices": [
+      "Use Spot Instances for all master and core nodes with a single Availability Zone deployment",
+      "Purchase 3-year Reserved Instances for all master and core nodes to maximize savings",
+      "Use On-Demand Instances for master nodes and Spot Instances for core nodes with instance fleet configuration",
+      "Use Spot Instances for master nodes and On-Demand Instances for core nodes"
+    ],
+    "answer": 2,
+    "explanation": "Using On-Demand for master nodes ensures cluster stability while Spot Instances for core nodes with instance fleet provides cost savings and capacity flexibility.",
+    "difficulty": "Medium",
+    "choiceExplanations": {
+      "0": "Using Spot Instances for master nodes risks cluster termination if the master is interrupted, causing job failures and data loss.",
+      "1": "Reserved Instances are not cost-effective for workloads running only 4 hours daily. The utilization would be too low to justify the commitment.",
+      "3": "Master nodes should never use Spot Instances as their termination would cause the entire cluster to fail, compromising job reliability."
+    }
+  },
+  {
+    "id": "SAA-659",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "Secrets Manager",
+    "question": "A company is migrating a legacy application to AWS that connects to an Amazon RDS MySQL database. The application currently stores database credentials in a configuration file on the application server. The security team requires that database credentials must be rotated every 30 days without requiring application code changes or manual intervention. The solution should also encrypt the credentials at rest.\n\nWhich solution meets these requirements with the LEAST operational overhead?",
+    "choices": [
+      "Store the credentials in AWS Systems Manager Parameter Store as a SecureString parameter. Create an AWS Lambda function triggered by Amazon EventBridge every 30 days to rotate the credentials and update the parameter.",
+      "Store the credentials in an encrypted Amazon S3 bucket using server-side encryption with AWS KMS. Create a scheduled AWS Lambda function to generate new credentials and update the S3 object every 30 days.",
+      "Store the credentials in AWS Secrets Manager and enable automatic rotation with a 30-day rotation schedule. Update the application to retrieve credentials from Secrets Manager at runtime.",
+      "Store the credentials in AWS Systems Manager Parameter Store as a SecureString parameter with AWS KMS encryption. Manually update the credentials every 30 days using the AWS Management Console."
+    ],
+    "answer": 2,
+    "explanation": "AWS Secrets Manager provides native automatic rotation for RDS databases with built-in Lambda functions, encrypts secrets at rest using KMS, and requires no custom code for rotation.",
+    "difficulty": "Medium",
+    "choiceExplanations": {
+      "0": "Parameter Store SecureString provides encryption but lacks built-in automatic rotation for RDS credentials. This requires custom Lambda code and additional operational overhead to maintain.",
+      "1": "Storing credentials in S3 is not a recommended practice for secrets management. This approach requires custom rotation logic and lacks the native database integration that Secrets Manager provides.",
+      "3": "This solution requires manual intervention every 30 days, which violates the requirement for no manual intervention and increases operational overhead significantly."
+    }
+  },
+  {
+    "id": "SAA-660",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "Secrets Manager",
+    "question": "A company is migrating a legacy application to AWS. The application connects to an Amazon RDS MySQL database and currently stores database credentials in a configuration file on the application server. The security team requires that database credentials be stored securely, rotated automatically every 30 days, and that the application retrieves credentials programmatically without storing them locally. Which solution meets these requirements with the LEAST operational overhead?",
+    "choices": [
+      "Store the credentials in AWS Systems Manager Parameter Store as a SecureString parameter. Create an AWS Lambda function triggered by Amazon EventBridge every 30 days to rotate the credentials.",
+      "Store the credentials in AWS Secrets Manager. Enable automatic rotation and configure the rotation schedule to 30 days.",
+      "Store the credentials in an encrypted Amazon S3 bucket. Configure an S3 Lifecycle policy to rotate the credentials file every 30 days.",
+      "Store the credentials in AWS Key Management Service (KMS). Use KMS key rotation to automatically rotate the credentials every 30 days."
+    ],
+    "answer": 1,
+    "explanation": "AWS Secrets Manager provides native automatic rotation for RDS database credentials with minimal setup, meeting all requirements with least operational overhead.",
+    "difficulty": "Medium",
+    "choiceExplanations": {
+      "0": "Parameter Store SecureString can store secrets but lacks native automatic rotation for RDS credentials - requires custom Lambda function development and maintenance.",
+      "2": "S3 Lifecycle policies manage object storage transitions and expiration, not credential rotation. This approach doesn't actually rotate database passwords.",
+      "3": "KMS manages encryption keys, not database credentials. KMS key rotation rotates the key material, not application secrets like database passwords."
+    }
+  },
+  {
+    "id": "SAA-661",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "Multi-Region",
+    "question": "A retail company operates a web application that serves customers across North America and Europe. The application uses an Amazon RDS MySQL database in the us-east-1 region. The company wants to improve read performance for European customers while also ensuring the database can be quickly promoted to a standalone database in eu-west-1 if the primary region becomes unavailable. The solution should minimize data loss during a regional failover.\n\nWhich solution meets these requirements?",
+    "choices": [
+      "Create daily automated snapshots and copy them to eu-west-1 for manual restoration if needed",
+      "Enable Amazon RDS Multi-AZ deployment and configure automatic failover to eu-west-1",
+      "Use AWS Database Migration Service (DMS) to continuously replicate data to a new RDS instance in eu-west-1",
+      "Create an Amazon RDS Read Replica in eu-west-1 and configure the application to direct European read traffic to this replica"
+    ],
+    "answer": 3,
+    "explanation": "RDS Cross-Region Read Replicas improve read performance in remote regions and can be promoted to standalone databases during regional failures with minimal data loss.",
+    "difficulty": "Medium",
+    "choiceExplanations": {
+      "0": "Daily snapshots would result in up to 24 hours of data loss during failover, which does not meet the requirement to minimize data loss during regional failover.",
+      "1": "Multi-AZ deployment only provides failover within the same region to a standby instance in a different Availability Zone, not cross-region failover to eu-west-1.",
+      "2": "While DMS can replicate data cross-region, it adds operational complexity and is not the native solution for this use case. Read Replicas are purpose-built for this scenario."
+    }
+  },
+  {
+    "id": "SAA-662",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "DynamoDB Performance",
+    "question": "A retail company is building an e-commerce application that stores product catalog data in Amazon DynamoDB. The application experiences highly variable traffic patterns, with read requests spiking to 10x normal levels during flash sales that occur unpredictably throughout the month. During normal operations, the table handles approximately 500 read capacity units (RCUs), but during sales events, it needs up to 5,000 RCUs. The company wants to ensure consistent low-latency reads during peak traffic while minimizing costs during normal operations. Which solution should a solutions architect recommend?",
+    "choices": [
+      "Provision the DynamoDB table with 5,000 RCUs to handle peak traffic at all times",
+      "Use DynamoDB on-demand capacity mode for the table",
+      "Create a DynamoDB global table replicated across multiple AWS Regions",
+      "Enable DynamoDB Streams to buffer read requests during peak periods"
+    ],
+    "answer": 1,
+    "explanation": "DynamoDB on-demand capacity mode automatically scales to handle traffic spikes without capacity planning, charging only for actual reads/writes used.",
+    "difficulty": "Medium",
+    "choiceExplanations": {
+      "0": "Provisioning for peak capacity (5,000 RCUs) constantly would result in significant wasted costs during normal operations when only 500 RCUs are needed.",
+      "2": "Global tables provide multi-Region replication for disaster recovery and low-latency global access, but don't address the variable capacity scaling requirement within a single Region.",
+      "3": "DynamoDB Streams capture data modification events for downstream processing; they do not buffer or queue read requests and cannot help with read capacity scaling."
+    }
+  },
+  {
+    "id": "SAA-663",
+    "domainId": "D4",
+    "domain": "Design Cost-Optimized Architectures",
+    "section": "Spot Instances",
+    "question": "A media company runs a video transcoding application on Amazon EC2. The application processes uploaded videos into multiple formats and resolutions. Processing jobs typically take 15-30 minutes to complete, and the application is designed to automatically retry failed jobs. The workload is flexible and can tolerate occasional interruptions. The company wants to reduce EC2 costs by at least 60% compared to their current On-Demand instances while maintaining processing capacity.\n\nWhich solution meets these requirements?",
+    "choices": [
+      "Purchase 1-year EC2 Reserved Instances with partial upfront payment for the transcoding workload",
+      "Deploy the application on AWS Lambda functions with provisioned concurrency enabled",
+      "Use EC2 Spot Instances and configure the application to save job progress to Amazon S3 for recovery",
+      "Use EC2 On-Demand Instances with Savings Plans for a 1-year commitment"
+    ],
+    "answer": 2,
+    "explanation": "Spot Instances offer up to 90% discount over On-Demand pricing. The workload is fault-tolerant with retry capability, making it ideal for Spot.",
+    "difficulty": "Medium",
+    "choiceExplanations": {
+      "0": "Reserved Instances provide up to 72% savings but require commitment to specific instance types. Spot offers greater savings for interruptible workloads.",
+      "1": "Lambda has a 15-minute execution timeout, which cannot accommodate 15-30 minute video transcoding jobs. This solution would not work.",
+      "3": "Savings Plans offer up to 72% savings but still cost more than Spot Instances. For fault-tolerant workloads, Spot provides better cost optimization."
+    }
+  },
+  {
+    "id": "SAA-664",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "KMS, S3 Security, IAM",
+    "question": "A healthcare company stores protected health information (PHI) in Amazon S3 buckets across multiple AWS accounts within an AWS Organization. The security team requires that all S3 objects must be encrypted using customer managed keys (CMKs) stored in a centralized security account. They also need to ensure that even if a bucket policy is misconfigured, objects cannot be accessed without proper KMS permissions. The company wants to prevent any AWS service or principal from bypassing the encryption requirements. Additionally, they need to audit all key usage across accounts and automatically rotate keys annually.\n\nWhich combination of configurations meets these requirements with the LEAST operational overhead?",
+    "choices": [
+      "Create CMKs in each member account with automatic key rotation enabled. Use S3 bucket policies to enforce server-side encryption with aws:kms. Enable CloudTrail in each account to log KMS API calls. Use AWS Config rules to detect unencrypted objects.",
+      "Create CMKs in the security account with imported key material for manual rotation control. Use AWS RAM to share keys across accounts. Apply SCPs to deny s3:PutObject without encryption. Use Amazon Macie to audit key usage patterns.",
+      "Create CMKs in the security account and replicate them to member accounts using AWS KMS multi-Region keys. Use S3 Object Lock to prevent unauthorized access. Enable AWS Config aggregator to monitor encryption compliance across all accounts.",
+      "Create CMKs in the security account with automatic key rotation enabled. Configure KMS key policies to allow cross-account access for specific IAM roles. Use S3 bucket policies with conditions requiring aws:SecureTransport and s3:x-amz-server-side-encryption-aws-kms-key-id. Enable CloudTrail with organization trail to log KMS events to a centralized bucket."
+    ],
+    "answer": 3,
+    "explanation": "Centralized CMKs in security account with cross-account key policies, S3 bucket conditions enforcing specific KMS keys, and organization-wide CloudTrail provides centralized control, encryption enforcement, and comprehensive auditing with minimal overhead.",
+    "difficulty": "Hard",
+    "choiceExplanations": {
+      "0": "Creating CMKs in each member account defeats the centralized key management requirement and increases operational overhead for key management and auditing across multiple accounts.",
+      "1": "Imported key material requires manual rotation, increasing operational overhead. AWS RAM cannot share KMS keys directly. Macie is for sensitive data discovery, not KMS key usage auditing.",
+      "2": "Multi-Region keys are for disaster recovery, not cross-account access. S3 Object Lock prevents deletion, not unauthorized access. This doesn't address the cross-account encryption requirement properly."
+    }
+  },
+  {
+    "id": "SAA-665",
+    "domainId": "D1",
+    "domain": "Design Secure Architectures",
+    "section": "KMS, Secrets Manager, IAM",
+    "question": "A financial services company is migrating a critical trading application to AWS. The application uses a multi-tier architecture with Amazon EC2 instances in private subnets, an Amazon RDS for PostgreSQL database with sensitive financial data, and integration with third-party trading APIs. The security team has the following requirements:\n\n1. Database credentials must be rotated automatically every 30 days without application downtime\n2. All data at rest must be encrypted using keys that the company controls and can audit\n3. The EC2 instances must only be able to retrieve their specific credentials, not credentials for other applications\n4. API keys for third-party services must be stored securely and accessed programmatically\n5. All access to secrets must be logged for compliance auditing\n\nWhich combination of AWS services and configurations meets ALL of these requirements?",
+    "choices": [
+      "Store database credentials in AWS Secrets Manager with automatic rotation enabled using a Lambda rotation function. Store API keys in Secrets Manager without rotation. Use customer managed KMS keys for encryption. Attach IAM policies to EC2 instance roles with resource tags and conditions to restrict secret access. Enable CloudTrail logging.",
+      "Store all credentials in AWS Systems Manager Parameter Store SecureString parameters encrypted with AWS managed keys. Use IAM instance profiles with resource-based policies to restrict access. Enable AWS CloudTrail to log Parameter Store API calls.",
+      "Store all credentials in an encrypted Amazon S3 bucket using SSE-KMS with customer managed keys. Create a Lambda function triggered by EventBridge every 30 days to rotate credentials. Use S3 bucket policies to restrict access per application. Enable S3 access logging and CloudTrail.",
+      "Store credentials in AWS Secrets Manager encrypted with AWS managed keys. Enable automatic rotation for all secrets. Use VPC endpoints with endpoint policies to restrict access. Configure Amazon GuardDuty to monitor for unauthorized access attempts."
+    ],
+    "answer": 0,
+    "explanation": "AWS Secrets Manager with Lambda rotation functions supports automatic credential rotation for RDS. Customer managed KMS keys provide control and auditability. IAM policies with conditions and resource tags enable granular per-application access control. CloudTrail logs all Secrets Manager API calls.",
+    "difficulty": "Hard",
+    "choiceExplanations": {
+      "1": "Parameter Store SecureString doesn't support automatic rotation natively - requires custom implementation. AWS managed keys don't provide the customer control and audit capabilities required for compliance.",
+      "2": "S3 is not designed for secrets management. Custom Lambda rotation lacks native RDS integration that Secrets Manager provides. This approach doesn't handle credential rotation without application downtime effectively.",
+      "3": "AWS managed keys don't meet the requirement for customer-controlled keys with audit capabilities. VPC endpoints alone don't provide per-application access restriction. GuardDuty monitors for threats but doesn't provide the compliance audit logging required."
+    }
+  },
+  {
+    "id": "SAA-666",
+    "domainId": "D2",
+    "domain": "Design Resilient Architectures",
+    "section": "Multi-Region Disaster Recovery",
+    "question": "A financial services company operates a critical trading platform hosted in us-east-1. The platform uses Amazon RDS for PostgreSQL with Multi-AZ deployment, Amazon ElastiCache for Redis for session management, and stores transaction logs in Amazon S3. Regulatory requirements mandate that the platform must be recoverable in a different AWS Region within 15 minutes (RTO) with no more than 1 minute of data loss (RPO). The company wants to minimize costs while meeting these strict requirements. During normal operations, the DR region should not serve any production traffic. Which combination of services and configurations will meet these requirements MOST cost-effectively?",
+    "choices": [
+      "Create an RDS cross-Region read replica in us-west-2 with automated promotion. Use ElastiCache Global Datastore for Redis. Configure S3 Cross-Region Replication with Replication Time Control. Deploy the application on EC2 instances in us-west-2 in a stopped state. Use Route 53 health checks with DNS failover.",
+      "Use AWS Database Migration Service for continuous replication to a standby RDS instance in us-west-2. Create ElastiCache snapshots every minute and copy to us-west-2. Enable S3 Cross-Region Replication. Use AWS Lambda to launch EC2 instances during failover.",
+      "Configure RDS automated backups with cross-Region backup replication to us-west-2. Use ElastiCache backup and restore. Enable S3 Cross-Region Replication. Deploy Auto Scaling groups in us-west-2 with desired capacity set to zero. Use Route 53 failover routing.",
+      "Create an Aurora PostgreSQL Global Database spanning us-east-1 and us-west-2. Use ElastiCache Global Datastore for Redis. Configure S3 Cross-Region Replication with Replication Time Control. Deploy the application using AWS Elastic Beanstalk in us-west-2 with zero running instances. Use Route 53 health checks with failover routing."
+    ],
+    "answer": 0,
+    "explanation": "RDS cross-Region read replica provides sub-minute RPO with fast promotion. ElastiCache Global Datastore enables sub-second replication. S3 CRR with RTC ensures 15-minute replication SLA. Stopped EC2 instances minimize costs while enabling quick startup.",
+    "difficulty": "Hard",
+    "choiceExplanations": {
+      "1": "DMS adds unnecessary complexity and cost for this use case. ElastiCache snapshots every minute cannot meet 1-minute RPO due to snapshot creation time. Lambda-based EC2 launch adds latency that may exceed 15-minute RTO.",
+      "2": "RDS automated backup replication has hours of RPO, not meeting the 1-minute requirement. ElastiCache backup and restore is too slow for 15-minute RTO. This approach is suitable for pilot light but not for strict RPO requirements.",
+      "3": "Aurora Global Database is more expensive than RDS cross-Region read replica and exceeds cost optimization requirements. While technically capable, the question asks for the MOST cost-effective solution, and Aurora pricing is significantly higher than standard RDS PostgreSQL."
+    }
+  },
+  {
+    "id": "SAA-667",
+    "domainId": "D3",
+    "domain": "Design High-Performing Architectures",
+    "section": "DynamoDB Performance",
+    "question": "A financial services company operates a high-frequency trading platform that processes millions of transactions per second. The platform uses Amazon DynamoDB to store real-time market data with a table that has a partition key of 'stock_symbol' and sort key of 'timestamp'. During peak trading hours, the application experiences throttling on specific partitions because 15 highly-traded stocks account for 80% of all read and write operations. The table uses provisioned capacity mode with 50,000 RCUs and 30,000 WCUs. The company requires sub-millisecond read latency for the most frequently accessed data while maintaining cost efficiency. The solution must handle sudden traffic spikes without manual intervention and ensure consistent performance across all stock symbols.\n\nWhich combination of solutions will BEST address the hot partition issue while meeting the latency and scalability requirements?",
+    "choices": [
+      "Enable DynamoDB on-demand capacity mode and implement write sharding by appending a random suffix to the partition key for hot stocks",
+      "Enable DynamoDB Accelerator (DAX) for read operations and implement write sharding by appending a calculated suffix (0-9) to the partition key based on a hash of the timestamp",
+      "Increase the provisioned capacity to 100,000 RCUs and 60,000 WCUs, and enable DynamoDB auto scaling with a target utilization of 50%",
+      "Create a Global Secondary Index with a different partition key distribution and enable DynamoDB Streams to populate an ElastiCache Redis cluster for reads"
+    ],
+    "answer": 1,
+    "explanation": "DAX provides sub-millisecond read latency for cached data, while write sharding with a calculated suffix distributes writes across multiple partitions, solving the hot partition problem while maintaining query predictability.",
+    "difficulty": "Hard",
+    "choiceExplanations": {
+      "0": "On-demand mode helps with capacity but doesn't solve hot partition issues. Random suffixes make querying difficult since you can't predict which partition contains specific data without scanning all shards.",
+      "2": "Simply increasing provisioned capacity doesn't solve hot partition problems - DynamoDB has per-partition limits (3,000 RCUs/1,000 WCUs per partition) regardless of total table capacity.",
+      "3": "GSIs inherit the same partition limits and would still experience hot partitions. Adding ElastiCache adds complexity and doesn't address the write throttling issue on the base table."
+    }
+  },
+  {
+    "id": "SAA-668",
+    "domainId": "D4",
+    "domain": "Design Cost-Optimized Architectures",
+    "section": "Cost Optimization",
+    "question": "A financial services company runs a data analytics platform on AWS that processes market data. The platform consists of three workload types: a web application tier running 24/7 with predictable traffic patterns, a batch processing cluster that runs for 8 hours daily during market hours with strict completion deadlines, and a machine learning training pipeline that runs overnight with flexible completion times and can tolerate interruptions. The company has analyzed 12 months of usage data showing consistent patterns. They want to minimize costs while ensuring the batch processing jobs always complete on time. The web tier uses m6i.xlarge instances, the batch cluster uses c6i.2xlarge instances, and the ML training uses p3.2xlarge GPU instances. Which combination of purchasing options provides the MOST cost-effective solution while meeting all requirements?",
+    "choices": [
+      "Purchase 3-year Compute Savings Plans for all workloads to maximize the discount rate across all instance types and sizes.",
+      "Use On-Demand Instances for the web tier, Spot Instances with Spot Fleet for the batch processing cluster, and Reserved Instances for the ML training pipeline.",
+      "Purchase 3-year Standard Reserved Instances for the web tier, use Spot Instances with On-Demand fallback in an Auto Scaling group for the batch processing cluster, and use Spot Instances for the ML training pipeline.",
+      "Purchase 1-year EC2 Instance Savings Plans for the web tier baseline, use On-Demand Instances for the batch processing cluster, and use Spot Instances with checkpointing for the ML training pipeline."
+    ],
+    "answer": 3,
+    "explanation": "EC2 Instance Savings Plans provide significant discounts for the predictable web tier, On-Demand ensures batch jobs complete on time, and Spot Instances are ideal for interruptible ML workloads.",
+    "difficulty": "Hard",
+    "choiceExplanations": {
+      "0": "3-year Compute Savings Plans for all workloads is wasteful - the batch processing only runs 8 hours daily and ML training runs overnight, so committing to 24/7 coverage wastes money on unused capacity.",
+      "1": "Using Spot Instances for batch processing with strict deadlines is risky - Spot interruptions could cause jobs to miss completion deadlines. Reserved Instances for overnight-only ML training wastes money during unused hours.",
+      "2": "Standard Reserved Instances lack flexibility if instance needs change. Using Spot with On-Demand fallback for time-critical batch processing adds complexity and may still cause delays during Spot interruptions when scaling up."
+    }
   }
 ]
