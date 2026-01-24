@@ -39,15 +39,14 @@ node_modules/
 package.json
 package-lock.json
 
-# Generated files and temporary data
+# Root-level generated and backup files
 generation-progress.json
-*-backup.json
-*-with-explanations.json
 questions-backup.json
 questions-with-explanations.json
+questions-with-explanations-backup-before-fix.json
 
-# Utility scripts (local development tools)
-generate-choice-explanations.js
-verify-explanations.js
-EXPLANATION-GENERATION.md
-QUICK-START.md
+# Generated files and temporary data in scripts folder
+scripts/*-backup*.json
+scripts/*-with-explanations*.json
+scripts/generation-progress.json
+scripts/questions-with-explanations-fixed.json
