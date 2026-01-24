@@ -44,9 +44,13 @@ generation-progress.json
 questions-backup.json
 questions-with-explanations.json
 questions-with-explanations-backup-before-fix.json
+new-questions-*.json
 
 # Generated files and temporary data in scripts folder
 scripts/*-backup*.json
 scripts/*-with-explanations*.json
 scripts/generation-progress.json
 scripts/questions-with-explanations-fixed.json
+docs/QUESTION-GENERATION.md
+scripts/aws-services-list.json
+scripts/remove-duplicates.js
