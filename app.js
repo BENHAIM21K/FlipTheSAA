@@ -2560,6 +2560,8 @@ function switchTab(tabName) {
     });
 
     // === UPDATE SECTION VISIBILITY ===
+    console.log('[DEBUG] Switching to tab:', tabName);
+
     document.querySelectorAll('.page-section').forEach(section => {
       section.classList.remove('active');
     });
@@ -2572,9 +2574,18 @@ function switchTab(tabName) {
       'contact': 'contactSection'
     };
 
+    console.log('[DEBUG] sectionMap:', sectionMap);
+    console.log('[DEBUG] Looking for section ID:', sectionMap[tabName]);
+
     const targetSection = document.getElementById(sectionMap[tabName]);
+    console.log('[DEBUG] Found targetSection:', targetSection);
+
     if (targetSection) {
       targetSection.classList.add('active');
+      console.log('[DEBUG] Added active class to:', sectionMap[tabName]);
+      console.log('[DEBUG] Section display style:', window.getComputedStyle(targetSection).display);
+    } else {
+      console.error('[DEBUG] ERROR: Could not find section with ID:', sectionMap[tabName]);
     }
 
     // === RETURNING TO TIMED QUIZ: RENDER WITH PAUSE STATE ===
