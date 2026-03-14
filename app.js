@@ -2764,7 +2764,7 @@ function renderPresentations() {
     ];
 
     const html = presentations.map((pres, index) => {
-      const pdfPath = `../assets/presentations/${encodeURIComponent(pres.filename)}`;
+      const pdfPath = `assets/presentations/${encodeURIComponent(pres.filename)}`;
 
       return `
         <div class="presentation-item" data-presentation-index="${index}">
