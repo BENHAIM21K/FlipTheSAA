@@ -2568,7 +2568,8 @@ function switchTab(tabName) {
       'home': 'homeSection',
       'practice': 'practiceSection',
       'performance': 'performanceSection',
-      'presentations': 'presentationsSection'
+      'presentations': 'presentationsSection',
+      'contact': 'contactSection'
     };
 
     const targetSection = document.getElementById(sectionMap[tabName]);

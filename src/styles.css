@@ -80,7 +80,7 @@ body {
 
 .header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   padding: 18px 20px;
   border-bottom: 1px solid rgba(255,255,255,0.06);
@@ -1485,4 +1485,31 @@ select {
   pointer-events: auto;
   opacity: 1;
   cursor: pointer;
+}
+
+/* ===== CONTACT SECTION ===== */
+.contact-card {
+  background: rgba(18, 27, 46, 0.5);
+  border: 1px solid rgba(78, 161, 255, 0.15);
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.contact-card:hover {
+  border-color: rgba(78, 161, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.contact-options {
+  display: grid;
+  gap: 20px;
+  margin-top: 24px;
+}
+
+@media (min-width: 860px) {
+  .contact-options {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
