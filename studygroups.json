@@ -1,0 +1,134 @@
+{
+  "_instructions": {
+    "_readme": "HOW TO ADD/UPDATE STUDY GROUP DATA — Read this before editing!",
+    "_howToAddNewCohort": [
+      "1. Copy an existing studyGroup block (everything from { 'number':... to the closing }).",
+      "2. Increment 'number', update 'name', 'dateRange', and 'description'.",
+      "3. Add all lessons for this cohort inside the 'lessons' array (newest lesson first).",
+      "4. Add the new cohort at the TOP of the 'studyGroups' array.",
+      "5. Upload studygroups.json to S3 and hard-refresh the site."
+    ],
+    "_howToAddNewLesson": [
+      "1. Find the correct studyGroup by number in the 'studyGroups' array.",
+      "2. Add a new lesson object at the TOP of its 'lessons' array (newest first).",
+      "3. Fill in: number, topic, date.",
+      "4. Paste Google Drive share link into recording.url and/or summary.url.",
+      "5. Leave any unused 'url' as empty string '' — the button will be hidden automatically.",
+      "6. 'homework' is an array: [ { url, label }, { url, label } ] — typically quiz first, then homework image.",
+      "7. For lessons 9-11: omit the 'presentation', 'links', and 'homework' keys entirely.",
+      "7. Upload studygroups.json to S3 and hard-refresh the site."
+    ],
+    "_fields": {
+      "studyGroups[].number": "Cohort number (integer). Used to display 'Study Group #N' on the card.",
+      "studyGroups[].name": "Display name shown on the card, e.g. 'Study Group #1'.",
+      "studyGroups[].dateRange": "Human-readable date range, e.g. 'Nov 2025 – Jan 2026'. Shown on the card.",
+      "studyGroups[].description": "Short description of the cohort. Shown on the card.",
+      "lessons[].number": "Lesson number within this cohort (integer). Shown as 'Lesson #N'.",
+      "lessons[].topic": "What this lesson covers. Shown as subtitle in the accordion header.",
+      "lessons[].date": "Date this lesson took place, e.g. 'Dec 27, 2025'.",
+      "lessons[].recording.url": "Google Drive or Zoom Cloud share link. Set to empty '' to hide the button.",
+      "lessons[].recording.label": "Button text, e.g. 'Lesson 8 Recording'.",
+      "lessons[].summary.url": "Link to AI meeting summary doc (Google Drive, Notion, etc.). Empty '' hides it.",
+      "lessons[].summary.label": "Button text, e.g. 'Lesson 8 AI Summary'.",
+      "lessons[].presentation.url": "Relative S3 path, e.g. 'assets/presentations/filename.pdf'. Empty '' hides it.",
+      "lessons[].presentation.label": "Button text, e.g. 'Lesson 8 Slides (PDF)'.",
+      "lessons[].links": "Array of useful links. Each: { 'label': 'Link text', 'url': 'https://...', 'type': 'youtube' or 'docs' }. Empty array [] hides the section.",
+      "lessons[].homework": "Array of homework links. Each: { 'url': '...', 'label': '...' }. Typically 2 items: quiz + homework image. Empty url '' hides that button. Empty array [] or omit key for lessons 9-11."
+    },
+    "_tip": "Any field with url set to empty string '' is automatically hidden from the UI. You never need to delete a field — just clear the url."
+  },
+  "studyGroups": [
+    {
+      "number": 1,
+      "name": "Study Group #3",
+      "dateRange": "Nov 2025 – Jan 2026",
+      "description": "AWS Solutions Architect Associate study cohort — 11 lessons covering all SAA-C03 domains.",
+      "lessons": [
+        {
+          "number": 8,
+          "topic": "Disaster Recovery & Migrations, More Solution Architectures, Other Services",
+          "date": "Dec 30, 2025",
+          "recording": { "url": "https://drive.google.com/file/d/1jXE52DFbpHH6CVsxxttTTdtY2bNlPIYI/view", "label": "Lesson 8 Recording" },
+          "summary": { "url": "https://drive.google.com/file/d/1sFVI6rgmdfrt5r06IA_dSGoJvmKG96yk/view?usp=drive_link", "label": "Lesson 8 AI Summary" },
+          "presentation": { "url": "assets/presentations/SG3_Lesson8.pdf", "label": "Lesson 8 Slides (PDF)" },
+          "links": [
+            { "url": "https://www.youtube.com/watch?v=ZzI9JE0i6Lc", "label": "AWS for the haters📺", "type": "youtube" }],
+          "homework": [
+            { "url": "https://docs.google.com/forms/d/e/1FAIpQLSdObG0xH05sG_6EpIvYohfo_svOI6li254aQgQAiJqrX2mOKw/viewform?usp=sharing&ouid=111223103749240751177", "label": "Lesson 8 Quiz" },
+            { "url": "https://drive.google.com/file/d/1Nws3GZ1BN2YHBc9aRPvRA7lRm4AGOQPD/view?usp=drive_link", "label": "Lesson 8 Homework" }
+          ]
+        },
+        {
+          "number": 7,
+          "topic": "Monitoring, IAM Advanced & Cloud Security",
+          "date": "Dec 25, 2025",
+          "recording": { "url": "", "label": "Lesson 7 Recording" },
+          "summary": { "url": "", "label": "Lesson 7 AI Summary" },
+          "presentation": { "url": "assets/presentations/SG3_Lesson7.pdf", "label": "Lesson 7 Slides (PDF)" },
+          "links": [],
+          "homework": { "url": "", "label": "Lesson 7 Quiz" }
+        },
+        {
+          "number": 6,
+          "topic": "Data, Analytics & Machine Learning on AWS",
+          "date": "Dec 17, 2025",
+          "recording": { "url": "", "label": "Lesson 6 Recording" },
+          "summary": { "url": "", "label": "Lesson 6 AI Summary" },
+          "presentation": { "url": "assets/presentations/SG3_Lesson6.pdf", "label": "Lesson 6 Slides (PDF)" },
+          "links": [],
+          "homework": { "url": "", "label": "Lesson 6 Quiz" }
+        },
+        {
+          "number": 5,
+          "topic": "Integration, Messaging, Containers & Serverless",
+          "date": "Dec 10, 2025",
+          "recording": { "url": "", "label": "Lesson 5 Recording" },
+          "summary": { "url": "", "label": "Lesson 5 AI Summary" },
+          "presentation": { "url": "assets/presentations/SG3_Lesson5.pdf", "label": "Lesson 5 Slides (PDF)" },
+          "links": [],
+          "homework": { "url": "", "label": "Lesson 5 Quiz" }
+        },
+        {
+          "number": 4,
+          "topic": "Advanced S3, Security & Global Delivery",
+          "date": "Dec 2, 2025",
+          "recording": { "url": "", "label": "Lesson 4 Recording" },
+          "summary": { "url": "", "label": "Lesson 4 AI Summary" },
+          "presentation": { "url": "assets/presentations/SG3_Lesson4.pdf", "label": "Lesson 4 Slides (PDF)" },
+          "links": [],
+          "homework": { "url": "", "label": "Lesson 4 Quiz" }
+        },
+        {
+          "number": 3,
+          "topic": "Route 53 & S3 Basics",
+          "date": "Nov 24, 2025",
+          "recording": { "url": "", "label": "Lesson 3 Recording" },
+          "summary": { "url": "", "label": "Lesson 3 AI Summary" },
+          "presentation": { "url": "assets/presentations/SG3_Lesson3.pdf", "label": "Lesson 3 Slides (PDF)" },
+          "links": [],
+          "homework": { "url": "", "label": "Lesson 3 Quiz" }
+        },
+        {
+          "number": 2,
+          "topic": "High Availability, Load Balancing & Databases",
+          "date": "Nov 18, 2025",
+          "recording": { "url": "", "label": "Lesson 2 Recording" },
+          "summary": { "url": "", "label": "Lesson 2 AI Summary" },
+          "presentation": { "url": "assets/presentations/SG3_Lesson2.pdf", "label": "Lesson 2 Slides (PDF)" },
+          "links": [],
+          "homework": { "url": "", "label": "Lesson 2 Quiz" }
+        },
+        {
+          "number": 1,
+          "topic": "IAM, EC2 & Storage Fundamentals",
+          "date": "Nov 10, 2025",
+          "recording": { "url": "", "label": "Lesson 1 Recording" },
+          "summary": { "url": "", "label": "Lesson 1 AI Summary" },
+          "presentation": { "url": "assets/presentations/SG3_Lesson1.pdf", "label": "Lesson 1 Slides (PDF)" },
+          "links": [],
+          "homework": { "url": "", "label": "Lesson 1 Quiz" }
+        }
+      ]
+    }
+  ]
+}

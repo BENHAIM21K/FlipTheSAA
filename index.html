@@ -23,7 +23,7 @@
           <button class="nav-tab active" data-tab="home" type="button">🏠 Home</button>
           <button class="nav-tab" data-tab="practice" type="button">📝 Practice Questions</button>
           <button class="nav-tab" data-tab="performance" type="button">📊 Performance</button>
-          <button class="nav-tab" data-tab="presentations" type="button">📄 Presentations</button>
+          <button class="nav-tab" data-tab="studygroups" type="button">📚 Study Groups</button>
           <button class="nav-tab" data-tab="contact" type="button">📧 Contact</button>
           <button class="nav-tab" data-tab="reset" type="button">🔄 Reset</button>
         </div>
@@ -77,9 +77,9 @@
               <p>Track your progress, identify weak areas, and monitor improvement trends</p>
             </div>
             <div class="feature-box">
-              <div class="feature-icon">📄</div>
-              <h3>Study Materials</h3>
-              <p>Access presentation slides covering key AWS concepts and services</p>
+              <div class="feature-icon">📚</div>
+              <h3>Study Groups</h3>
+              <p>Session recordings, AI summaries, slides, and resources organized by lesson</p>
             </div>
           </div>
 
@@ -93,8 +93,6 @@
       <!-- ===== PRACTICE QUESTIONS SECTION ===== -->
       <section class="page-section" id="practiceSection">
         <section class="card">
-          <h2>Setup</h2>
-
           <div class="grid">
             <label class="field">
               <span>Mode</span>
@@ -205,14 +203,30 @@
         </section>
       </section>
 
-      <!-- ===== PRESENTATIONS SECTION ===== -->
-      <section class="page-section" id="presentationsSection">
-        <div class="card presentations-card">
-          <h2>📄 Study Presentation</h2>
-          <p class="hint">Review presentations slides covering AWS SAA concepts and services</p>
+      <!-- ===== STUDY GROUPS SECTION ===== -->
+      <section class="page-section" id="studyGroupsSection">
+        <div class="card study-groups-card">
+          <h2>📚 Study Groups</h2>
 
-          <div class="presentations-list">
-            <!-- Populated dynamically by JavaScript -->
+          <!-- LIST VIEW: shown by default -->
+          <div class="sg-list-view">
+            <p class="hint">Select a study group to see its lessons, recordings, and resources.</p>
+            <div class="sg-cohort-list">
+              <!-- Populated dynamically by JavaScript -->
+            </div>
+          </div>
+
+          <!-- DETAIL VIEW: shown when a cohort is selected -->
+          <div class="sg-detail-view" style="display:none">
+            <button class="sg-back-btn" type="button">← Back to Study Groups</button>
+            <div class="sg-detail-header">
+              <h3 class="sg-detail-title"></h3>
+              <p class="sg-detail-meta"></p>
+              <p class="sg-detail-desc hint"></p>
+            </div>
+            <div class="study-groups-list">
+              <!-- Lessons accordion populated dynamically -->
+            </div>
           </div>
         </div>
       </section>

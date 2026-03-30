@@ -2560,8 +2560,6 @@ function switchTab(tabName) {
     });
 
     // === UPDATE SECTION VISIBILITY ===
-    console.log('[DEBUG] Switching to tab:', tabName);
-
     document.querySelectorAll('.page-section').forEach(section => {
       section.classList.remove('active');
     });
@@ -2570,22 +2568,16 @@ function switchTab(tabName) {
       'home': 'homeSection',
       'practice': 'practiceSection',
       'performance': 'performanceSection',
-      'presentations': 'presentationsSection',
+      'studygroups': 'studyGroupsSection',
       'contact': 'contactSection'
     };
 
-    console.log('[DEBUG] sectionMap:', sectionMap);
-    console.log('[DEBUG] Looking for section ID:', sectionMap[tabName]);
-
     const targetSection = document.getElementById(sectionMap[tabName]);
-    console.log('[DEBUG] Found targetSection:', targetSection);
 
     if (targetSection) {
       targetSection.classList.add('active');
-      console.log('[DEBUG] Added active class to:', sectionMap[tabName]);
-      console.log('[DEBUG] Section display style:', window.getComputedStyle(targetSection).display);
     } else {
-      console.error('[DEBUG] ERROR: Could not find section with ID:', sectionMap[tabName]);
+      console.error('[SAA Error] Could not find section with ID:', sectionMap[tabName]);
     }
 
     // === RETURNING TO TIMED QUIZ: RENDER WITH PAUSE STATE ===
@@ -2620,8 +2612,8 @@ function switchTab(tabName) {
       renderPerformanceDashboard();
     }
 
-    if (tabName === 'presentations') {
-      renderPresentations();
+    if (tabName === 'studygroups') {
+      renderStudyGroups();
     }
 
     // === MOBILE: CLOSE MENU ===
@@ -2720,86 +2712,171 @@ function togglePause(state) {
 }
 
 /**
- * WHAT IT DOES: Renders the presentations list with embedded PDF viewers
+ * WHAT IT DOES: Renders the study groups section (two-level: cohort list → lesson accordion)
  */
-function renderPresentations() {
-  safeOperation('Render Presentations', () => {
-    const presentationsListEl = document.querySelector('.presentations-list');
+let studyGroupsCache = null;
 
-    if (!presentationsListEl) {
-      console.warn('[SAA Warning] Presentations list element not found');
+async function renderStudyGroups() {
+  if (!studyGroupsCache) {
+    const cohortListEl = document.querySelector('.sg-cohort-list');
+    if (cohortListEl) cohortListEl.innerHTML = '<p class="hint" style="padding:20px 0">Loading...</p>';
+    try {
+      const res = await fetch('studygroups.json');
+      studyGroupsCache = await res.json();
+    } catch (e) {
+      if (cohortListEl) cohortListEl.innerHTML = '<p class="hint" style="padding:20px 0">Could not load study group data.</p>';
+      console.warn('[SAA Warning] Could not load studygroups.json', e);
       return;
     }
+  }
+  showStudyGroupsList();
+}
 
-    const presentations = [
-      {
-        filename: 'קבוצת למידה SAA v1.pdf',
-        title: 'IAM, EC2 & Storage Fundamentals',
-        description: 'SAA Study Group Session 1'
-      },
-      {
-        filename: 'קבוצת למידה SAA v2.pdf',
-        title: 'High Availability, Load Balancing & Databases',
-        description: 'SAA Study Group Session 2'
-      },
-      {
-        filename: 'קבוצת למידה SAA v3.pdf',
-        title: 'Route 53 & S3 Basics',
-        description: 'SAA Study Group Session 3'
-      },
-      {
-        filename: 'קבוצת למידה SAA v4.pdf',
-        title: 'Advanced S3, Security & Global Delivery',
-        description: 'SAA Study Group Session 4'
-      },
-      {
-        filename: 'קבוצת למידה SAA v5.pdf',
-        title: 'Integration, Messaging, Containers & Serverless',
-        description: 'SAA Study Group Session 5'
-      },
-      {
-        filename: 'קבוצת למידה SAA v6.pdf',
-        title: 'Data, Analytics & Machine Learning on AWS',
-        description: 'SAA Study Group Session 6'
-      },
-      {
-        filename: 'קבוצת למידה SAA v7.pdf',
-        title: 'Monitoring, IAM Advanced & Cloud Security',
-        description: 'SAA Study Group Session 7'
-      },
-      {
-        filename: 'קבוצת למידה SAA v8.pdf',
-        title: 'VPC Networking & DR',
-        description: 'SAA Study Group Session 8'
-      }
-    ];
+function showStudyGroupsList() {
+  const listView = document.querySelector('.sg-list-view');
+  const detailView = document.querySelector('.sg-detail-view');
+  if (!listView || !detailView) return;
 
-    const html = presentations.map((pres, index) => {
-      const pdfPath = `assets/presentations/${encodeURIComponent(pres.filename)}`;
+  listView.style.display = '';
+  detailView.style.display = 'none';
 
-      return `
-        <div class="presentation-item" data-presentation-index="${index}">
-          <h3 class="presentation-header">${escapeHtml(pres.title)}</h3>
-          <embed
-            src="${pdfPath}#toolbar=1&navpanes=1&scrollbar=1&view=FitH"
-            type="application/pdf"
-            class="presentation-embed"
-            aria-label="${escapeHtml(pres.title)}"
-          />
-          <noscript>
-            <div class="presentation-fallback">
-              <p>📄 Your browser doesn't support embedded PDFs.</p>
-              <p><a href="${pdfPath}" download="${escapeHtml(pres.filename)}">⬇️ Download ${escapeHtml(pres.title)}</a></p>
-            </div>
-          </noscript>
+  const cohortListEl = document.querySelector('.sg-cohort-list');
+  const cohorts = studyGroupsCache.studyGroups || [];
+
+  cohortListEl.innerHTML = cohorts.map(cohort => `
+    <div class="sg-cohort-card" data-cohort="${cohort.number}">
+      <div class="sg-cohort-info">
+        <div class="sg-cohort-title">${escapeHtml(cohort.name)}</div>
+        <div class="sg-cohort-meta">${escapeHtml(cohort.dateRange || '')}${cohort.lessons && cohort.lessons.length ? ' · ' + cohort.lessons.length + ' Lessons' : ''}</div>
+        ${cohort.description ? `<p class="sg-cohort-desc">${escapeHtml(cohort.description)}</p>` : ''}
+      </div>
+      <button class="btn btn-ghost sg-cohort-btn" type="button">View Lessons →</button>
+    </div>
+  `).join('');
+
+  cohortListEl.querySelectorAll('.sg-cohort-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const cohortNum = parseInt(card.dataset.cohort, 10);
+      const cohort = (studyGroupsCache.studyGroups || []).find(c => c.number === cohortNum);
+      if (cohort) showStudyGroupDetail(cohort);
+    });
+  });
+
+  console.info('[SAA Info] Rendered', cohorts.length, 'study group cohorts');
+}
+
+function showStudyGroupDetail(cohort) {
+  const listView = document.querySelector('.sg-list-view');
+  const detailView = document.querySelector('.sg-detail-view');
+  if (!listView || !detailView) return;
+
+  listView.style.display = 'none';
+  detailView.style.display = '';
+
+  detailView.querySelector('.sg-detail-title').textContent = cohort.name;
+  detailView.querySelector('.sg-detail-meta').textContent = cohort.dateRange || '';
+  detailView.querySelector('.sg-detail-desc').textContent = cohort.description || '';
+
+  const lessonsListEl = detailView.querySelector('.study-groups-list');
+  lessonsListEl.innerHTML = (cohort.lessons || []).map(lesson => buildLessonHTML(lesson)).join('');
+
+  lessonsListEl.querySelectorAll('.sg-header').forEach(header => {
+    header.addEventListener('click', () => {
+      header.closest('.sg-item').classList.toggle('open');
+    });
+  });
+
+  // Back button — re-attach each time to avoid stale closures
+  const backBtn = detailView.querySelector('.sg-back-btn');
+  if (backBtn) {
+    backBtn.onclick = showStudyGroupsList;
+  }
+
+  console.info('[SAA Info] Showing detail for', cohort.name, '—', (cohort.lessons || []).length, 'lessons');
+}
+
+function buildLessonHTML(lesson) {
+  const sections = [];
+
+  if (lesson.recording && lesson.recording.url) {
+    sections.push(`
+      <div class="sg-section">
+        <div class="sg-section-title">🎥 Recording</div>
+        <a href="${escapeHtml(lesson.recording.url)}" target="_blank" rel="noopener noreferrer"
+           class="btn btn-primary sg-btn">
+          ${escapeHtml(lesson.recording.label || 'Watch Recording')} ↗
+        </a>
+      </div>`);
+  }
+
+  if (lesson.summary && lesson.summary.url) {
+    sections.push(`
+      <div class="sg-section">
+        <div class="sg-section-title">📋 AI Summary</div>
+        <a href="${escapeHtml(lesson.summary.url)}" target="_blank" rel="noopener noreferrer"
+           class="btn btn-secondary sg-btn">
+          ${escapeHtml(lesson.summary.label || 'View Summary')} ↗
+        </a>
+      </div>`);
+  }
+
+  if (lesson.presentation && lesson.presentation.url) {
+    sections.push(`
+      <div class="sg-section">
+        <div class="sg-section-title">📄 Presentation</div>
+        <a href="${escapeHtml(lesson.presentation.url)}" target="_blank" rel="noopener noreferrer"
+           class="btn btn-ghost sg-btn">
+          ${escapeHtml(lesson.presentation.label || 'Open Slides')} ↗
+        </a>
+      </div>`);
+  }
+
+  if (lesson.links && lesson.links.length > 0) {
+    const linkItems = lesson.links.map(link => `
+      <a href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer"
+         class="sg-link-item">
+        ${link.type === 'youtube' ? '▶' : '🔗'} ${escapeHtml(link.label)}
+      </a>`).join('');
+    sections.push(`
+      <div class="sg-section">
+        <div class="sg-section-title">🔗 Useful Links</div>
+        <div class="sg-links-list">${linkItems}</div>
+      </div>`);
+  }
+
+  const homeworkItems = Array.isArray(lesson.homework)
+    ? lesson.homework.filter(h => h.url)
+    : (lesson.homework && lesson.homework.url ? [lesson.homework] : []);
+  if (homeworkItems.length > 0) {
+    const hwButtons = homeworkItems.map(h => `
+      <a href="${escapeHtml(h.url)}" target="_blank" rel="noopener noreferrer"
+         class="btn btn-primary sg-btn">
+        ${escapeHtml(h.label || 'Open')} ↗
+      </a>`).join('');
+    sections.push(`
+      <div class="sg-section">
+        <div class="sg-section-title">📝 Homework & Quiz</div>
+        ${hwButtons}
+      </div>`);
+  }
+
+  const bodyContent = sections.length > 0
+    ? sections.join('')
+    : '<p class="hint" style="margin:0">Content coming soon.</p>';
+
+  return `
+    <div class="sg-item">
+      <div class="sg-header">
+        <div>
+          <div class="sg-title">Lesson #${lesson.number}</div>
+          <div class="sg-meta">${lesson.topic ? escapeHtml(lesson.topic) + ' · ' : ''}${escapeHtml(lesson.date || '')}</div>
         </div>
-      `;
-    }).join('');
-
-    presentationsListEl.innerHTML = html;
-
-    console.info('[SAA Info] Rendered', presentations.length, 'presentations');
-  }, undefined);
+        <span class="sg-chevron">▼</span>
+      </div>
+      <div class="sg-body">
+        ${bodyContent}
+      </div>
+    </div>`;
 }
 
 // ============================================================================
