@@ -39,20 +39,47 @@
   },
   "studyGroups": [
     {
+      "number": 2,
+      "name": "Study Group #4",
+      "dateRange": "TBD 2026 – TBD 2026",
+      "description": "AWS Solutions Architect Associate study cohort — 11 lessons covering all SAA-C03 domains."
+    },
+    {
       "number": 1,
       "name": "Study Group #3",
       "dateRange": "Nov 2025 – Jan 2026",
       "description": "AWS Solutions Architect Associate study cohort — 11 lessons covering all SAA-C03 domains.",
       "lessons": [
         {
+          "number": 11,
+          "topic": "Mock Exam Practice",
+          "date": "Jan 22, 2026",
+          "recording": { "url": "https://drive.google.com/file/d/1P9LW_vn1JrH5h9VAMPV6q9wKzLF5F7tY/view?usp=drive_link", "label": "Lesson 8 Recording" },
+          "summary": { "url": "https://drive.google.com/file/d/1EAsZHgry38-aBY_Azxq4ln5qavIlOIW7/view?usp=drive_link", "label": "Lesson 8 AI Summary" }
+        },
+        {
+          "number": 10,
+          "topic": "Mock Exam Practice",
+          "date": "Jan 15, 2026",
+          "recording": { "url": "https://drive.google.com/file/d/1yKjlzknIBhiUYFwn7oENqpe1x9USPGZr/view?usp=drive_link", "label": "Lesson 8 Recording" },
+          "summary": { "url": "https://drive.google.com/file/d/1-8JK_wPHBTsqJ6fCazpD2Q5VA-6aRMkV/view?usp=drive_link", "label": "Lesson 8 AI Summary" }
+        },
+        {
+          "number": 9,
+          "topic": "Mock Exam Practice",
+          "date": "Jan 8, 2026",
+          "recording": { "url": "https://drive.google.com/file/d/1b1JHfMqsrecD-BYnddr5flCWG3YktcJu/view?usp=drive_link", "label": "Lesson 8 Recording" },
+          "summary": { "url": "https://drive.google.com/file/d/1xKBnCqrHgJ0RmnX8R6S1DGgbkC6c6x7R/view?usp=drive_link", "label": "Lesson 8 AI Summary" }
+        },
+        {
           "number": 8,
           "topic": "Disaster Recovery & Migrations, More Solution Architectures, Other Services",
           "date": "Dec 30, 2025",
-          "recording": { "url": "https://drive.google.com/file/d/1jXE52DFbpHH6CVsxxttTTdtY2bNlPIYI/view", "label": "Lesson 8 Recording" },
+          "recording": { "url": "https://drive.google.com/file/d/1jXE52DFbpHH6CVsxxttTTdtY2bNlPIYI/view?usp=drive_link", "label": "Lesson 8 Recording" },
           "summary": { "url": "https://drive.google.com/file/d/1sFVI6rgmdfrt5r06IA_dSGoJvmKG96yk/view?usp=drive_link", "label": "Lesson 8 AI Summary" },
           "presentation": { "url": "assets/presentations/SG3_Lesson8.pdf", "label": "Lesson 8 Slides (PDF)" },
           "links": [
-            { "url": "https://www.youtube.com/watch?v=ZzI9JE0i6Lc", "label": "AWS for the haters📺", "type": "youtube" }],
+            ],
           "homework": [
             { "url": "https://docs.google.com/forms/d/e/1FAIpQLSdObG0xH05sG_6EpIvYohfo_svOI6li254aQgQAiJqrX2mOKw/viewform?usp=sharing&ouid=111223103749240751177", "label": "Lesson 8 Quiz" },
             { "url": "https://drive.google.com/file/d/1Nws3GZ1BN2YHBc9aRPvRA7lRm4AGOQPD/view?usp=drive_link", "label": "Lesson 8 Homework" }
@@ -62,71 +89,85 @@
           "number": 7,
           "topic": "Monitoring, IAM Advanced & Cloud Security",
           "date": "Dec 25, 2025",
-          "recording": { "url": "", "label": "Lesson 7 Recording" },
-          "summary": { "url": "", "label": "Lesson 7 AI Summary" },
+          "recording": { "url": "https://drive.google.com/file/d/1Y0jywq-3WSQKdULmyC7uHjAIirUJdxF8/view?usp=drive_link", "label": "Lesson 7 Recording" },
+          "summary": { "url": "https://drive.google.com/file/d/1dznBPjGsG7nHirKno66cAdEM-5ysSaRr/view?usp=drive_link", "label": "Lesson 7 AI Summary" },
           "presentation": { "url": "assets/presentations/SG3_Lesson7.pdf", "label": "Lesson 7 Slides (PDF)" },
           "links": [],
-          "homework": { "url": "", "label": "Lesson 7 Quiz" }
+          "homework": [{ "url": "", "label": "Lesson 7 Quiz" },
+          {"url":"https://drive.google.com/file/d/1GI2rzR6_a_llrjnJ0NGVDUFxCoiLJe8P/view?usp=drive_link", "label":"Lesson 7 Homework"}
+        ]
         },
         {
           "number": 6,
           "topic": "Data, Analytics & Machine Learning on AWS",
           "date": "Dec 17, 2025",
-          "recording": { "url": "", "label": "Lesson 6 Recording" },
-          "summary": { "url": "", "label": "Lesson 6 AI Summary" },
+          "recording": { "url": "https://drive.google.com/file/d/1KtULaHNSDf_TU8wHcyDHeZg9MqR8NR6v/view?usp=drive_link", "label": "Lesson 6 Recording" },
+          "summary": { "url": "https://drive.google.com/file/d/13HU324-oFhi0PgzYTRTDq5_U-y3zNlwA/view?usp=drive_link", "label": "Lesson 6 AI Summary" },
           "presentation": { "url": "assets/presentations/SG3_Lesson6.pdf", "label": "Lesson 6 Slides (PDF)" },
           "links": [],
-          "homework": { "url": "", "label": "Lesson 6 Quiz" }
+          "homework": [{ "url": "", "label": "Lesson 6 Quiz" },
+          {"url":"https://drive.google.com/file/d/1lwJo56WI82wG6MDOL80ag6g8ccLhoW31/view?usp=drive_link", "label":"Lesson 6 Homework"}
+        ]
         },
         {
           "number": 5,
           "topic": "Integration, Messaging, Containers & Serverless",
           "date": "Dec 10, 2025",
-          "recording": { "url": "", "label": "Lesson 5 Recording" },
-          "summary": { "url": "", "label": "Lesson 5 AI Summary" },
+          "recording": { "url": "https://drive.google.com/file/d/146iVc8W6iZKrqjbP2n_iIlntj1h1exul/view?usp=drive_link", "label": "Lesson 5 Recording" },
+          "summary": { "url": "https://drive.google.com/file/d/1lR0tD1YPUUJ56fcAw9j3pLmKENz03fj2/view?usp=drive_link", "label": "Lesson 5 AI Summary" },
           "presentation": { "url": "assets/presentations/SG3_Lesson5.pdf", "label": "Lesson 5 Slides (PDF)" },
           "links": [],
-          "homework": { "url": "", "label": "Lesson 5 Quiz" }
+          "homework": [{ "url": "", "label": "Lesson 5 Quiz" },
+          {"url":"https://drive.google.com/file/d/14NSZXCtupR5CRad_4_s758XthC4xneZA/view?usp=drive_link", "label":"Lesson 5 Homework"}
+        ]
         },
         {
           "number": 4,
           "topic": "Advanced S3, Security & Global Delivery",
           "date": "Dec 2, 2025",
-          "recording": { "url": "", "label": "Lesson 4 Recording" },
-          "summary": { "url": "", "label": "Lesson 4 AI Summary" },
+          "recording": { "url": "https://drive.google.com/file/d/1E3o8m3UqwbcBU9a4X0UOyRVOM1HiiCcK/view?usp=drive_link", "label": "Lesson 4 Recording" },
+          "summary": { "url": "https://drive.google.com/file/d/15ELTIU3wa0OVfUHxtYtGqvuKXUhSR7VI/view?usp=drive_link", "label": "Lesson 4 AI Summary" },
           "presentation": { "url": "assets/presentations/SG3_Lesson4.pdf", "label": "Lesson 4 Slides (PDF)" },
           "links": [],
-          "homework": { "url": "", "label": "Lesson 4 Quiz" }
+          "homework": [{ "url": "", "label": "Lesson 4 Quiz" },
+          {"url":"https://drive.google.com/file/d/1a9Vhe4gH3rRzk3QG7KNReq6RcUYmvDNp/view?usp=drive_link", "label":"Lesson 4 Homework"}
+        ]
         },
         {
           "number": 3,
           "topic": "Route 53 & S3 Basics",
           "date": "Nov 24, 2025",
           "recording": { "url": "", "label": "Lesson 3 Recording" },
-          "summary": { "url": "", "label": "Lesson 3 AI Summary" },
+          "summary": { "url": "https://drive.google.com/file/d/1TbQgEianTFEnsHYEmtaLaRPCl_AMnIA7/view?usp=drive_link", "label": "Lesson 3 AI Summary" },
           "presentation": { "url": "assets/presentations/SG3_Lesson3.pdf", "label": "Lesson 3 Slides (PDF)" },
           "links": [],
-          "homework": { "url": "", "label": "Lesson 3 Quiz" }
+          "homework": [{ "url": "", "label": "Lesson 3 Quiz" },
+          {"url":"https://drive.google.com/file/d/1VNx7-pI3vAmN8qnb5SUZ7DroPRz_eI9z/view?usp=drive_link", "label":"Lesson 3 Homework"}
+        ]
         },
         {
           "number": 2,
           "topic": "High Availability, Load Balancing & Databases",
           "date": "Nov 18, 2025",
-          "recording": { "url": "", "label": "Lesson 2 Recording" },
-          "summary": { "url": "", "label": "Lesson 2 AI Summary" },
+          "recording": { "url": "https://drive.google.com/file/d/1jJrTT9yh85SHGnnmwAQNT507iW-RgJzh/view?usp=drive_link", "label": "Lesson 2 Recording" },
+          "summary": { "url": "https://drive.google.com/file/d/1EyU3m75VEGFSyrhkRaZboBxoP-hIupdp/view?usp=drive_link", "label": "Lesson 2 AI Summary" },
           "presentation": { "url": "assets/presentations/SG3_Lesson2.pdf", "label": "Lesson 2 Slides (PDF)" },
           "links": [],
-          "homework": { "url": "", "label": "Lesson 2 Quiz" }
+          "homework":[ { "url": "https://docs.google.com/forms/d/e/1FAIpQLScec2fRc9dsNT-x6RoJ496YvcBswC4tttPFEFniziqlEqw58A/viewform?usp=sharing&ouid=111223103749240751177", "label": "Lesson 2 Quiz" },
+                      {"url":"https://drive.google.com/file/d/1bEbijAuQFNY9Xam9B7ljAhBRUWHgAtkW/view?usp=drive_link", "label":"Lesson 2 Homework"}
+        ]
         },
         {
           "number": 1,
           "topic": "IAM, EC2 & Storage Fundamentals",
           "date": "Nov 10, 2025",
-          "recording": { "url": "", "label": "Lesson 1 Recording" },
-          "summary": { "url": "", "label": "Lesson 1 AI Summary" },
+          "recording": { "url": "https://drive.google.com/file/d/1JUdowvEvBYuo0lJHN_jRH7JAIYBp0kt4/view?usp=drive_link", "label": "Lesson 1 Recording" },
+          "summary": { "url": "https://docs.google.com/document/d/1CeMc0sQoRNLSBjJBqyrcSZ5K6rivqSdi/edit?usp=drive_link&ouid=111223103749240751177&rtpof=true&sd=true", "label": "Lesson 1 AI Summary" },
           "presentation": { "url": "assets/presentations/SG3_Lesson1.pdf", "label": "Lesson 1 Slides (PDF)" },
           "links": [],
-          "homework": { "url": "", "label": "Lesson 1 Quiz" }
+          "homework":[ { "url": "https://docs.google.com/forms/d/e/1FAIpQLScNW2BvDufubHr4Oe4SQVg4UUurRRrb2hE0QrAcRt8o6V8PKA/viewform?usp=sharing&ouid=111223103749240751177", "label": "Lesson 1 Quiz" },
+                      {"url":"https://drive.google.com/file/d/1FXiDK6FJ0XmQxsR0k_IzLtEkGXzIe5Jj/view", "label":"Lesson 1 Homework"}
+          ]
         }
       ]
     }

@@ -169,11 +169,11 @@ body {
 
 .page-section {
   display: none;
-  animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .page-section.active {
   display: block;
+  animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
 .wrap { max-width: 980px; margin: 0 auto; padding: 18px; }
