@@ -163,42 +163,54 @@
             <h2>📊 Performance Dashboard</h2>
           </div>
 
-        <!-- Summary Stats -->
-        <div class="perf-summary">
-          <div class="stat-box">
-            <div class="stat-value" id="totalAttempts">0</div>
-            <div class="stat-label">Total Attempts</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-value" id="avgScore">0</div>
-            <div class="stat-label">Average Score</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-value" id="passRate">0%</div>
-            <div class="stat-label">Pass Rate</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-value" id="improvement">+0</div>
-            <div class="stat-label">Trend</div>
+        <!-- Empty state (shown when no history) -->
+        <div id="perfEmptyState" style="display:none">
+          <div class="perf-empty">
+            <div class="perf-empty-icon">📈</div>
+            <div class="perf-empty-text">No performance data yet</div>
+            <div class="perf-empty-hint">Complete a quiz to start tracking your progress</div>
           </div>
         </div>
 
-        <!-- Domain Performance Bars -->
-        <div class="perf-section">
-          <h3>Domain Performance</h3>
-          <div id="domainBars" class="perf-bars"></div>
-        </div>
+        <!-- Content (shown when history exists) -->
+        <div id="perfContent">
+          <!-- Summary Stats -->
+          <div class="perf-summary">
+            <div class="stat-box">
+              <div class="stat-value" id="totalAttempts">0</div>
+              <div class="stat-label">Total Attempts</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value" id="avgScore">0</div>
+              <div class="stat-label">Average Score</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value" id="passRate">0%</div>
+              <div class="stat-label">Pass Rate</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value" id="improvement">+0</div>
+              <div class="stat-label">Trend</div>
+            </div>
+          </div>
 
-        <!-- Weak Areas List -->
-        <div class="perf-section">
-          <h3>Questions to Review</h3>
-          <div id="weakAreas" class="weak-list"></div>
-        </div>
+          <!-- Domain Performance Bars -->
+          <div class="perf-section">
+            <h3>Domain Performance</h3>
+            <div id="domainBars" class="perf-bars"></div>
+          </div>
 
-        <!-- Score Trend Chart -->
-        <div class="perf-section">
-          <h3>Score Trend (Last 10 Attempts)</h3>
-          <div id="scoreTrend" class="trend-chart"></div>
+          <!-- Weak Areas List -->
+          <div class="perf-section">
+            <h3>Questions to Review</h3>
+            <div id="weakAreas" class="weak-list"></div>
+          </div>
+
+          <!-- Score Trend Chart -->
+          <div class="perf-section">
+            <h3>Score Trend (Last 10 Attempts)</h3>
+            <div id="scoreTrend" class="trend-chart"></div>
+          </div>
         </div>
         </section>
       </section>

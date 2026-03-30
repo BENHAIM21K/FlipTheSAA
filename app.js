@@ -2155,26 +2155,18 @@ function getDomainPerformance(history) {
 function renderPerformanceDashboard() {
   safeOperation('Render Performance Dashboard', () => {
     const history = getSessionHistory();
-    const performanceCard = document.getElementById('performanceCard');
-
-    // Visibility now controlled by page-section.active class (via switchTab)
 
     // If no history, show empty state
+    const emptyState = document.getElementById('perfEmptyState');
+    const perfContent = document.getElementById('perfContent');
     if (!history.sessions || history.sessions.length === 0) {
-      performanceCard.innerHTML = `
-        <div class="perf-header">
-          <h2>📊 Performance Dashboard</h2>
-        </div>
-        <div class="perf-empty">
-          <div class="perf-empty-icon">📈</div>
-          <div class="perf-empty-text">No performance data yet</div>
-          <div class="perf-empty-hint">Complete a quiz to start tracking your progress</div>
-        </div>
-      `;
-
+      if (emptyState) emptyState.style.display = '';
+      if (perfContent) perfContent.style.display = 'none';
       console.info('[SAA Info] Performance dashboard shown (empty state)');
       return;
     }
+    if (emptyState) emptyState.style.display = 'none';
+    if (perfContent) perfContent.style.display = '';
 
     // Calculate summary statistics
     const totalAttempts = history.sessions.length;
