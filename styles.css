@@ -1089,6 +1089,8 @@ select {
   .header {
     flex-wrap: wrap;
     padding: 14px 16px;
+    position: relative;
+    z-index: 100;
   }
 
   .brand {
