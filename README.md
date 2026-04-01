@@ -1,249 +1,137 @@
 # FlipTheSAA
 
-**A free platform for AWS Solutions Architect Associate (SAA-C03) exam practice**
+**A free platform to help you pass the AWS Solutions Architect Associate (SAA-C03) exam**
 
-FlipTheSAA provides students with a realistic, no-cost alternative to expensive practice exam platforms. Practice with confidence using our timed exam simulator that mirrors the actual AWS certification experience.
-
----
-
-## 🎯 Why FlipTheSAA?
-
-Preparing for the AWS SAA-C03 exam shouldn't require expensive subscriptions. FlipTheSAA gives you:
-
-- **100% Free** - No paywalls, no subscriptions, no hidden costs
-- **Realistic Timed Mode** - Exact exam conditions: 130 minutes, 65 questions, 50 scored (15 unscored pretest questions)
-- **Instant Feedback** - Review mode with detailed explanations for immediate learning
-- **Performance Tracking** - Built-in analytics to identify weak areas and track improvement
-- **Privacy-First** - All data stored locally in your browser, nothing sent to servers
+[flipthesaa.com](https://www.flipthesaa.com)
 
 ---
 
-## ✨ Features
+## What is FlipTheSAA?
 
-### 📝 Two Modes
+FlipTheSAA is a community-built, completely free AWS SAA-C03 preparation platform. It has two core pillars: structured study group cohorts with real people, and a realistic practice exam simulator you can use on your own at any time.
 
-#### **Review Mode** (Recommended for Learning)
-- Instant feedback after each question
-- Detailed explanations for correct answers
-- Review flagged questions
-- Perfect for learning new concepts
-
-#### **Timed Exam Mode** (Realistic Exam Simulation)
-- 130 minutes for 65 questions (exactly like the real SAA-C03 exam)
-- 50 scored questions + 15 unscored pretest questions (AWS pretest simulation)
-- No instant feedback - answers revealed only after submission
-- Question flagging system (just like the real AWS exam)
-- Automatic timer with visual warnings
-- 1000-point scoring scale (720 to pass)
-
-### 🎲 Smart Question Selection
-
-- **Domain Filtering** - Focus on specific exam domains (D1-D4):
-  - D1: Design Secure Architectures
-  - D2: Design Resilient Architectures
-  - D3: Design High-Performing Architectures
-  - D4: Design Cost-Optimized Architectures
-
-- **Section Filtering** - Practice specific AWS services:
-  - IAM, EC2, VPC, S3, CloudFront, Route 53
-  - RDS, DynamoDB, ELB, Auto Scaling, Lambda
-  - SQS, SNS, CloudWatch, CloudFormation, ECS
-
-### 📊 Performance Dashboard
-
-Track your progress with comprehensive analytics:
-
-- **Summary Statistics**
-  - Total attempts across all practice sessions
-  - Average score and pass rate
-  - Score trend visualization (last 10 attempts)
-  - Improvement indicators
-
-- **Domain Performance Bars**
-  - Visual breakdown of accuracy per exam domain
-  - Color-coded indicators (Green ≥80%, Yellow 60-79%, Red <60%)
-
-- **Questions to Review**
-  - Identifies your most-missed questions
-  - Direct links to retake specific questions
-  - Prioritizes weak areas for targeted study
-
-### 🚩 Question Flagging
-
-In Timed Exam mode, flag questions for review (exactly like the AWS exam interface):
-- Mark questions you're unsure about
-- Visual indicators in the jump grid
-- Review flagged questions before final submission
-
-### 🗺️ Jump Grid Navigation
-
-Navigate through questions with ease:
-- Visual map of all 65 questions
-- Color-coded status indicators:
-  - **Answered** (blue) - Question has been answered
-  - **Current** (highlighted) - Currently viewing
-  - **Flagged** (yellow flag badge) - Marked for review (Timed mode only)
-
-### 💾 Persistent State
-
-Never lose your progress:
-- Automatic save after every action
-- Resume interrupted sessions exactly where you left off
-- History persists across browser sessions
-- Deterministic shuffling ensures consistent question order after page refresh
+No login required. No paywall. All your data stays in your browser.
 
 ---
 
-## 🎓 How to Use
+## 📚 Study Groups
 
-### First-Time Users (Learning Mode)
+Study groups are the heart of FlipTheSAA. Each cohort runs for 11 lessons over roughly two months, covering all SAA-C03 exam domains together with a group of students.
 
-1. **Start with Review Mode**
-   - Select "Review (instant feedback)" from Mode dropdown
-   - Choose a specific domain (e.g., D1: Design Secure Architectures)
-   - Select a specific section (e.g., IAM) to focus on one service at a time
-   - Click "Start / Resume"
+Every lesson includes:
 
-2. **Answer Questions**
-   - Read each question carefully
-   - Select your answer choice
-   - Review the instant feedback and explanation
-   - Click "Next" to continue
+- **Recording** — Full session recording so you never miss a class and can rewatch at your own pace
+- **AI Summary** — An AI-generated summary of the session covering the key points discussed
+- **Slides** — Lesson presentation available as a PDF
+- **Homework** — A practice quiz and homework assignment to reinforce the material
+- **Useful Links** — Curated videos and documentation referenced during the session
 
-3. **Track Your Progress**
-   - Use the jump grid to navigate between questions
-   - Check your mini-score in the top-right corner
-   - Click "📊 Performance" to view detailed analytics
+Past cohort recordings and materials remain accessible to everyone on the Study Groups page after the cohort ends, so you can go through any previous cohort independently at your own pace.
 
-### Exam Simulation (Test Your Readiness)
-
-1. **Launch Timed Exam Mode**
-   - Select "Timed Exam (130 min, no instant feedback)"
-   - Choose "ALL" for both Domain and Section (full 65-question exam)
-   - Click "Start Fresh (new shuffle)" for a randomized question set
-
-2. **Take the Exam**
-   - You have 130 minutes to answer 65 questions
-   - Flag questions you're unsure about using the 🚩 button
-   - Use the jump grid to navigate and check completion status
-   - Watch the timer in the top-right corner
-
-3. **Review Results**
-   - Click "Submit" when ready (or timer expires automatically)
-   - See your score on the 1000-point scale (720 = pass)
-   - Review all questions with correct answers and explanations
-   - Check flagged questions to see how you did on uncertain answers
-
-### Using Performance Dashboard
-
-1. **Click "📊 Performance"** from the header
-2. **Review Summary Stats**
-   - Total attempts, average score, pass rate
-   - Improvement trend (comparing recent attempts)
-3. **Analyze Domain Performance**
-   - Visual bars show accuracy per exam domain
-   - Identify which domains need more practice
-4. **Focus on Weak Areas**
-   - See your top 10 most-missed questions
-   - Click any question to start a targeted review session
+To join the next live cohort, DM on [LinkedIn](https://www.linkedin.com/in/ben-haim-/).
 
 ---
 
-## 📖 Exam Tips
+## 📝 Practice Exams
 
-### Before You Take the Real Exam
+A self-contained quiz simulator you can use independently of study groups.
 
-1. **Consistent 720+ Scores** - Aim for 5+ consecutive passing scores in Timed mode
-2. **All Domains Above 70%** - Check Performance Dashboard to ensure no weak areas
-3. **Complete Under 100 Minutes** - If you finish Timed exams with 30+ minutes remaining, you're ready
-4. **Review Flagged Questions** - Minimize uncertainty by studying your most-flagged topics
+### Two Modes
 
-### During Timed Practice
+**Review Mode** — for learning
+- Instant feedback after each answer
+- Detailed explanation of the correct answer
+- No time pressure, no score tracking
+- Best for learning new topics or reviewing weak areas
 
-- **Flag liberally** - Mark any question you're not 100% confident about
-- **Time management** - Aim for 2 minutes per question (130 min ÷ 65 questions)
-- **Read carefully** - AWS questions often have subtle wording differences
-- **Eliminate wrong answers** - Rule out obviously incorrect choices first
+**Timed Exam Mode** — for readiness testing
+- 130 minutes, 65 questions (50 scored + 15 unscored pretest, mirroring real AWS exam structure)
+- No feedback until you submit
+- 1000-point scoring scale, passing at 720
+- Question flagging system identical to the real AWS exam interface
+- Timer with automatic submission when time runs out
+
+### Smart Filtering
+
+Narrow questions by:
+
+- **Domain** — D1: Design Secure Architectures, D2: Design Resilient Architectures, D3: Design High-Performing Architectures, D4: Design Cost-Optimized Architectures
+- **Section** — Specific AWS services: IAM, EC2, VPC, S3, RDS, DynamoDB, Lambda, SQS, CloudFront, Route 53, CloudWatch, ELB, Auto Scaling, EBS, EFS, KMS
+- **Difficulty** — Easy, Medium, Hard, or All
+
+### Jump Grid Navigation
+
+A visual map of all questions shows answered, current, and flagged status at a glance. Click any cell to jump directly to that question.
+
+---
+
+## 📊 Performance Dashboard
+
+Tracks your progress across all completed sessions:
+
+- Total attempts, average score, pass rate
+- Score trend across your last 10 sessions
+- Per-domain accuracy bars, color-coded (green ≥80%, yellow 60-79%, red <60%)
+- Top 10 most-missed questions with a direct link to retake each one
+
+Data is stored locally in `localStorage` and persists across browser sessions. Nothing is sent to any server.
+
+---
+
+## 💾 Persistent State
+
+- Auto-saves after every answer and navigation action
+- Resume an interrupted session exactly where you left off, including timer state
+- Deterministic shuffle: the same question order is preserved if you refresh mid-session
+- Last 50 completed sessions kept in history
+
+---
+
+## 🛠️ How to Use
+
+### Learning a new topic
+1. Go to Practice Questions
+2. Select Review Mode
+3. Filter to the domain or AWS service you want to focus on
+4. Work through questions and read every explanation
+
+### Testing exam readiness
+1. Go to Practice Questions
+2. Select Timed Exam Mode
+3. Set Domain and Section to ALL
+4. Click "Start Fresh" and treat it like the real thing
+5. After submitting, go to Performance to see your score and weak areas
+
+### Catching up on a study group
+1. Go to Study Groups
+2. Select a cohort
+3. Open any lesson accordion to access its recording, summary, slides, and homework
+
+---
+
+## 🏆 Readiness Benchmarks
+
+Before booking the real exam:
+
+- At least 5 consecutive Timed Exam scores of 720 or above
+- No domain below 70% on the Performance Dashboard
+- Finishing Timed Exams with 30 or more minutes remaining
 
 ---
 
 ## 🛠️ Technical Details
 
-### Architecture
-
-- **Pure Frontend** - No backend server required
-- **localStorage API** - Browser-based persistence for session state and history
-- **Vanilla JavaScript** - No frameworks, no dependencies
-- **Responsive Design** - Mobile-friendly with touch-optimized controls
-
-### Data Storage
-
-All data is stored in your browser's `localStorage`:
-
-- **Session State** (`saa_practice_state_v1`)
-  - Current quiz progress, selected answers, timer state, question shuffle seed
-
-- **Performance History** (`saa_practice_history_v1`)
-  - Last 50 completed sessions, domain and section breakdowns, question-level results
-
-### Scoring System
-
-**Review Mode**:
-- Simple percentage: (Correct / Total) × 100
-
-**Timed Exam Mode** (Realistic AWS Scoring):
-- 1000-point scale based on 50 scored questions (15 pretest questions excluded)
-- Formula: `(Correct Scored / 50) × 1000`
-- Passing score: **720 / 1000** (72%)
-- Mirrors the actual AWS SAA-C03 scoring methodology
-
-### Browser Compatibility
-
-Tested and working on:
-- ✅ Chrome 90+ (Desktop & Android)
-- ✅ Firefox 88+
-- ✅ Safari 14+ (Desktop & iOS)
-- ✅ Edge 90+
-
-Requires JavaScript enabled and localStorage support.
+- Pure frontend — no backend, no server, no database
+- Vanilla JavaScript, no frameworks or dependencies
+- All data stored in browser `localStorage`:
+  - `saa_practice_state_v1` — current session state, answers, timer, shuffle seed
+  - `saa_practice_history_v1` — last 50 completed sessions with domain and section breakdowns
+- Responsive design, tested on desktop and mobile (Chrome, Firefox, Safari, Edge)
 
 ---
 
-## 📞 Contact & Support
+## 📞 Contact
 
-### Need Help or Have Suggestions?
+For bug reports, feature requests, question quality issues, or to join the next study group cohort:
 
-If you encounter any issues, bugs, or have feature requests, please contact me directly on LinkedIn:
-
-**👤 [Ben Haim on LinkedIn](https://www.linkedin.com/in/ben-haim-/)**
-
-- 🐛 Bug reports
-- 💡 Feature suggestions
-- ❓ Questions about the platform
-- 📝 Feedback on question quality or explanations
-
-Please send me a direct message with details about your request. I'm committed to improving FlipTheSAA.
-
----
-
-## 🎓 About the SAA-C03 Exam
-
-The **AWS Certified Solutions Architect - Associate (SAA-C03)** exam validates your ability to:
-- Design secure, resilient, high-performing, and cost-optimized architectures
-- Implement solutions using AWS services
-- Understand AWS Well-Architected Framework principles
-
-**Exam Details**:
-- **Duration**: 130 minutes
-- **Questions**: 65 (50 scored + 15 unscored pretest)
-- **Passing Score**: 720 / 1000
-- **Format**: Multiple choice and multiple response
-- **Cost**: $150 USD
-
-**This practice platform mirrors these exact conditions to prepare you for success.**
-
----
-
-**Good luck with your AWS certification journey! 🚀**
-
-*Remember: Practice doesn't make perfect. Perfect practice makes perfect. Use FlipTheSAA to simulate real exam conditions and identify areas for improvement before test day.*
+[Ben Haim on LinkedIn](https://www.linkedin.com/in/ben-haim-/)
