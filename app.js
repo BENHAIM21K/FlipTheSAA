@@ -53,6 +53,7 @@
 
 const STATE_KEY = "saa_practice_state_v1"; // localStorage key for current session
 const HISTORY_KEY = "saa_practice_history_v1"; // localStorage key for quiz history
+const TAB_KEY = "saa_active_tab_v1"; // localStorage key for last active tab
 const MAX_HISTORY_SESSIONS = 50; // Keep most recent 50 sessions (FIFO)
 
 const EXAM_DURATION_SEC = 130 * 60; // 130 minutes = 7800 seconds (AWS exam time)
@@ -278,6 +279,7 @@ function clearAllData() {
   safeOperation('Clear All Data from localStorage', () => {
     localStorage.removeItem(STATE_KEY);     // Clear quiz state
     localStorage.removeItem(HISTORY_KEY);   // Clear performance history
+    localStorage.removeItem(TAB_KEY);       // Clear last active tab
     console.info('[SAA Info] All data cleared from localStorage (state + history)');
   }, undefined);
 }
@@ -2540,6 +2542,7 @@ function switchTab(tabName) {
     // === UPDATE NAVIGATION STATE ===
     const previousTab = currentTab;
     currentTab = tabName;
+    localStorage.setItem(TAB_KEY, tabName);
 
     // Update tab button active states
     document.querySelectorAll('.nav-tab').forEach(tab => {
@@ -2977,11 +2980,6 @@ async function init() {
   QUESTIONS = questions;
   QMAP = new Map(QUESTIONS.map((q) => [q.id, q]));
 
-  // Hide loading overlay after successful load
-  if (loadingOverlay) {
-    loadingOverlay.style.display = 'none';
-  }
-
   // ===== STEP 2: Setup UI =====
 
   // Mode select already configured in HTML (Review + Timed only)
@@ -3011,48 +3009,61 @@ async function init() {
   // ===== STEP 3: Restore Previous Session (if exists) =====
 
   const existing = normalizeStateForRuntime(loadState());
+  const savedTab = localStorage.getItem(TAB_KEY); // null on first visit
 
-  // Check if there's a valid session to restore
-  if (existing && existing.session && existing.session.questionIds && existing.session.questionIds.length) {
-    console.info('[SAA Info] Restoring previous session');
-
-    const s = existing.session;
-
-    // Restore UI state to match the session
-    modeSelect.value = normalizeMode(s.mode);
-
-    if (s.mode === "timed") {
-      domainSelect.value = "ALL";
-      sectionSelect.value = "ALL";
-      // Restore difficulty for timed mode (can be filtered)
-      buildDifficultyOptions("ALL", "ALL");
-      difficultySelect.value = s.difficulty || "ALL";
-    } else {
-      domainSelect.value = s.domainId;
-      buildSectionOptions(s.domainId);
-      sectionSelect.value = s.section;
-      buildDifficultyOptions(s.domainId, s.section);
-      difficultySelect.value = s.difficulty || "ALL";
-    }
-
-    ensureModeRulesUI();
-
-    // Navigate to practice tab to show the quiz
-    switchTab('practice');
-
-    // If session was completed, show results. Otherwise, resume quiz.
-    if (s.completed) {
-      console.info('[SAA Info] Session was completed, showing results');
-      showResults(existing, false);
-    } else {
-      console.info('[SAA Info] Session in progress, resuming quiz');
-      renderQuiz(existing);
-    }
-  } else {
-    console.info('[SAA Info] No previous session found, showing home page');
-    // Initialize to home tab
+  if (savedTab === null) {
+    // FIRST VISIT: no saved tab → always show home
+    console.info('[SAA Info] First visit, showing home page');
     currentTab = 'home';
     switchTab('home');
+  } else if (savedTab === 'practice') {
+    // Last tab was practice: restore session if one exists
+    if (existing && existing.session && existing.session.questionIds && existing.session.questionIds.length) {
+      console.info('[SAA Info] Restoring previous practice session');
+
+      const s = existing.session;
+
+      // Restore UI state to match the session
+      modeSelect.value = normalizeMode(s.mode);
+
+      if (s.mode === "timed") {
+        domainSelect.value = "ALL";
+        sectionSelect.value = "ALL";
+        buildDifficultyOptions("ALL", "ALL");
+        difficultySelect.value = s.difficulty || "ALL";
+      } else {
+        domainSelect.value = s.domainId;
+        buildSectionOptions(s.domainId);
+        sectionSelect.value = s.section;
+        buildDifficultyOptions(s.domainId, s.section);
+        difficultySelect.value = s.difficulty || "ALL";
+      }
+
+      ensureModeRulesUI();
+      switchTab('practice');
+
+      if (s.completed) {
+        console.info('[SAA Info] Session was completed, showing results');
+        showResults(existing, false);
+      } else {
+        console.info('[SAA Info] Session in progress, resuming quiz');
+        renderQuiz(existing);
+      }
+    } else {
+      // Was on practice but no valid session → show home
+      console.info('[SAA Info] Practice tab saved but no session, showing home');
+      currentTab = 'home';
+      switchTab('home');
+    }
+  } else {
+    // Last tab was home, performance, studygroups, or contact → go there
+    console.info(`[SAA Info] Restoring tab: ${savedTab}`);
+    switchTab(savedTab);
+  }
+
+  // Hide loading overlay now that the correct section is active
+  if (loadingOverlay) {
+    loadingOverlay.style.display = 'none';
   }
 
   console.info('[SAA Info] Initialization complete');
