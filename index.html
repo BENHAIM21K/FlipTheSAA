@@ -94,28 +94,64 @@
       <section class="page-section" id="practiceSection">
         <section class="card">
           <div class="grid">
-            <label class="field">
+            <div class="field">
               <span>Mode</span>
-              <select id="modeSelect">
-                <option value="review">Review (instant feedback)</option>
-                <option value="timed">Timed Exam (130 min, no instant feedback)</option>
-              </select>
-            </label>
+              <div class="ms-dropdown" id="modeDropdown">
+                <button class="ms-trigger" id="modeTrigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+                  <span class="ms-label" id="modeLabel">Review (instant feedback)</span>
+                  <span class="ms-caret" aria-hidden="true">&#9660;</span>
+                </button>
+                <div class="ms-panel" id="modePanel" role="listbox" hidden>
+                  <div class="ms-option ms-option--selected" data-value="review">Review (instant feedback)</div>
+                  <div class="ms-option" data-value="timed">Timed Exam (130 min, no instant feedback)</div>
+                </div>
+              </div>
+            </div>
 
-            <label class="field">
+            <div class="field">
               <span>Domain</span>
-              <select id="domainSelect"></select>
-            </label>
+              <div class="ms-dropdown" id="domainDropdown">
+                <button class="ms-trigger" id="domainTrigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+                  <span class="ms-label" id="domainLabel">All domains</span>
+                  <span class="ms-caret" aria-hidden="true">&#9660;</span>
+                </button>
+                <div class="ms-panel" id="domainPanel" role="listbox" aria-multiselectable="true" hidden>
+                  <label class="ms-option ms-option-all">
+                    <input type="checkbox" class="ms-check" id="domainAll" value="ALL" checked>
+                    <span>All domains</span>
+                  </label>
+                </div>
+              </div>
+            </div>
 
-            <label class="field">
+            <div class="field">
               <span>Section</span>
-              <select id="sectionSelect"></select>
-            </label>
+              <div class="ms-dropdown" id="sectionDropdown">
+                <button class="ms-trigger" id="sectionTrigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+                  <span class="ms-label" id="sectionLabel">All sections</span>
+                  <span class="ms-caret" aria-hidden="true">&#9660;</span>
+                </button>
+                <div class="ms-panel" id="sectionPanel" role="listbox" aria-multiselectable="true" hidden>
+                  <label class="ms-option ms-option-all">
+                    <input type="checkbox" class="ms-check" id="sectionAll" value="ALL" checked>
+                    <span>All sections</span>
+                  </label>
+                </div>
+              </div>
+            </div>
 
-            <label class="field">
+            <div class="field">
               <span>Difficulty</span>
-              <select id="difficultySelect"></select>
-            </label>
+              <div class="ms-dropdown" id="difficultyDropdown">
+                <button class="ms-trigger" id="difficultyTrigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+                  <span class="ms-label" id="difficultyLabel">All difficulties</span>
+                  <span class="ms-caret" aria-hidden="true">&#9660;</span>
+                </button>
+                <div class="ms-panel" id="difficultyPanel" role="listbox" hidden>
+                  <!-- dynamically injected by buildDifficultyOptions() -->
+                </div>
+              </div>
+            </div>
           </div>
 
           <div id="sectionButtons" class="chips"></div>

@@ -730,6 +730,122 @@ select {
 }
 .chip:hover { border-color: rgba(255,255,255,0.25); }
 
+/* ── Multi-Select Dropdown Widget ─────────────────────────────────────────── */
+.ms-dropdown { position: relative; width: 100%; }
+
+.ms-trigger {
+  width: 100%;
+  padding: 10px 10px;
+  border-radius: 10px;
+  background: #252b3b;
+  border: 1px solid rgba(129,161,193,0.18);
+  color: var(--text);
+  cursor: pointer;
+  font-size: inherit;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  text-align: left;
+  transition: border-color 0.2s ease;
+}
+.ms-trigger:hover { border-color: rgba(129,161,193,0.35); }
+.ms-trigger[aria-expanded="true"] {
+  border-color: rgba(129,161,193,0.5);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.ms-trigger:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.ms-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.ms-caret {
+  font-size: 10px;
+  color: var(--muted);
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+.ms-trigger[aria-expanded="true"] .ms-caret { transform: rotate(180deg); }
+
+.ms-panel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  background: #252b3b;
+  border: 1px solid rgba(129,161,193,0.35);
+  border-top: none;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  max-height: 240px;
+  overflow-y: auto;
+  animation: slideDown 0.15s ease both;
+  box-shadow: var(--shadow-md, 0 8px 24px rgba(0,0,0,0.3));
+}
+
+.ms-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text);
+  transition: background 0.15s ease;
+  user-select: none;
+}
+.ms-option:hover { background: rgba(129,161,193,0.1); }
+
+.ms-option-all {
+  border-bottom: 1px solid var(--border);
+  font-style: italic;
+  color: var(--muted);
+}
+
+.ms-option--selected {
+  background: rgba(129,161,193,0.08);
+}
+.ms-option--selected::after {
+  content: '✓';
+  margin-left: auto;
+  color: #81a1c1;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.ms-check {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  border-radius: 4px;
+  border: 1px solid rgba(129,161,193,0.4);
+  background: rgba(255,255,255,0.04);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.15s ease;
+}
+.ms-check:checked {
+  background: rgba(129,161,193,0.3);
+  border-color: rgba(129,161,193,0.7);
+}
+.ms-check:checked::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 5px;
+  width: 4px;
+  height: 8px;
+  border: 2px solid #81a1c1;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg);
+}
+/* ─────────────────────────────────────────────────────────────────────────── */
+
 .footer { color: var(--muted); font-size: 12px; padding: 6px 2px; }
 
 /* Performance Dashboard Styles */

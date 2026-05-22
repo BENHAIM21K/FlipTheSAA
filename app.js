@@ -72,6 +72,14 @@ let QUESTIONS = []; // Array of all question objects loaded from questions.json
 let QMAP = new Map(); // Fast lookup: questionId → question object
 let timerInterval = null; // Reference to the running timer (for cleanup)
 
+// Single-select filter state
+let selectedMode       = 'review';
+let selectedDifficulty = 'ALL';
+
+// Multi-select filter state ([] = all / no filter)
+let selectedDomains  = [];
+let selectedSections = [];
+
 // Navigation state
 let currentTab = 'home'; // Current active tab
 let quizPausedState = null; // Stores timer state when paused: { pausedAt: timestamp, frozenTime: remaining seconds }
@@ -82,10 +90,28 @@ let navigationLocked = false; // Prevents rapid tab switching
 // ============================================================================
 
 // Setup card controls (shown before starting quiz)
-const modeSelect = document.getElementById("modeSelect"); // Dropdown: Review or Timed
-const domainSelect = document.getElementById("domainSelect"); // Dropdown: D1, D2, D3, D4, or ALL
-const sectionSelect = document.getElementById("sectionSelect"); // Dropdown: EC2, S3, IAM, etc. or ALL
-const difficultySelect = document.getElementById("difficultySelect"); // Dropdown: Easy, Medium, Hard, or ALL
+// Single-select mode widget
+const modeDropdown      = document.getElementById("modeDropdown");
+const modeTrigger       = document.getElementById("modeTrigger");
+const modeLabel         = document.getElementById("modeLabel");
+const modePanel         = document.getElementById("modePanel");
+// Multi-select domain widget
+const domainDropdown  = document.getElementById("domainDropdown");
+const domainTrigger   = document.getElementById("domainTrigger");
+const domainLabel     = document.getElementById("domainLabel");
+const domainPanel     = document.getElementById("domainPanel");
+const domainAllCheck  = document.getElementById("domainAll");
+// Multi-select section widget
+const sectionDropdown = document.getElementById("sectionDropdown");
+const sectionTrigger  = document.getElementById("sectionTrigger");
+const sectionLabel    = document.getElementById("sectionLabel");
+const sectionPanel    = document.getElementById("sectionPanel");
+const sectionAllCheck = document.getElementById("sectionAll");
+// Single-select difficulty widget
+const difficultyDropdown = document.getElementById("difficultyDropdown");
+const difficultyTrigger  = document.getElementById("difficultyTrigger");
+const difficultyLabel    = document.getElementById("difficultyLabel");
+const difficultyPanel    = document.getElementById("difficultyPanel");
 const startBtn = document.getElementById("startBtn"); // "Start" or "Resume" button
 const newSessionBtn = document.getElementById("newSessionBtn"); // "Start Fresh" button
 // const resetBtn = document.getElementById("resetBtn"); // REMOVED - now handled by navigation tab
@@ -421,6 +447,57 @@ function pickSeededSubset(arr, count, seedStr) {
 }
 
 // ============================================================================
+// MULTI-SELECT DROPDOWN HELPERS
+// ============================================================================
+
+function getSelectedValues(panel) {
+  return Array.from(panel.querySelectorAll('.ms-check:not([value="ALL"]):checked'))
+    .map(cb => cb.value);
+}
+
+function updateTriggerLabel(labelEl, values, allText, singular, plural) {
+  labelEl.textContent = values.length === 0 ? allText
+    : values.length === 1 ? `1 ${singular} selected`
+    : `${values.length} ${plural} selected`;
+}
+
+function openDropdown(trigger, panel) {
+  panel.hidden = false;
+  trigger.setAttribute('aria-expanded', 'true');
+}
+
+function closeDropdown(trigger, panel) {
+  panel.hidden = true;
+  trigger.setAttribute('aria-expanded', 'false');
+}
+
+function closeAllDropdowns() {
+  closeDropdown(modeTrigger, modePanel);
+  closeDropdown(domainTrigger, domainPanel);
+  closeDropdown(sectionTrigger, sectionPanel);
+  closeDropdown(difficultyTrigger, difficultyPanel);
+}
+
+const MODE_LABELS = {
+  review: 'Review (instant feedback)',
+  timed:  'Timed Exam (130 min, no instant feedback)'
+};
+
+function syncModeUI() {
+  modeLabel.textContent = MODE_LABELS[selectedMode] || selectedMode;
+  modePanel.querySelectorAll('.ms-option').forEach(el => {
+    el.classList.toggle('ms-option--selected', el.dataset.value === selectedMode);
+  });
+}
+
+function syncDifficultyUI() {
+  difficultyLabel.textContent = selectedDifficulty === 'ALL' ? 'All difficulties' : selectedDifficulty;
+  difficultyPanel.querySelectorAll('.ms-option').forEach(el => {
+    el.classList.toggle('ms-option--selected', el.dataset.value === selectedDifficulty);
+  });
+}
+
+// ============================================================================
 // FILTER AND SESSION KEY FUNCTIONS - Handle quiz filtering and session identity
 // ============================================================================
 
@@ -437,10 +514,10 @@ function pickSeededSubset(arr, count, seedStr) {
  */
 function getFiltersFromUI() {
   return {
-    mode: normalizeMode(modeSelect.value),
-    domainId: domainSelect.value,
-    section: sectionSelect.value,
-    difficulty: difficultySelect.value
+    mode: normalizeMode(selectedMode),
+    domainIds: [...selectedDomains],
+    sections:  [...selectedSections],
+    difficulty: selectedDifficulty
   };
 }
 
@@ -470,8 +547,10 @@ function sessionKeyFor(filters) {
   // (domain and section are always ALL in timed mode)
   if (mode === "timed") return `timed::ALL::ALL::${filters.difficulty || "ALL"}`;
 
-  // Review mode sessions are identified by domain + section + difficulty
-  return `review::${filters.domainId}::${filters.section}::${filters.difficulty || "ALL"}`;
+  // Review mode sessions are identified by domain(s) + section(s) + difficulty
+  const d = (filters.domainIds && filters.domainIds.length > 0) ? [...filters.domainIds].sort().join(',') : 'ALL';
+  const s = (filters.sections  && filters.sections.length  > 0) ? [...filters.sections].sort().join(',')  : 'ALL';
+  return `review::${d}::${s}::${filters.difficulty || "ALL"}`;
 }
 
 /**
@@ -503,13 +582,13 @@ function filteredQuestions(filters) {
 
   // Review mode: Also filter by domain and section
   if (filters.mode !== "timed") {
-    // Filter by domain if not "ALL"
-    if (filters.domainId !== "ALL") {
-      list = list.filter((q) => q.domainId === filters.domainId);
+    // Filter by domain(s) if any selected
+    if (filters.domainIds && filters.domainIds.length > 0) {
+      list = list.filter((q) => filters.domainIds.includes(q.domainId));
     }
-    // Filter by section if not "ALL"
-    if (filters.section !== "ALL") {
-      list = list.filter((q) => q.section === filters.section);
+    // Filter by section(s) if any selected
+    if (filters.sections && filters.sections.length > 0) {
+      list = list.filter((q) => filters.sections.includes(q.section));
     }
   }
 
@@ -536,18 +615,30 @@ function filteredQuestions(filters) {
  * SIDE EFFECTS: Modifies domainSelect.innerHTML
  */
 function buildDomainOptions() {
-  // Create "ALL" option + extract unique domains from questions
-  const domains = [
-    { id: "ALL", name: "All domains" },
-    ...Array.from(
-      new Map(QUESTIONS.map((q) => [q.domainId, q.domain])).entries()
-    ).map(([id, name]) => ({ id, name }))
-  ];
+  const domains = Array.from(
+    new Map(QUESTIONS.map((q) => [q.domainId, q.domain])).entries()
+  ).map(([id, name]) => ({ id, name }));
 
-  // Build <option> tags and update dropdown
-  domainSelect.innerHTML = domains
-    .map((d) => `<option value="${d.id}">${d.name}</option>`)
-    .join("");
+  // Remove previously injected dynamic options (keep the "All" label)
+  domainPanel.querySelectorAll('.ms-option:not(.ms-option-all)').forEach(el => el.remove());
+
+  domains.forEach(({ id, name }) => {
+    const label = document.createElement('label');
+    label.className = 'ms-option';
+    label.innerHTML = `<input type="checkbox" class="ms-check" value="${escapeHtml(id)}"><span>${escapeHtml(name)}</span>`;
+    domainPanel.appendChild(label);
+  });
+
+  syncDomainCheckboxes();
+}
+
+function syncDomainCheckboxes() {
+  const allSelected = selectedDomains.length === 0;
+  domainAllCheck.checked = allSelected;
+  domainPanel.querySelectorAll('.ms-check:not([value="ALL"])').forEach(cb => {
+    cb.checked = !allSelected && selectedDomains.includes(cb.value);
+  });
+  updateTriggerLabel(domainLabel, selectedDomains, 'All domains', 'domain', 'domains');
 }
 
 /**
@@ -572,26 +663,37 @@ function buildDomainOptions() {
  * EXAMPLE:
  * buildSectionOptions("D1") → Shows only sections present in Domain 1
  */
-function buildSectionOptions(domainId) {
-  // Start with all questions, then filter by domain if specified
+function buildSectionOptions(domainIds) {
   let list = QUESTIONS;
-  if (domainId && domainId !== "ALL") {
-    list = list.filter((q) => q.domainId === domainId);
+  if (domainIds && domainIds.length > 0) {
+    list = list.filter((q) => domainIds.includes(q.domainId));
   }
 
-  // Get unique sections from the filtered questions
   const present = new Set(list.map((q) => q.section));
-
-  // Order sections according to SECTION_ORDER array
   const ordered = SECTION_ORDER.filter((s) => present.has(s));
 
-  // Add "ALL" as first option
-  const sections = ["ALL", ...ordered];
+  // Remove previously injected dynamic options (keep the "All" label)
+  sectionPanel.querySelectorAll('.ms-option:not(.ms-option-all)').forEach(el => el.remove());
 
-  // Build <option> tags and update dropdown
-  sectionSelect.innerHTML = sections
-    .map((s) => `<option value="${s}">${s === "ALL" ? "All sections" : s}</option>`)
-    .join("");
+  ordered.forEach(section => {
+    const label = document.createElement('label');
+    label.className = 'ms-option';
+    label.innerHTML = `<input type="checkbox" class="ms-check" value="${escapeHtml(section)}"><span>${escapeHtml(section)}</span>`;
+    sectionPanel.appendChild(label);
+  });
+
+  // Prune selectedSections to only those still available
+  selectedSections = selectedSections.filter(s => present.has(s));
+  syncSectionCheckboxes();
+}
+
+function syncSectionCheckboxes() {
+  const allSelected = selectedSections.length === 0;
+  sectionAllCheck.checked = allSelected;
+  sectionPanel.querySelectorAll('.ms-check:not([value="ALL"])').forEach(cb => {
+    cb.checked = !allSelected && selectedSections.includes(cb.value);
+  });
+  updateTriggerLabel(sectionLabel, selectedSections, 'All sections', 'section', 'sections');
 }
 
 /**
@@ -612,16 +714,15 @@ function buildSectionOptions(domainId) {
  * - domainId: Current domain filter ("ALL" or "D1"-"D4")
  * - section: Current section filter ("ALL" or section name)
  */
-function buildDifficultyOptions(domainId, section) {
-  // Start with all questions, then filter by domain/section
+function buildDifficultyOptions(domainIds, sections) {
   let list = QUESTIONS;
 
-  if (domainId && domainId !== "ALL") {
-    list = list.filter((q) => q.domainId === domainId);
+  if (domainIds && domainIds.length > 0) {
+    list = list.filter((q) => domainIds.includes(q.domainId));
   }
 
-  if (section && section !== "ALL") {
-    list = list.filter((q) => q.section === section);
+  if (sections && sections.length > 0) {
+    list = list.filter((q) => sections.includes(q.section));
   }
 
   // Get unique difficulties from the filtered questions
@@ -635,10 +736,21 @@ function buildDifficultyOptions(domainId, section) {
   // Add "ALL" as first option
   const difficulties = ["ALL", ...ordered];
 
-  // Build <option> tags and update dropdown
-  difficultySelect.innerHTML = difficulties
-    .map(d => `<option value="${d}">${d === "ALL" ? "All difficulties" : d}</option>`)
-    .join("");
+  // Rebuild panel options
+  difficultyPanel.innerHTML = '';
+  difficulties.forEach(d => {
+    const div = document.createElement('div');
+    div.className = 'ms-option' + (d === selectedDifficulty ? ' ms-option--selected' : '');
+    div.dataset.value = d;
+    div.textContent = d === "ALL" ? "All difficulties" : d;
+    difficultyPanel.appendChild(div);
+  });
+
+  // If current selectedDifficulty is no longer available, reset to ALL
+  if (!difficulties.includes(selectedDifficulty)) {
+    selectedDifficulty = 'ALL';
+  }
+  syncDifficultyUI();
 }
 
 // ============================================================================
@@ -917,27 +1029,27 @@ function startTimer(state) {
 }
 
 function ensureModeRulesUI() {
-  const mode = normalizeMode(modeSelect.value);
+  const mode = normalizeMode(selectedMode);
 
   if (mode === "timed") {
-    // Force domain and section to ALL (disabled in timed mode)
-    domainSelect.value = "ALL";
-    sectionSelect.value = "ALL";
-    domainSelect.disabled = true;
-    sectionSelect.disabled = true;
-
-    // Difficulty can be selected in timed mode (enabled)
-    difficultySelect.disabled = false;
+    // Reset selections to "all" and disable widgets
+    selectedDomains = [];
+    selectedSections = [];
+    syncDomainCheckboxes();
+    syncSectionCheckboxes();
+    domainTrigger.disabled = true;
+    sectionTrigger.disabled = true;
+    difficultyTrigger.disabled = false;
 
     hintText.textContent =
       "Timed mode: random 65 questions from all domains and sections. Filter by difficulty if desired. Finish the exam to see results.";
   } else {
     // Review mode: all filters enabled
-    domainSelect.disabled = false;
-    sectionSelect.disabled = false;
-    difficultySelect.disabled = false;
-    buildSectionOptions(domainSelect.value);
-    buildDifficultyOptions(domainSelect.value, sectionSelect.value);
+    domainTrigger.disabled = false;
+    sectionTrigger.disabled = false;
+    difficultyTrigger.disabled = false;
+    buildSectionOptions(selectedDomains);
+    buildDifficultyOptions(selectedDomains, selectedSections);
 
     hintText.textContent =
       "Review mode: filter by domain, section, and difficulty. Question order and answers persist on refresh.";
@@ -1012,8 +1124,8 @@ function createNewSession(filters, forceFresh) {
   const session = {
     version: 1,
     mode: filters.mode,
-    domainId: filters.mode === "timed" ? "ALL" : filters.domainId,
-    section: filters.mode === "timed" ? "ALL" : filters.section,
+    domainIds: filters.mode === "timed" ? [] : (filters.domainIds || []),
+    sections:  filters.mode === "timed" ? [] : (filters.sections  || []),
     seed,
     questionIds: order,
     answers: {}, // { [id]: choiceIndex }
@@ -1918,8 +2030,8 @@ function recordSessionToHistory(state) {
     const sessionRecord = {
       sessionId: `${session.mode}-${startedAt}`,
       mode: session.mode,
-      domainId: session.domainId,
-      section: session.section,
+      domainIds: session.domainIds || [],
+      sections:  session.sections  || [],
       startedAt: startedAt,
       completedAt: completedAt,
       durationSeconds: durationSeconds,
@@ -2999,9 +3111,10 @@ async function init() {
   }
 
   // Build dropdown options from loaded questions
+  syncModeUI();
   buildDomainOptions();
-  buildSectionOptions("ALL");
-  buildDifficultyOptions("ALL", "ALL");
+  buildSectionOptions([]);
+  buildDifficultyOptions([], []);
 
   // Apply mode-specific UI rules
   ensureModeRulesUI();
@@ -3024,19 +3137,27 @@ async function init() {
       const s = existing.session;
 
       // Restore UI state to match the session
-      modeSelect.value = normalizeMode(s.mode);
+      selectedMode = normalizeMode(s.mode);
+      syncModeUI();
 
       if (s.mode === "timed") {
-        domainSelect.value = "ALL";
-        sectionSelect.value = "ALL";
-        buildDifficultyOptions("ALL", "ALL");
-        difficultySelect.value = s.difficulty || "ALL";
+        selectedDomains = [];
+        selectedSections = [];
+        syncDomainCheckboxes();
+        buildSectionOptions([]);
+        selectedDifficulty = s.difficulty || "ALL";
+        buildDifficultyOptions([], []);
       } else {
-        domainSelect.value = s.domainId;
-        buildSectionOptions(s.domainId);
-        sectionSelect.value = s.section;
-        buildDifficultyOptions(s.domainId, s.section);
-        difficultySelect.value = s.difficulty || "ALL";
+        // Migrate old single-value saves (domainId/section strings) to arrays
+        selectedDomains = Array.isArray(s.domainIds) ? [...s.domainIds]
+          : (s.domainId && s.domainId !== "ALL") ? [s.domainId] : [];
+        buildSectionOptions(selectedDomains);
+        selectedSections = Array.isArray(s.sections) ? [...s.sections]
+          : (s.section && s.section !== "ALL") ? [s.section] : [];
+        syncDomainCheckboxes();
+        syncSectionCheckboxes();
+        selectedDifficulty = s.difficulty || "ALL";
+        buildDifficultyOptions(selectedDomains, selectedSections);
       }
 
       ensureModeRulesUI();
@@ -3074,13 +3195,38 @@ async function init() {
 // ============================================================================
 // All button clicks and dropdown changes are handled here
 
-/**
- * MODE DROPDOWN CHANGE
- * When user switches between Review and Timed mode, update UI rules
- * (Timed mode disables domain/section filtering)
- */
-modeSelect.addEventListener("change", () => {
+// ── Mode trigger: toggle open/close ───────────────────────────────────────
+modeTrigger.addEventListener('click', () => {
+  const isOpen = !modePanel.hidden;
+  closeAllDropdowns();
+  if (!isOpen) openDropdown(modeTrigger, modePanel);
+});
+
+// ── Mode panel: option click selects mode ─────────────────────────────────
+modePanel.addEventListener('click', (e) => {
+  const option = e.target.closest('.ms-option');
+  if (!option || !option.dataset.value) return;
+  selectedMode = option.dataset.value;
+  syncModeUI();
+  closeDropdown(modeTrigger, modePanel);
   ensureModeRulesUI();
+});
+
+// ── Difficulty trigger: toggle open/close ─────────────────────────────────
+difficultyTrigger.addEventListener('click', () => {
+  if (difficultyTrigger.disabled) return;
+  const isOpen = !difficultyPanel.hidden;
+  closeAllDropdowns();
+  if (!isOpen) openDropdown(difficultyTrigger, difficultyPanel);
+});
+
+// ── Difficulty panel: option click selects difficulty ─────────────────────
+difficultyPanel.addEventListener('click', (e) => {
+  const option = e.target.closest('.ms-option');
+  if (!option || !option.dataset.value) return;
+  selectedDifficulty = option.dataset.value;
+  syncDifficultyUI();
+  closeDropdown(difficultyTrigger, difficultyPanel);
 });
 
 // ============================================================================
@@ -3154,26 +3300,71 @@ window.addEventListener('orientationchange', () => {
 // EXISTING EVENT LISTENERS
 // ============================================================================
 
-/**
- * DOMAIN DROPDOWN CHANGE
- * When user selects a domain, rebuild the section dropdown to show
- * only sections that exist in that domain
- */
-domainSelect.addEventListener("change", () => {
-  buildSectionOptions(domainSelect.value);
-  buildDifficultyOptions(domainSelect.value, sectionSelect.value);
+// ── Domain trigger: toggle open/close ─────────────────────────────────────
+domainTrigger.addEventListener('click', () => {
+  if (domainTrigger.disabled) return;
+  const isOpen = !domainPanel.hidden;
+  closeAllDropdowns();
+  if (!isOpen) openDropdown(domainTrigger, domainPanel);
 });
 
-sectionSelect.addEventListener("change", () => {
-  buildDifficultyOptions(domainSelect.value, sectionSelect.value);
+// ── Domain panel: handle checkbox changes ──────────────────────────────────
+domainPanel.addEventListener('change', (e) => {
+  if (!e.target.classList.contains('ms-check')) return;
+
+  if (e.target.value === 'ALL') {
+    if (e.target.checked) {
+      selectedDomains = [];
+    } else {
+      e.target.checked = true; // can't uncheck "All" with nothing else selected
+    }
+  } else {
+    selectedDomains = getSelectedValues(domainPanel);
+  }
+
+  syncDomainCheckboxes();
+  selectedSections = [];
+  buildSectionOptions(selectedDomains);
+  buildDifficultyOptions(selectedDomains, []);
 });
 
-/**
- * SECTION DROPDOWN CHANGE
- * Placeholder for future functionality (currently no action needed)
- */
-sectionSelect.addEventListener("change", () => {
-  // no-op (reserved for future features)
+// ── Section trigger: toggle open/close ────────────────────────────────────
+sectionTrigger.addEventListener('click', () => {
+  if (sectionTrigger.disabled) return;
+  const isOpen = !sectionPanel.hidden;
+  closeAllDropdowns();
+  if (!isOpen) openDropdown(sectionTrigger, sectionPanel);
+});
+
+// ── Section panel: handle checkbox changes ─────────────────────────────────
+sectionPanel.addEventListener('change', (e) => {
+  if (!e.target.classList.contains('ms-check')) return;
+
+  if (e.target.value === 'ALL') {
+    if (e.target.checked) {
+      selectedSections = [];
+    } else {
+      e.target.checked = true; // can't uncheck "All" with nothing else selected
+    }
+  } else {
+    selectedSections = getSelectedValues(sectionPanel);
+  }
+
+  syncSectionCheckboxes();
+  buildDifficultyOptions(selectedDomains, selectedSections);
+});
+
+// ── Click outside: close any open dropdown ────────────────────────────────
+document.addEventListener('click', (e) => {
+  if (!modeDropdown.contains(e.target))       closeDropdown(modeTrigger, modePanel);
+  if (!domainDropdown.contains(e.target))     closeDropdown(domainTrigger, domainPanel);
+  if (!sectionDropdown.contains(e.target))    closeDropdown(sectionTrigger, sectionPanel);
+  if (!difficultyDropdown.contains(e.target)) closeDropdown(difficultyTrigger, difficultyPanel);
+});
+
+// ── Escape key: close any open dropdown ───────────────────────────────────
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeAllDropdowns();
 });
 
 /**
