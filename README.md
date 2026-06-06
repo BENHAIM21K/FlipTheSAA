@@ -8,7 +8,7 @@
 
 ## What is FlipTheSAA?
 
-FlipTheSAA is a community-built, completely free AWS SAA-C03 preparation platform. It has two core pillars: structured study group cohorts with real people, and a realistic practice exam simulator you can use on your own at any time.
+FlipTheSAA is a community-built, completely free AWS SAA-C03 preparation platform. It combines structured live study group cohorts with a realistic practice exam simulator, a performance dashboard, and a curated resource hub — all in one place.
 
 No login required. No paywall. All your data stays in your browser.
 
@@ -18,13 +18,17 @@ No login required. No paywall. All your data stays in your browser.
 
 Study groups are the heart of FlipTheSAA. Each cohort runs for 11 lessons over roughly two months, covering all SAA-C03 exam domains together with a group of students.
 
-Every lesson includes:
+**Lessons 1–8** include:
 
 - **Recording** — Full session recording so you never miss a class and can rewatch at your own pace
 - **AI Summary** — An AI-generated summary of the session covering the key points discussed
-- **Slides** — Lesson presentation available as a PDF
-- **Homework** — A practice quiz and homework assignment to reinforce the material
-- **Useful Links** — Curated videos and documentation referenced during the session
+- **Slides** — Lesson presentation slides (PDF or Google Drive link)
+- **Quiz** — A practice quiz to reinforce the material
+
+**Lessons 9–11** (mock exam sessions) include:
+
+- **Recording** — Full session recording
+- **AI Summary** — AI-generated summary of the session
 
 Past cohort recordings and materials remain accessible to everyone on the Study Groups page after the cohort ends, so you can go through any previous cohort independently at your own pace.
 
@@ -71,10 +75,37 @@ Tracks your progress across all completed sessions:
 
 - Total attempts, average score, pass rate
 - Score trend across your last 10 sessions
-- Per-domain accuracy bars, color-coded (green ≥80%, yellow 60-79%, red <60%)
+- Per-domain accuracy bars, color-coded (green ≥80%, yellow 60–79%, red <60%)
 - Top 10 most-missed questions with a direct link to retake each one
 
 Data is stored locally in `localStorage` and persists across browser sessions. Nothing is sent to any server.
+
+---
+
+## 🔗 Resources
+
+A curated reference hub with two sections.
+
+### Study Resources
+
+Categorized links to the best external SAA-C03 study materials:
+
+- **YouTube** — Channels with exam-focused video content
+- **LinkedIn** — People to follow for AWS insights and tips
+- **GitHub** — Repositories with practical AWS guides
+- **Platforms** — Practice exam and learning platforms
+
+Filter by type to quickly find what you need.
+
+### AWS Service Cheat Sheet
+
+A searchable, filterable quick-reference for every AWS service tested on the SAA-C03 exam (~115 services).
+
+- **Flip cards** — Front shows the service name and icon; click to flip and reveal the description and exam-relevant keywords
+- **Live search** — Type a service name or any keyword (e.g. "DDoS", "NoSQL", "serverless") to filter cards instantly
+- **Category filter** — Filter by service family: Compute, Storage, Database, Networking, Security, Integration, Analytics, Serverless, Management, Migration, Containers, Cost, Machine Learning, Media, Frontend, Developer Tools
+
+Both filters work together — search narrows the active category, and selecting a category narrows the current search.
 
 ---
 
@@ -90,22 +121,28 @@ Data is stored locally in `localStorage` and persists across browser sessions. N
 ## 🛠️ How to Use
 
 ### Learning a new topic
-1. Go to Practice Questions
-2. Select Review Mode
+1. Go to **Practice Questions**
+2. Select **Review Mode**
 3. Filter to the domain or AWS service you want to focus on
 4. Work through questions and read every explanation
 
 ### Testing exam readiness
-1. Go to Practice Questions
-2. Select Timed Exam Mode
+1. Go to **Practice Questions**
+2. Select **Timed Exam Mode**
 3. Set Domain and Section to ALL
 4. Click "Start Fresh" and treat it like the real thing
-5. After submitting, go to Performance to see your score and weak areas
+5. After submitting, go to **Performance** to see your score and weak areas
 
 ### Catching up on a study group
-1. Go to Study Groups
+1. Go to **Study Groups**
 2. Select a cohort
-3. Open any lesson accordion to access its recording, summary, slides, and homework
+3. Open any lesson accordion to access its recording, AI summary, slides, and quiz
+
+### Studying AWS services
+1. Go to **Resources**
+2. Open the **AWS Service Cheat Sheet**
+3. Use the search bar or category filters to find a service
+4. Click any card to flip it and reveal the description and keywords
 
 ---
 
@@ -123,7 +160,8 @@ Before booking the real exam:
 
 - Pure frontend — no backend, no server, no database
 - Vanilla JavaScript, no frameworks or dependencies
-- All data stored in browser `localStorage`:
+- Data files served as static JSON from S3: `questions.json`, `studygroups.json`, `resources.json`
+- All session data stored in browser `localStorage`:
   - `saa_practice_state_v1` — current session state, answers, timer, shuffle seed
   - `saa_practice_history_v1` — last 50 completed sessions with domain and section breakdowns
 - Responsive design, tested on desktop and mobile (Chrome, Firefox, Safari, Edge)

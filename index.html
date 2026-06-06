@@ -24,6 +24,7 @@
           <button class="nav-tab" data-tab="practice" type="button">📝 Practice Questions</button>
           <button class="nav-tab" data-tab="performance" type="button">📊 Performance</button>
           <button class="nav-tab" data-tab="studygroups" type="button">📚 Study Groups</button>
+          <button class="nav-tab" data-tab="resources" type="button">🔗 Resources</button>
           <button class="nav-tab" data-tab="contact" type="button">📧 Contact</button>
           <button class="nav-tab" data-tab="reset" type="button">🔄 Reset</button>
         </div>
@@ -275,6 +276,42 @@
             </div>
             <div class="study-groups-list">
               <!-- Lessons accordion populated dynamically -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== RESOURCES SECTION ===== -->
+      <section class="page-section" id="resourcesSection">
+        <div class="card">
+          <h2>🔗 Resources</h2>
+          <p class="hint">Curated study materials, useful channels, and a quick-reference cheat sheet for every SAA-C03 service.</p>
+
+          <!-- External Links -->
+          <div class="res-block">
+            <h3 class="res-block-title">Study Resources</h3>
+            <div class="res-filter-bar" id="resFilterBar">
+              <button class="res-filter-btn active" data-filter="all">All</button>
+              <button class="res-filter-btn" data-filter="youtube">▶ YouTube</button>
+              <button class="res-filter-btn" data-filter="linkedin">in LinkedIn</button>
+              <button class="res-filter-btn" data-filter="github">⌥ GitHub</button>
+              <button class="res-filter-btn" data-filter="platform">🖥 Platform</button>
+            </div>
+            <div class="res-links-grid" id="resLinksGrid">
+              <p class="hint" style="padding: 16px 0">Loading resources...</p>
+            </div>
+          </div>
+
+          <!-- Cheat Sheet -->
+          <div class="res-block">
+            <h3 class="res-block-title">AWS Service Cheat Sheet</h3>
+            <div class="res-cs-controls">
+              <input type="text" id="csSearch" class="res-cs-search" placeholder="Search service or keyword (e.g. DDoS, NoSQL)…" autocomplete="off">
+              <div class="res-filter-bar" id="csCategoryBar"></div>
+            </div>
+            <p class="res-cs-count hint" id="csCount"></p>
+            <div class="cheatsheet-grid" id="cheatsheetGrid">
+              <p class="hint" style="padding: 16px 0">Loading cheat sheet...</p>
             </div>
           </div>
         </div>

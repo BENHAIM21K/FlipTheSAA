@@ -2676,6 +2676,7 @@ function switchTab(tabName) {
       'practice': 'practiceSection',
       'performance': 'performanceSection',
       'studygroups': 'studyGroupsSection',
+      'resources': 'resourcesSection',
       'contact': 'contactSection'
     };
 
@@ -2721,6 +2722,10 @@ function switchTab(tabName) {
 
     if (tabName === 'studygroups') {
       renderStudyGroups();
+    }
+
+    if (tabName === 'resources') {
+      renderResources();
     }
 
     // === MOBILE: CLOSE MENU ===
@@ -2984,6 +2989,203 @@ function buildLessonHTML(lesson) {
         ${bodyContent}
       </div>
     </div>`;
+}
+
+// ============================================================================
+// RESOURCES TAB
+// ============================================================================
+
+let resourcesCache = null;
+let csActiveCategory = 'all';
+let resActiveFilter = 'all';
+
+async function renderResources() {
+  if (resourcesCache) {
+    renderExternalLinks(resourcesCache.externalLinks || []);
+    renderCheatSheet(resourcesCache.cheatsheet || []);
+    return;
+  }
+  try {
+    const res = await fetch('resources.json');
+    resourcesCache = await res.json();
+  } catch (e) {
+    console.warn('[SAA Warning] Could not load resources.json', e);
+    const grid = document.getElementById('resLinksGrid');
+    if (grid) grid.innerHTML = '<p class="hint">Could not load resources.</p>';
+    return;
+  }
+  renderExternalLinks(resourcesCache.externalLinks || []);
+  renderCheatSheet(resourcesCache.cheatsheet || []);
+}
+
+const RES_TYPE_META = {
+  youtube:  { label: 'YouTube',  color: '#ff4444', icon: 'fa-brands fa-youtube' },
+  linkedin: { label: 'LinkedIn', color: '#0077b5', icon: 'fa-brands fa-linkedin' },
+  github:   { label: 'GitHub',   color: '#8b949e', icon: 'fa-brands fa-github' },
+  platform: { label: 'Platform', color: '#5e81ac', icon: 'fa-solid fa-desktop' }
+};
+
+function renderExternalLinks(links) {
+  const grid = document.getElementById('resLinksGrid');
+  if (!grid) return;
+
+  if (!links.length) {
+    grid.innerHTML = '<p class="hint">No resources yet.</p>';
+    return;
+  }
+
+  grid.innerHTML = links.map(link => {
+    const meta = RES_TYPE_META[link.type] || { label: link.type, color: 'var(--accent-primary)', icon: 'fa-solid fa-link' };
+    return `
+      <div class="res-link-card" data-type="${link.type}">
+        <div class="res-link-icon-wrap" style="color:${meta.color}">
+          <i class="${meta.icon} res-link-icon"></i>
+        </div>
+        <div class="res-link-body">
+          <span class="res-link-name">${link.name}</span>
+          <p class="res-link-desc">${link.description}</p>
+        </div>
+        <a class="btn btn-ghost res-link-btn" href="${link.url}" target="_blank" rel="noopener noreferrer">Visit ↗</a>
+      </div>`;
+  }).join('');
+
+  // Filter bar wiring
+  const filterBar = document.getElementById('resFilterBar');
+  if (filterBar) {
+    filterBar.querySelectorAll('.res-filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBar.querySelectorAll('.res-filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        resActiveFilter = btn.dataset.filter;
+        filterExternalLinks();
+      });
+    });
+  }
+
+  filterExternalLinks();
+}
+
+function filterExternalLinks() {
+  const grid = document.getElementById('resLinksGrid');
+  if (!grid) return;
+  grid.querySelectorAll('.res-link-card').forEach(card => {
+    const show = resActiveFilter === 'all' || card.dataset.type === resActiveFilter;
+    card.style.display = show ? '' : 'none';
+  });
+}
+
+const CS_CATEGORY_COLORS = {
+  Compute:        '#81a1c1',
+  Storage:        '#88c0d0',
+  Database:       '#8fbcbb',
+  Networking:     '#5e81ac',
+  Security:       '#bf616a',
+  Integration:    '#d08770',
+  Analytics:      '#ebcb8b',
+  Serverless:     '#a3be8c',
+  Management:     '#b48ead',
+  Migration:      '#4c566a',
+  Containers:     '#6a9fb5',
+  Cost:           '#a8c76a',
+  'Machine Learning': '#c49a6c',
+  Media:          '#9b59b6',
+  Frontend:       '#1abc9c',
+  'Developer Tools': '#e67e22',
+  Other:          '#6e7f8d'
+};
+
+function renderCheatSheet(entries) {
+  const grid = document.getElementById('cheatsheetGrid');
+  const search = document.getElementById('csSearch');
+  const catBar = document.getElementById('csCategoryBar');
+  if (!grid) return;
+
+  if (!entries.length) {
+    grid.innerHTML = '<p class="hint">No cheat sheet entries yet.</p>';
+    return;
+  }
+
+  // Build category filter bar dynamically from data
+  if (catBar) {
+    const categories = ['all', ...new Set(entries.map(e => e.category))].sort((a, b) =>
+      a === 'all' ? -1 : b === 'all' ? 1 : a.localeCompare(b)
+    );
+    catBar.innerHTML = categories.map(cat =>
+      `<button class="res-filter-btn${cat === csActiveCategory ? ' active' : ''}" data-cat="${cat}">${cat === 'all' ? 'All' : cat}</button>`
+    ).join('');
+
+    catBar.querySelectorAll('.res-filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        catBar.querySelectorAll('.res-filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        csActiveCategory = btn.dataset.cat;
+        filterCheatSheet();
+      });
+    });
+  }
+
+  grid.innerHTML = entries.map(entry => {
+    const color = CS_CATEGORY_COLORS[entry.category] || 'var(--accent-primary)';
+    const chips = entry.keywords.map(kw => `<span class="chip">${kw}</span>`).join('');
+    const icon = entry.icon || '☁️';
+    return `
+      <div class="service-card flip-card" data-service="${entry.service.toLowerCase()}" data-category="${entry.category}" data-keywords="${entry.keywords.join(' ').toLowerCase()}">
+        <div class="flip-card-inner">
+          <div class="flip-card-front" style="border-color:${color}33">
+            <span class="flip-icon">${icon}</span>
+            <span class="flip-service-name">${entry.service}</span>
+            <span class="flip-hint">tap to reveal ↺</span>
+          </div>
+          <div class="flip-card-back" style="border-color:${color}55">
+            <div class="service-card-top">
+              <span class="service-cat-badge" style="background:${color}22;color:${color};border-color:${color}44">${entry.category}</span>
+              <span class="service-name">${entry.service}</span>
+            </div>
+            <p class="service-desc">${entry.description}</p>
+            <div class="chips">${chips}</div>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  // Flip on click
+  grid.querySelectorAll('.flip-card').forEach(card => {
+    card.addEventListener('click', () => card.classList.toggle('is-flipped'));
+  });
+
+  // Search wiring
+  if (search) {
+    search.removeEventListener('input', filterCheatSheet);
+    search.addEventListener('input', filterCheatSheet);
+  }
+
+  filterCheatSheet();
+}
+
+function filterCheatSheet() {
+  const grid = document.getElementById('cheatsheetGrid');
+  const search = document.getElementById('csSearch');
+  const countEl = document.getElementById('csCount');
+  if (!grid) return;
+
+  const query = (search ? search.value.trim().toLowerCase() : '');
+  let visible = 0;
+
+  grid.querySelectorAll('.service-card').forEach(card => {
+    const matchCat = csActiveCategory === 'all' || card.dataset.category === csActiveCategory;
+    const matchSearch = !query ||
+      card.dataset.service.includes(query) ||
+      card.dataset.keywords.includes(query) ||
+      card.querySelector('.service-desc').textContent.toLowerCase().includes(query);
+    const show = matchCat && matchSearch;
+    card.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+
+  if (countEl) {
+    const total = grid.querySelectorAll('.service-card').length;
+    countEl.textContent = visible === total ? `${total} services` : `${visible} of ${total} services`;
+  }
 }
 
 // ============================================================================

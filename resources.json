@@ -1,0 +1,197 @@
+{
+  "_instructions": {
+    "_readme": "HOW TO ADD/UPDATE RESOURCES DATA — Read this before editing!",
+    "_howToAddExternalLink": [
+      "1. Add a new object to the 'externalLinks' array.",
+      "2. Set 'type' to one of: 'youtube', 'linkedin', 'github', 'platform'.",
+      "3. Fill in 'name', 'description', and 'url'.",
+      "4. Upload resources.json to S3 and hard-refresh the site."
+    ],
+    "_howToAddCheatsheetEntry": [
+      "1. Add a new object to the 'cheatsheet' array.",
+      "2. Set 'service' to the AWS service name.",
+      "3. Set 'icon' to an emoji representing the service.",
+      "4. Set 'category' to one of: Compute, Storage, Database, Networking, Security, Integration, Analytics, Serverless, Management, Migration, Containers, Cost, Machine Learning, Media, Frontend, Developer Tools, Other.",
+      "5. Write a short one-liner 'description' of what the service does.",
+      "6. Add relevant 'keywords' as an array of strings — include exam-relevant terms.",
+      "7. Upload resources.json to S3 and hard-refresh the site."
+    ],
+    "_fields": {
+      "externalLinks[].name": "Display name of the channel, person, repo, or platform.",
+      "externalLinks[].type": "Category: 'youtube', 'linkedin', 'github', or 'platform'.",
+      "externalLinks[].description": "Short note on why it's useful for SAA prep.",
+      "externalLinks[].url": "Full URL to the resource.",
+      "cheatsheet[].service": "AWS service name (e.g. 'S3', 'Lambda', 'Shield').",
+      "cheatsheet[].icon": "Emoji icon shown on the front of the flip card.",
+      "cheatsheet[].category": "Service family category for filtering.",
+      "cheatsheet[].description": "One-line description of what the service does.",
+      "cheatsheet[].keywords": "Array of exam-relevant keywords and synonyms for search."
+    }
+  },
+  "externalLinks": [
+    {
+      "name": "Stephane Maarek",
+      "type": "youtube",
+      "description": "The go-to SAA-C03 course creator. Deep dives on every AWS service with exam-focused explanations.",
+      "url": "https://www.youtube.com/@StephaneMaarek"
+    },
+    {
+      "name": "AWS re:Invent",
+      "type": "youtube",
+      "description": "Official AWS conference talks — great for understanding real-world use cases behind services.",
+      "url": "https://www.youtube.com/@AWSEventsChannel"
+    },
+    {
+      "name": "TutorialsDojo",
+      "type": "platform",
+      "description": "Best practice exam questions for SAA-C03. Detailed explanations on every answer.",
+      "url": "https://tutorialsdojo.com/aws-solutions-architect-associate/"
+    },
+    {
+      "name": "AWS Skill Builder",
+      "type": "platform",
+      "description": "Official AWS learning platform with free SAA exam prep content and practice questions.",
+      "url": "https://skillbuilder.aws/"
+    },
+    {
+      "name": "open-guides/og-aws",
+      "type": "github",
+      "description": "Community-maintained practical guide to AWS — great overview of every service with gotchas and tips.",
+      "url": "https://github.com/open-guides/og-aws"
+    }
+  ],
+  "cheatsheet": [
+    { "service": "EC2", "icon": "🖥️", "category": "Compute", "description": "Resizable virtual servers in the cloud", "keywords": ["virtual machine", "instance", "AMI", "spot", "reserved", "on-demand", "placement group", "EBS", "user data", "hibernate"] },
+    { "service": "Auto Scaling", "icon": "📈", "category": "Compute", "description": "Automatically adjust EC2 capacity based on demand", "keywords": ["scaling", "min", "max", "desired", "launch template", "cooldown", "scheduled", "dynamic", "predictive", "ASG"] },
+    { "service": "Elastic Beanstalk", "icon": "🌱", "category": "Compute", "description": "PaaS for deploying web applications without managing infrastructure", "keywords": ["PaaS", "deploy", "managed", "environment", "blue/green", "rolling", "web server", "worker tier"] },
+    { "service": "AWS Batch", "icon": "⚙️", "category": "Compute", "description": "Run batch computing workloads at any scale without managing servers", "keywords": ["batch jobs", "managed compute", "queue", "job definition", "EC2", "Fargate", "HPC", "Docker"] },
+    { "service": "Outposts", "icon": "🏠", "category": "Compute", "description": "Run AWS infrastructure and services on-premises for a hybrid experience", "keywords": ["on-premises", "hybrid", "local", "rack", "extension", "low latency", "data residency"] },
+    { "service": "Serverless Application Repository", "icon": "📦", "category": "Compute", "description": "Discover and deploy pre-built serverless applications and components", "keywords": ["SAR", "marketplace", "Lambda", "reuse", "publish", "deploy", "serverless"] },
+    { "service": "Wavelength", "icon": "📡", "category": "Compute", "description": "Deploy AWS compute and storage at the edge of 5G networks for ultra-low latency", "keywords": ["5G", "edge", "ultra-low latency", "mobile", "telecom", "Carrier Gateway"] },
+
+    { "service": "ECS", "icon": "🐳", "category": "Containers", "description": "Fully managed container orchestration service for Docker workloads", "keywords": ["container", "Docker", "task", "service", "cluster", "Fargate", "EC2 launch type", "ECR", "task definition"] },
+    { "service": "EKS", "icon": "⎈", "category": "Containers", "description": "Managed Kubernetes service — run K8s without managing the control plane", "keywords": ["Kubernetes", "K8s", "container", "cluster", "node group", "Fargate", "managed", "pod"] },
+    { "service": "ECR", "icon": "🗂️", "category": "Containers", "description": "Managed Docker container image registry to store, manage, and deploy images", "keywords": ["registry", "Docker image", "container", "push", "pull", "private", "vulnerability scan", "lifecycle"] },
+    { "service": "ECS Anywhere", "icon": "🌍", "category": "Containers", "description": "Run ECS container workloads on-premises or any cloud with your own hardware", "keywords": ["on-premises", "hybrid", "external", "ECS", "container", "agent", "anywhere"] },
+    { "service": "EKS Anywhere", "icon": "🌍", "category": "Containers", "description": "Create and operate Kubernetes clusters on-premises using AWS-managed tooling", "keywords": ["on-premises", "hybrid", "Kubernetes", "bare metal", "vSphere", "anywhere"] },
+    { "service": "EKS Distro", "icon": "📦", "category": "Containers", "description": "AWS-curated Kubernetes distribution — same software AWS uses in EKS", "keywords": ["Kubernetes distribution", "open source", "on-premises", "self-managed", "EKS", "consistent"] },
+
+    { "service": "S3", "icon": "🪣", "category": "Storage", "description": "Scalable object storage for any amount of data, accessible from anywhere", "keywords": ["object storage", "bucket", "versioning", "lifecycle", "static website", "presigned URL", "glacier", "replication", "ACL", "S3 Standard", "Intelligent-Tiering"] },
+    { "service": "EBS", "icon": "💽", "category": "Storage", "description": "High-performance block storage volumes attached to EC2 instances", "keywords": ["block storage", "volume", "snapshot", "gp2", "gp3", "io1", "io2", "IOPS", "throughput", "AZ-locked", "encrypt"] },
+    { "service": "EFS", "icon": "📁", "category": "Storage", "description": "Scalable elastic shared file system for Linux workloads", "keywords": ["NFS", "shared", "file system", "multi-AZ", "elastic", "POSIX", "mount target", "lifecycle", "Linux"] },
+    { "service": "S3 Glacier", "icon": "🧊", "category": "Storage", "description": "Low-cost archival object storage with configurable retrieval times", "keywords": ["archive", "cold storage", "retrieval", "Instant", "Flexible", "Deep Archive", "vault", "lifecycle", "long-term"] },
+    { "service": "FSx", "icon": "🗄️", "category": "Storage", "description": "Managed file systems for Windows, Lustre, NetApp ONTAP, and OpenZFS", "keywords": ["Windows", "Lustre", "ONTAP", "OpenZFS", "SMB", "NFS", "HPC", "file share", "managed"] },
+    { "service": "AWS Backup", "icon": "💾", "category": "Storage", "description": "Centrally manage and automate backups across AWS services", "keywords": ["backup", "restore", "policy", "vault", "cross-region", "cross-account", "EBS", "RDS", "EFS", "DynamoDB"] },
+    { "service": "Storage Gateway", "icon": "🌉", "category": "Storage", "description": "Hybrid cloud storage bridge connecting on-premises to AWS storage", "keywords": ["hybrid", "on-premises", "file gateway", "volume gateway", "tape gateway", "S3", "iSCSI", "NFS"] },
+
+    { "service": "RDS", "icon": "🗄️", "category": "Database", "description": "Managed relational database service supporting MySQL, PostgreSQL, and more", "keywords": ["relational", "SQL", "MySQL", "PostgreSQL", "MariaDB", "Oracle", "SQL Server", "Multi-AZ", "read replica", "snapshots"] },
+    { "service": "Aurora", "icon": "✨", "category": "Database", "description": "High-performance MySQL/PostgreSQL-compatible cloud-native managed database", "keywords": ["MySQL", "PostgreSQL", "relational", "global database", "replica", "auto scaling", "5x faster", "HA"] },
+    { "service": "Aurora Serverless", "icon": "⚡", "category": "Database", "description": "Auto-scaling serverless version of Aurora — capacity adjusts automatically", "keywords": ["serverless", "auto-scaling", "Aurora", "capacity units", "ACU", "pause", "resume", "on-demand"] },
+    { "service": "DynamoDB", "icon": "⚡", "category": "Database", "description": "Fully managed serverless NoSQL key-value and document database", "keywords": ["NoSQL", "key-value", "document", "serverless", "DAX", "streams", "GSI", "LSI", "millisecond", "on-demand"] },
+    { "service": "ElastiCache", "icon": "🚀", "category": "Database", "description": "In-memory caching service with Redis or Memcached", "keywords": ["cache", "Redis", "Memcached", "in-memory", "session store", "sub-millisecond", "read-heavy", "lazy loading", "write-through"] },
+    { "service": "DocumentDB", "icon": "📄", "category": "Database", "description": "MongoDB-compatible managed document database service", "keywords": ["MongoDB", "document", "JSON", "NoSQL", "managed", "replica", "compatible", "flexible schema"] },
+    { "service": "Keyspaces", "icon": "🔑", "category": "Database", "description": "Managed Apache Cassandra-compatible serverless database", "keywords": ["Cassandra", "wide-column", "NoSQL", "serverless", "compatible", "CQL", "time-series", "IoT"] },
+    { "service": "Neptune", "icon": "🌊", "category": "Database", "description": "Managed graph database for highly connected datasets", "keywords": ["graph", "nodes", "edges", "Gremlin", "SPARQL", "RDF", "property graph", "social network", "fraud detection"] },
+
+    { "service": "VPC", "icon": "🌐", "category": "Networking", "description": "Logically isolated virtual network where you launch AWS resources", "keywords": ["subnet", "CIDR", "route table", "internet gateway", "NAT", "security group", "NACL", "peering", "flow logs", "private", "public"] },
+    { "service": "CloudFront", "icon": "⚡", "category": "Networking", "description": "Global CDN that delivers content with low latency from edge locations", "keywords": ["CDN", "edge location", "distribution", "cache", "origin", "HTTPS", "signed URL", "geo restriction", "OAC", "Lambda@Edge"] },
+    { "service": "Route 53", "icon": "🗺️", "category": "Networking", "description": "Scalable DNS service with domain registration and health checking", "keywords": ["DNS", "domain", "routing policy", "failover", "latency", "geolocation", "weighted", "alias", "health check", "CNAME"] },
+    { "service": "ELB", "icon": "⚖️", "category": "Networking", "description": "Distribute incoming application traffic across multiple targets", "keywords": ["load balancer", "ALB", "NLB", "CLB", "GLB", "target group", "listener", "sticky session", "cross-zone", "health check"] },
+    { "service": "Global Accelerator", "icon": "🚀", "category": "Networking", "description": "Improve global application availability using the AWS global network", "keywords": ["Anycast", "global", "static IP", "latency", "failover", "TCP", "UDP", "edge", "performance", "AWS backbone"] },
+    { "service": "Direct Connect", "icon": "🔌", "category": "Networking", "description": "Dedicated private physical connection from on-premises to AWS", "keywords": ["dedicated", "private", "on-premises", "hybrid", "bandwidth", "consistent latency", "1Gbps", "10Gbps", "DX"] },
+    { "service": "Site-to-Site VPN", "icon": "🔒", "category": "Networking", "description": "Encrypted IPSec tunnel connecting on-premises network to AWS VPC", "keywords": ["site-to-site", "IPSec", "virtual private gateway", "customer gateway", "encrypted", "on-premises", "tunnel"] },
+    { "service": "Client VPN", "icon": "💻", "category": "Networking", "description": "Managed VPN for remote users to securely access AWS and on-premises resources", "keywords": ["remote access", "VPN", "SSL/TLS", "users", "endpoint", "client", "OpenVPN", "certificate"] },
+    { "service": "Transit Gateway", "icon": "🌉", "category": "Networking", "description": "Central network hub to connect VPCs, VPNs, and Direct Connect at scale", "keywords": ["hub", "VPC peering", "on-premises", "centralized", "routing", "multicast", "inter-region", "spoke"] },
+    { "service": "PrivateLink", "icon": "🔗", "category": "Networking", "description": "Expose services to other VPCs privately without internet traversal", "keywords": ["private", "endpoint", "VPC endpoint", "no internet", "interface endpoint", "service provider", "PrivateLink"] },
+
+    { "service": "IAM", "icon": "🔑", "category": "Security", "description": "Manage access to AWS services and resources securely with fine-grained permissions", "keywords": ["users", "groups", "roles", "policies", "permissions", "MFA", "access key", "trust policy", "least privilege", "ARN"] },
+    { "service": "Shield", "icon": "🛡️", "category": "Security", "description": "Managed DDoS protection service for AWS workloads", "keywords": ["DDoS", "protection", "Advanced", "Standard", "WAF", "Layer 3", "Layer 4", "Layer 7", "free", "SRT"] },
+    { "service": "WAF", "icon": "🧱", "category": "Security", "description": "Web application firewall to filter malicious HTTP/HTTPS traffic", "keywords": ["firewall", "web ACL", "rule", "SQL injection", "XSS", "IP block", "rate limit", "Layer 7", "CloudFront", "ALB"] },
+    { "service": "KMS", "icon": "🔐", "category": "Security", "description": "Create and control encryption keys used to encrypt your data", "keywords": ["encryption", "key", "CMK", "envelope encryption", "symmetric", "asymmetric", "audit", "CloudTrail", "rotate", "HSM"] },
+    { "service": "Secrets Manager", "icon": "🗝️", "category": "Security", "description": "Store, rotate, and manage access to secrets like DB credentials and API keys", "keywords": ["secrets", "credentials", "rotation", "RDS", "API key", "password", "encrypted", "cross-account", "automatic rotation"] },
+    { "service": "Certificate Manager", "icon": "📜", "category": "Security", "description": "Provision and manage SSL/TLS certificates for AWS services", "keywords": ["SSL", "TLS", "HTTPS", "certificate", "ACM", "CloudFront", "ALB", "free", "auto renew", "public", "private"] },
+    { "service": "Cognito", "icon": "👤", "category": "Security", "description": "Add user authentication and authorization to web and mobile apps", "keywords": ["user pool", "identity pool", "OAuth", "JWT", "social login", "MFA", "federation", "SAML", "OpenID"] },
+    { "service": "GuardDuty", "icon": "👁️", "category": "Security", "description": "Intelligent threat detection using ML, VPC logs, CloudTrail, and DNS logs", "keywords": ["threat detection", "ML", "anomaly", "VPC flow logs", "CloudTrail", "DNS logs", "findings", "automated", "continuous"] },
+    { "service": "Inspector", "icon": "🔍", "category": "Security", "description": "Automated security vulnerability assessment for EC2, Lambda, and containers", "keywords": ["vulnerability", "assessment", "CVE", "EC2", "ECR", "Lambda", "patch", "automated", "findings", "risk score"] },
+    { "service": "Macie", "icon": "🔎", "category": "Security", "description": "Discover and protect sensitive data stored in S3 using machine learning", "keywords": ["PII", "sensitive data", "S3", "ML", "data discovery", "compliance", "privacy", "personal information"] },
+    { "service": "CloudHSM", "icon": "🔐", "category": "Security", "description": "Dedicated hardware security modules for cryptographic key management in AWS", "keywords": ["HSM", "hardware", "dedicated", "FIPS", "keys", "cryptography", "compliance", "single-tenant", "PKCS11"] },
+    { "service": "IAM Identity Center", "icon": "🪪", "category": "Security", "description": "Centralized single sign-on (SSO) and permissions management for AWS accounts", "keywords": ["SSO", "single sign-on", "multi-account", "federation", "SAML", "SCIM", "permission set", "Organizations"] },
+    { "service": "Directory Service", "icon": "📁", "category": "Security", "description": "Managed Microsoft Active Directory in the AWS cloud", "keywords": ["Active Directory", "AD", "Microsoft", "LDAP", "Kerberos", "managed", "federation", "on-premises", "SSO"] },
+    { "service": "Firewall Manager", "icon": "🧱", "category": "Security", "description": "Centrally configure and manage WAF, Shield, and Security Group rules across accounts", "keywords": ["centralized", "WAF", "Shield", "security group", "Organizations", "policy", "multi-account"] },
+    { "service": "Network Firewall", "icon": "🔥", "category": "Security", "description": "Managed stateful and stateless network firewall for Amazon VPC", "keywords": ["stateful", "stateless", "firewall", "VPC", "intrusion detection", "rules", "Suricata", "traffic inspection"] },
+    { "service": "Security Hub", "icon": "🔭", "category": "Security", "description": "Central security dashboard aggregating findings across AWS security services", "keywords": ["findings", "compliance", "GuardDuty", "Inspector", "Macie", "CIS", "NIST", "aggregation", "benchmark"] },
+    { "service": "Detective", "icon": "🕵️", "category": "Security", "description": "Analyze and investigate the root cause of security findings using ML", "keywords": ["investigation", "root cause", "ML", "GuardDuty", "VPC flow logs", "CloudTrail", "visualization", "security findings"] },
+    { "service": "Artifact", "icon": "📋", "category": "Security", "description": "On-demand access to AWS compliance reports, certifications, and agreements", "keywords": ["compliance", "audit", "SOC", "ISO", "PCI", "reports", "certifications", "agreements", "NDA"] },
+    { "service": "Audit Manager", "icon": "📝", "category": "Security", "description": "Continuously audit AWS usage to simplify risk and compliance assessment", "keywords": ["audit", "compliance", "frameworks", "evidence", "GDPR", "HIPAA", "PCI DSS", "controls", "assessment"] },
+    { "service": "RAM", "icon": "🤝", "category": "Security", "description": "Share AWS resources across AWS accounts and within your organization", "keywords": ["resource sharing", "cross-account", "Organizations", "VPC subnet", "Transit Gateway", "License Manager", "share"] },
+
+    { "service": "Lambda", "icon": "λ", "category": "Serverless", "description": "Run code without provisioning or managing servers — pay per invocation", "keywords": ["serverless", "function", "event-driven", "trigger", "15 minutes", "stateless", "cold start", "concurrency", "layers"] },
+    { "service": "Fargate", "icon": "🚀", "category": "Serverless", "description": "Serverless compute engine for containers — no EC2 to manage", "keywords": ["serverless", "container", "ECS", "EKS", "no servers", "task", "pod", "pay per use", "CPU", "memory"] },
+    { "service": "API Gateway", "icon": "🚪", "category": "Serverless", "description": "Create, manage, and secure REST, HTTP, and WebSocket APIs at any scale", "keywords": ["REST", "API", "WebSocket", "HTTP", "throttle", "cache", "Lambda proxy", "stage", "authorizer", "rate limit"] },
+    { "service": "Step Functions", "icon": "🔄", "category": "Serverless", "description": "Coordinate distributed application components using visual state machines", "keywords": ["workflow", "state machine", "orchestration", "Lambda", "retry", "parallel", "sequential", "visual", "Standard", "Express"] },
+
+    { "service": "SQS", "icon": "📬", "category": "Integration", "description": "Fully managed message queue for decoupling and scaling distributed systems", "keywords": ["queue", "message", "decouple", "FIFO", "standard", "visibility timeout", "dead letter", "polling", "delay", "batch"] },
+    { "service": "SNS", "icon": "📣", "category": "Integration", "description": "Managed pub/sub messaging service for fan-out notifications to multiple subscribers", "keywords": ["pub/sub", "topic", "subscription", "fan-out", "push", "notification", "email", "SMS", "Lambda trigger", "filter"] },
+    { "service": "EventBridge", "icon": "🔀", "category": "Integration", "description": "Serverless event bus for connecting applications using events from AWS, SaaS, and custom sources", "keywords": ["events", "rules", "schedule", "bus", "SaaS", "Lambda trigger", "cron", "pattern match", "pipe"] },
+    { "service": "AppFlow", "icon": "🔁", "category": "Integration", "description": "No-code integration service to transfer data between SaaS apps and AWS", "keywords": ["SaaS", "integration", "Salesforce", "Slack", "S3", "Redshift", "no-code", "data transfer", "scheduled"] },
+    { "service": "AppSync", "icon": "⚡", "category": "Integration", "description": "Managed GraphQL API service for real-time data sync across clients", "keywords": ["GraphQL", "API", "real-time", "subscriptions", "resolvers", "DynamoDB", "Lambda", "offline", "sync"] },
+    { "service": "Amazon MQ", "icon": "📨", "category": "Integration", "description": "Managed broker for Apache ActiveMQ and RabbitMQ message queue migration", "keywords": ["ActiveMQ", "RabbitMQ", "message broker", "AMQP", "MQTT", "STOMP", "migration", "managed", "on-premises"] },
+
+    { "service": "Athena", "icon": "🔭", "category": "Analytics", "description": "Serverless interactive query service — analyze S3 data with standard SQL", "keywords": ["serverless", "SQL", "S3", "query", "Glue", "pay per query", "Presto", "CSV", "JSON", "Parquet", "interactive"] },
+    { "service": "Redshift", "icon": "📊", "category": "Analytics", "description": "Managed cloud data warehouse optimized for large-scale analytics queries", "keywords": ["data warehouse", "OLAP", "SQL", "columnar", "Spectrum", "cluster", "analytics", "BI", "petabyte", "Serverless"] },
+    { "service": "Glue", "icon": "🧩", "category": "Analytics", "description": "Serverless ETL service for discovering, preparing, and transforming data", "keywords": ["ETL", "serverless", "data catalog", "crawler", "transform", "Spark", "job", "Athena", "S3", "schema"] },
+    { "service": "Kinesis", "icon": "🌊", "category": "Analytics", "description": "Ingest, buffer, and process real-time streaming data at any scale", "keywords": ["streaming", "real-time", "Data Streams", "Firehose", "Analytics", "shard", "producer", "consumer", "S3", "retention"] },
+    { "service": "Data Firehose", "icon": "🔥", "category": "Analytics", "description": "Load real-time streaming data into S3, Redshift, OpenSearch, or Splunk", "keywords": ["streaming", "delivery", "S3", "Redshift", "OpenSearch", "Splunk", "transform", "Lambda", "buffer", "Kinesis"] },
+    { "service": "EMR", "icon": "⚙️", "category": "Analytics", "description": "Managed big data platform for running Hadoop, Spark, and other frameworks", "keywords": ["Hadoop", "Spark", "big data", "cluster", "HDFS", "S3", "Hive", "HBase", "Presto", "managed"] },
+    { "service": "OpenSearch Service", "icon": "🔍", "category": "Analytics", "description": "Managed OpenSearch and Kibana for log analytics, search, and visualization", "keywords": ["Elasticsearch", "search", "log analytics", "Kibana", "OpenSearch Dashboards", "index", "shard", "full-text"] },
+    { "service": "MSK", "icon": "📨", "category": "Analytics", "description": "Managed Apache Kafka service for real-time event streaming pipelines", "keywords": ["Kafka", "streaming", "managed", "broker", "topic", "partition", "producer", "consumer", "event", "real-time"] },
+    { "service": "QuickSight", "icon": "📊", "category": "Analytics", "description": "Cloud-native BI service for building and publishing interactive dashboards", "keywords": ["BI", "dashboard", "visualization", "SPICE", "serverless", "analytics", "business intelligence", "report"] },
+    { "service": "Lake Formation", "icon": "🏞️", "category": "Analytics", "description": "Build, secure, and manage data lakes on top of S3", "keywords": ["data lake", "S3", "permissions", "catalog", "governance", "Glue", "fine-grained", "row-level", "column-level"] },
+    { "service": "Data Exchange", "icon": "🔄", "category": "Analytics", "description": "Find, subscribe to, and use third-party data in the cloud", "keywords": ["marketplace", "data", "third-party", "subscribe", "provider", "S3", "API", "data sets"] },
+
+    { "service": "CloudWatch", "icon": "📊", "category": "Management", "description": "Monitor AWS resources with metrics, logs, alarms, and dashboards", "keywords": ["monitoring", "metrics", "logs", "alarms", "dashboard", "events", "EventBridge", "retention", "agent", "Insights"] },
+    { "service": "CloudTrail", "icon": "📋", "category": "Management", "description": "Record API activity and user actions for auditing and governance", "keywords": ["audit", "API calls", "logging", "governance", "compliance", "S3", "event history", "trail", "management events", "data events"] },
+    { "service": "Systems Manager", "icon": "🔧", "category": "Management", "description": "Operational management for EC2 and on-premises servers without SSH", "keywords": ["SSM", "Parameter Store", "patch", "run command", "session manager", "inventory", "hybrid", "no SSH", "automation"] },
+    { "service": "CloudFormation", "icon": "🏗️", "category": "Management", "description": "Define and provision AWS infrastructure using code (YAML or JSON)", "keywords": ["IaC", "template", "stack", "YAML", "JSON", "drift", "change set", "rollback", "nested stack", "StackSets"] },
+    { "service": "Organizations", "icon": "🏢", "category": "Management", "description": "Centrally manage and govern multiple AWS accounts under one organization", "keywords": ["multi-account", "SCP", "OU", "consolidated billing", "root", "policy", "governance", "master account"] },
+    { "service": "Config", "icon": "⚙️", "category": "Management", "description": "Track resource configurations over time and evaluate against compliance rules", "keywords": ["compliance", "audit", "configuration", "rules", "drift", "history", "remediation", "timeline", "recorder"] },
+    { "service": "Trusted Advisor", "icon": "💡", "category": "Management", "description": "Real-time guidance to optimize cost, security, performance, and fault tolerance", "keywords": ["best practices", "cost optimization", "security", "performance", "fault tolerance", "limits", "checks", "support plan"] },
+    { "service": "Control Tower", "icon": "🏛️", "category": "Management", "description": "Set up and govern a secure, multi-account AWS environment with landing zones", "keywords": ["landing zone", "guardrails", "multi-account", "Organizations", "SSO", "governance", "baseline", "SCPs"] },
+    { "service": "Compute Optimizer", "icon": "🎯", "category": "Management", "description": "Recommend optimal AWS compute resources based on actual utilization data", "keywords": ["recommendations", "EC2", "Lambda", "EBS", "Auto Scaling", "rightsizing", "ML", "cost savings"] },
+    { "service": "Health Dashboard", "icon": "❤️", "category": "Management", "description": "View the health of AWS services and get alerts impacting your resources", "keywords": ["service health", "events", "alerts", "notifications", "account events", "personal health", "scheduled changes"] },
+    { "service": "Service Catalog", "icon": "🛒", "category": "Management", "description": "Create and manage catalogs of approved IT services for self-service deployment", "keywords": ["catalog", "portfolio", "product", "CloudFormation", "approved", "self-service", "governance", "IT"] },
+    { "service": "License Manager", "icon": "📋", "category": "Management", "description": "Manage software licenses from vendors across AWS and on-premises", "keywords": ["license", "BYOL", "compliance", "Microsoft", "Oracle", "SAP", "usage", "tracking"] },
+    { "service": "Managed Grafana", "icon": "📈", "category": "Management", "description": "Fully managed Grafana service for operational metrics visualization", "keywords": ["Grafana", "dashboards", "metrics", "visualization", "CloudWatch", "managed", "workspace", "observability"] },
+    { "service": "Managed Prometheus", "icon": "📈", "category": "Management", "description": "Managed Prometheus-compatible monitoring for container environments", "keywords": ["Prometheus", "metrics", "Kubernetes", "containers", "EKS", "scraping", "AlertManager", "managed"] },
+    { "service": "Well-Architected Tool", "icon": "🏛️", "category": "Management", "description": "Review workloads against AWS best practices using the Well-Architected Framework", "keywords": ["best practices", "pillars", "review", "workload", "reliability", "security", "performance", "cost", "sustainability"] },
+
+    { "service": "DMS", "icon": "🔄", "category": "Migration", "description": "Migrate databases to AWS with minimal downtime using replication", "keywords": ["database migration", "replication", "source", "target", "homogeneous", "heterogeneous", "CDC", "SCT", "ongoing replication"] },
+    { "service": "Snow Family", "icon": "❄️", "category": "Migration", "description": "Physical devices to migrate massive amounts of data to AWS offline", "keywords": ["Snowball", "Snowcone", "Snowmobile", "offline", "physical", "edge compute", "petabyte", "transfer", "80TB"] },
+    { "service": "DataSync", "icon": "🔄", "category": "Migration", "description": "Automated, high-speed online data transfer between on-premises and AWS", "keywords": ["online transfer", "NFS", "SMB", "S3", "EFS", "FSx", "agent", "scheduled", "incremental"] },
+    { "service": "Application Migration Service", "icon": "🚀", "category": "Migration", "description": "Lift-and-shift server migration to AWS with minimal downtime", "keywords": ["lift and shift", "MGN", "rehost", "agent", "replication", "cutover", "on-premises", "continuous replication"] },
+    { "service": "Transfer Family", "icon": "📂", "category": "Migration", "description": "Managed SFTP, FTPS, and FTP service to transfer files directly into S3 or EFS", "keywords": ["SFTP", "FTPS", "FTP", "file transfer", "S3", "EFS", "managed", "legacy", "endpoint", "workflows"] },
+
+    { "service": "Budgets", "icon": "💰", "category": "Cost", "description": "Set custom cost and usage budgets with automated alerts when thresholds are exceeded", "keywords": ["budget", "alert", "cost", "usage", "threshold", "notification", "forecast", "RI", "Savings Plans"] },
+    { "service": "Cost Explorer", "icon": "📈", "category": "Cost", "description": "Visualize, understand, and analyze your AWS cost and usage patterns over time", "keywords": ["cost analysis", "usage", "trends", "forecast", "rightsizing", "RI recommendations", "tags", "filter"] },
+    { "service": "Cost & Usage Report", "icon": "📄", "category": "Cost", "description": "Granular billing data for cost allocation, delivered to S3 for analysis", "keywords": ["billing", "detailed", "S3", "Athena", "QuickSight", "cost allocation", "tags", "line items"] },
+    { "service": "Savings Plans", "icon": "💳", "category": "Cost", "description": "Flexible pricing model offering lower rates in exchange for usage commitment", "keywords": ["commit", "discount", "EC2", "Lambda", "Fargate", "Compute", "1 year", "3 years", "flexible"] },
+
+    { "service": "SageMaker", "icon": "🤖", "category": "Machine Learning", "description": "Build, train, and deploy machine learning models at scale", "keywords": ["machine learning", "ML", "model", "training", "inference", "notebook", "endpoint", "ground truth", "feature store"] },
+    { "service": "Rekognition", "icon": "👁️", "category": "Machine Learning", "description": "Image and video analysis using deep learning for object and face detection", "keywords": ["image", "video", "facial recognition", "object detection", "labels", "moderation", "deep learning", "celebrity"] },
+    { "service": "Comprehend", "icon": "🧠", "category": "Machine Learning", "description": "Natural language processing service to extract insights and relationships from text", "keywords": ["NLP", "text", "sentiment", "entities", "key phrases", "language detection", "topic modeling", "PII"] },
+    { "service": "Lex", "icon": "💬", "category": "Machine Learning", "description": "Build conversational interfaces (chatbots) using voice and text", "keywords": ["chatbot", "conversational AI", "voice", "text", "NLU", "intents", "slots", "Alexa", "ASR"] },
+    { "service": "Polly", "icon": "🔊", "category": "Machine Learning", "description": "Turn text into lifelike speech using deep learning", "keywords": ["text-to-speech", "TTS", "speech", "voice", "SSML", "neural", "NTTS", "languages", "MP3"] },
+    { "service": "Transcribe", "icon": "🎤", "category": "Machine Learning", "description": "Automatic speech recognition service to convert audio to text", "keywords": ["speech-to-text", "STT", "ASR", "transcription", "audio", "vocabulary", "speaker diarization", "medical"] },
+    { "service": "Translate", "icon": "🌐", "category": "Machine Learning", "description": "Neural machine translation for fast and accurate language translation", "keywords": ["translation", "language", "neural", "batch", "real-time", "custom terminology", "multilingual"] },
+    { "service": "Textract", "icon": "📝", "category": "Machine Learning", "description": "Extract text, data, and tables from scanned documents using ML", "keywords": ["OCR", "document", "extract", "forms", "tables", "scanned", "PDF", "handwriting", "structured data"] },
+    { "service": "Kendra", "icon": "🔍", "category": "Machine Learning", "description": "ML-powered intelligent enterprise search service", "keywords": ["search", "enterprise", "NLP", "index", "connector", "FAQ", "relevance", "documents", "intelligent"] },
+
+    { "service": "Amplify", "icon": "📱", "category": "Frontend", "description": "Build and deploy full-stack web and mobile apps with AWS backend integration", "keywords": ["full-stack", "web", "mobile", "React", "CI/CD", "hosting", "authentication", "GraphQL", "S3"] },
+    { "service": "Device Farm", "icon": "📲", "category": "Frontend", "description": "Test web and mobile apps on real physical devices in the AWS cloud", "keywords": ["testing", "real devices", "mobile", "iOS", "Android", "web", "automation", "Appium", "remote access"] },
+
+    { "service": "X-Ray", "icon": "🔬", "category": "Developer Tools", "description": "Distributed tracing service to analyze and debug production applications", "keywords": ["tracing", "debugging", "distributed", "latency", "service map", "segments", "annotations", "Lambda", "ECS"] },
+
+    { "service": "Elastic Transcoder", "icon": "🎬", "category": "Media", "description": "Convert media files stored in S3 into formats required by consumer playback devices", "keywords": ["transcoding", "video", "audio", "S3", "pipeline", "preset", "thumbnail", "MP4", "HLS"] },
+    { "service": "Kinesis Video Streams", "icon": "🎥", "category": "Media", "description": "Capture, process, and store video streams for analytics and machine learning", "keywords": ["video", "streaming", "real-time", "WebRTC", "playback", "Rekognition", "fragments", "IoT", "cameras"] }
+  ]
+}

@@ -54,3 +54,7 @@ scripts/questions-with-explanations-fixed.json
 docs/QUESTION-GENERATION.md
 scripts/aws-services-list.json
 scripts/remove-duplicates.js
+
+# Presentation PDFs — large binary files, served directly from S3
+assets/presentations/
+assetspresentations/
