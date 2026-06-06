@@ -41,8 +41,119 @@
     {
       "number": 2,
       "name": "Study Group #4",
-      "dateRange": "APR 2026 – JUN 2026",
-      "description": "AWS Solutions Architect Associate study cohort — 11 lessons covering all SAA-C03 domains."
+      "dateRange": "APR 2026 – JUL 2026",
+      "description": "AWS Solutions Architect Associate study cohort — 11 lessons covering all SAA-C03 domains.",
+      "lessons": [
+        {
+          "number": 11,
+          "topic": "Mock Exam Practice",
+          "date": "Jul 1, 2026",
+          "recording": { "url": "", "label": "Lesson 11 Recording" },
+          "summary": { "url": "", "label": "Lesson 11 AI Summary" }
+        },
+        {
+          "number": 10,
+          "topic": "Mock Exam Practice",
+          "date": "Jun 24, 2026",
+          "recording": { "url": "", "label": "Lesson 10 Recording" },
+          "summary": { "url": "", "label": "Lesson 10 AI Summary" }
+        },
+        {
+          "number": 9,
+          "topic": "Mock Exam Practice",
+          "date": "Jun 17, 2026",
+          "recording": { "url": "", "label": "Lesson 9 Recording" },
+          "summary": { "url": "", "label": "Lesson 9 AI Summary" }
+        },
+        {
+          "number": 8,
+          "topic": "Disaster Recovery & Migrations, More Solution Architectures, Other Services",
+          "date": "Jun 10, 2026",
+          "recording": { "url": "", "label": "Lesson 8 Recording" },
+          "summary": { "url": "", "label": "Lesson 8 AI Summary" },
+          "presentation": { "url": "https://drive.google.com/file/d/1Ls5fVCG8h45_14M_eeceNI9MOZTO-L0z/view?usp=drive_link", "label": "Lesson 8 Slides (PDF)" },
+          "homework": [
+            { "url": "https://docs.google.com/forms/d/e/1FAIpQLSfUhKlLqPIObvCqvTTs8nH18uf1IE_i1UMp6nx2GMzmsld9hQ/viewform?usp=dialog", "label": "Lesson 8 Quiz" }
+          ]
+        },
+        {
+          "number": 7,
+          "topic": "Monitoring, IAM Advanced & Cloud Security",
+          "date": "Jun 3, 2026",
+          "recording": { "url": "https://drive.google.com/file/d/1r3hstYtF7WbQec6-T3mESNKWRTMYpluj/view?usp=drive_link", "label": "Lesson 7 Recording" },
+          "summary": { "url": "https://drive.google.com/file/d/16PnhRQiN_xCNtOFDRVoPcg9grLfpswHU/view?usp=drive_link", "label": "Lesson 7 AI Summary" },
+          "presentation": { "url": "https://drive.google.com/file/d/1HEk9ut6I22ih_XMyk4BnbCXN6qVoTHYM/view?usp=drive_link", "label": "Lesson 7 Slides (PDF)" },
+          "homework": [
+            { "url": "https://docs.google.com/forms/d/e/1FAIpQLSfaNrTSKtCoZuDjml_Q7Cwe_9DeheRu3FFwZlXzGs9yRDoF5w/viewform?usp=dialog", "label": "Lesson 7 Quiz" }
+          ]
+        },
+        {
+          "number": 6,
+          "topic": "Data, Analytics & Machine Learning on AWS",
+          "date": "May 20, 2026",
+          "recording": { "url": "https://drive.google.com/file/d/1ByEkACe4_xwqscMGMA8m2akcPF-ShH5W/view?usp=drive_link", "label": "Lesson 6 Recording" },
+          "summary": { "url": "https://drive.google.com/file/d/1x9SNq4LcxC-qTzRoKyVJ3snseObadoZA/view?usp=drive_link", "label": "Lesson 6 AI Summary" },
+          "presentation": { "url": "https://drive.google.com/file/d/1izvUfRqMPdD-Z7j09LSpgfyCdU3gnSS_/view?usp=drive_link", "label": "Lesson 6 Slides (PDF)" },
+          "homework": [
+            { "url": "https://docs.google.com/forms/d/e/1FAIpQLScwDgmyjT_QcCqzkMu7F6ZJypdgvonJhce3WXhqy0gYGHyJcg/viewform?usp=dialog", "label": "Lesson 6 Quiz" }
+          ]
+        },
+        {
+          "number": 5,
+          "topic": "Integration, Messaging, Containers & Serverless",
+          "date": "May 14, 2026",
+          "recording": { "url": "https://drive.google.com/file/d/1ZoxpgfMreFZK3sLgAxxu304Hos9NV8t5/view?usp=drive_link", "label": "Lesson 5 Recording" },
+          "summary": { "url": "https://drive.google.com/file/d/1G_nKNHlZA9_a7zLR-HEANWzw1AuAGJLp/view?usp=drive_link", "label": "Lesson 5 AI Summary" },
+          "presentation": { "url": "https://drive.google.com/file/d/1IYb4SK54tGgcvZZAJ0Vpq8rtnKDmaBSe/view?usp=drive_link", "label": "Lesson 5 Slides (PDF)" },
+          "homework": [
+            { "url": "https://docs.google.com/forms/d/e/1FAIpQLScfGRYZHoVRDx4fH_gUv-1dx2m7h1av8qErQAuoA2IfhobNIQ/viewform?usp=dialog", "label": "Lesson 5 Quiz" }
+          ]
+        },
+        {
+          "number": 4,
+          "topic": "Advanced S3, Security & Global Delivery",
+          "date": "May 7, 2026",
+          "recording": { "url": "https://drive.google.com/file/d/12Py4CtlGHe-c8cYqOtRZJnPLHQUmS5Zy/view?usp=drive_link", "label": "Lesson 4 Recording" },
+          "summary": { "url": "https://drive.google.com/file/d/15PX9tBeWebebW-uYsr8A837KngE1X2n6/view?usp=drive_link", "label": "Lesson 4 AI Summary" },
+          "presentation": { "url": "https://drive.google.com/file/d/1UddxR-19Tpid0x8ogMxYw1uItMxttl-L/view?usp=drive_link", "label": "Lesson 4 Slides (PDF)" },
+          "homework": [
+            { "url": "https://docs.google.com/forms/d/e/1FAIpQLSd_znglOB6yGNvxCwl6lQ8HdADZgxDGmPEh1Nk38E_3O3ZIVQ/viewform?usp=dialog", "label": "Lesson 4 Quiz" }
+          ]
+        },
+        {
+          "number": 3,
+          "topic": "Route 53 & S3 Basics",
+          "date": "Apr 29, 2026",
+          "recording": { "url": "https://drive.google.com/file/d/1VojHRZOleV0DUe1bgOO13gHbYVrveqgy/view?usp=drive_link", "label": "Lesson 3 Recording" },
+          "summary": { "url": "https://drive.google.com/file/d/1_V81bplCGeUNoQ1exx1i5-Hhl_o6bvHj/view?usp=drive_link", "label": "Lesson 3 AI Summary" },
+          "presentation": { "url": "https://drive.google.com/file/d/1kPd_gncRxX2VbGezzlJS7ms0-o2996NR/view?usp=drive_link", "label": "Lesson 3 Slides (PDF)" },
+          "homework": [
+            { "url": "https://docs.google.com/forms/d/e/1FAIpQLScE7naR_IsnYZXt_wm5wTZQtUWvuTokthsAQUL9XnvXmUzvUg/viewform?usp=dialog", "label": "Lesson 3 Quiz" }
+          ]
+        },
+        {
+          "number": 2,
+          "topic": "High Availability, Load Balancing & Databases",
+          "date": "Apr 23, 2026",
+          "recording": { "url": "https://drive.google.com/file/d/1ukGbXi6Htof7-tzieQhBLg9PZkqamYMb/view?usp=drive_link", "label": "Lesson 2 Recording" },
+          "summary": { "url": "https://drive.google.com/file/d/1qbDpfWdybO29HXhM-tkWCJjMXf2SQVnb/view?usp=drive_link", "label": "Lesson 2 AI Summary" },
+          "presentation": { "url": "https://drive.google.com/file/d/1qyGMPD1bs27y9DY9watFlXx0JMuKL0JA/view?usp=drive_link", "label": "Lesson 2 Slides (PDF)" },
+          "homework": [
+            { "url": "https://docs.google.com/forms/d/e/1FAIpQLScKvHl3zdFdArcyV69FJux9ysjFAtCZ02GdwiKAjuLZr_kkkg/viewform?usp=dialog", "label": "Lesson 2 Quiz" }
+          ]
+        },
+        {
+          "number": 1,
+          "topic": "IAM, EC2 & Storage Fundamentals",
+          "date": "Apr 15, 2026",
+          "recording": { "url": "https://drive.google.com/file/d/1M8w784P6igcxxw4LRAu63T5iqS5fI5OS/view?usp=drive_link", "label": "Lesson 1 Recording" },
+          "summary": { "url": "https://drive.google.com/file/d/1-nU6sULnXauHsvhzXGgpgI9vZK9kVYSa/view?usp=drive_link", "label": "Lesson 1 AI Summary" },
+          "presentation": { "url": "https://drive.google.com/file/d/1cegOK0iKMdMDRvwuVbpVsxU9UX50MPTL/view?usp=drive_link", "label": "Lesson 1 Slides (PDF)" },
+          "homework": [
+            { "url": "https://docs.google.com/forms/d/e/1FAIpQLSfn9XIb8uMeg48yDYUocIcR_vJD9Mseq4bmnlLja9AhHRcITg/viewform?usp=sharing&ouid=111223103749240751177", "label": "Lesson 1 Quiz" }
+          ]
+        }
+      ]
     },
     {
       "number": 1,
