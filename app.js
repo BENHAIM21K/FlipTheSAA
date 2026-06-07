@@ -3127,12 +3127,14 @@ function renderCheatSheet(entries) {
   grid.innerHTML = entries.map(entry => {
     const color = CS_CATEGORY_COLORS[entry.category] || 'var(--accent-primary)';
     const chips = entry.keywords.map(kw => `<span class="chip">${kw}</span>`).join('');
-    const icon = entry.icon || '☁️';
+    const iconHtml = entry.iconImg
+      ? `<img class="flip-icon-img" src="${entry.iconImg}" alt="${entry.service}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span class="flip-icon" style="display:none">${entry.icon || '☁️'}</span>`
+      : `<span class="flip-icon">${entry.icon || '☁️'}</span>`;
     return `
       <div class="service-card flip-card" data-service="${entry.service.toLowerCase()}" data-category="${entry.category}" data-keywords="${entry.keywords.join(' ').toLowerCase()}">
         <div class="flip-card-inner">
           <div class="flip-card-front" style="border-color:${color}33">
-            <span class="flip-icon">${icon}</span>
+            ${iconHtml}
             <span class="flip-service-name">${entry.service}</span>
             <span class="flip-hint">tap to reveal ↺</span>
           </div>

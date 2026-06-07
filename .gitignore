@@ -55,6 +55,8 @@ docs/QUESTION-GENERATION.md
 scripts/aws-services-list.json
 scripts/remove-duplicates.js
 
-# Presentation PDFs — large binary files, served directly from S3
+# Binary assets served directly from S3 — do not commit
 assets/presentations/
+assets/service-icons/
 assetspresentations/
+AWS Icons/

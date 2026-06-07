@@ -1997,6 +1997,13 @@ select {
   display: block;
 }
 
+.flip-icon-img {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  display: block;
+}
+
 .flip-service-name {
   font-size: 14px;
   font-weight: 800;
