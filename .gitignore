@@ -57,6 +57,5 @@ scripts/remove-duplicates.js
 
 # Binary assets served directly from S3 — do not commit
 assets/presentations/
-assets/service-icons/
 assetspresentations/
 AWS Icons/
