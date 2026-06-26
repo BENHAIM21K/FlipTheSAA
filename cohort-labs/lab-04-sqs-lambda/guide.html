@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab 04 — Decoupled Architecture: SQS + Lambda</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 14px; color: #1a1a2e; background: #fff; max-width: 860px; margin: 0 auto; padding: 40px 32px; }
+    h1 { font-size: 26px; color: #0f3460; border-bottom: 3px solid #e94560; padding-bottom: 10px; margin-bottom: 6px; }
+    .meta { font-size: 12px; color: #666; margin-bottom: 28px; }
+    h2 { font-size: 16px; color: #0f3460; margin: 28px 0 10px; border-left: 4px solid #e94560; padding-left: 10px; }
+    h3 { font-size: 13px; color: #333; margin: 18px 0 6px; }
+    p, li { line-height: 1.7; margin-bottom: 6px; }
+    ul, ol { padding-left: 22px; }
+    ol li { margin-bottom: 10px; }
+    .step { display: flex; align-items: flex-start; margin-bottom: 14px; }
+    .step-num { display: inline-block; background: #0f3460; color: #fff; border-radius: 50%; width: 22px; height: 22px; text-align: center; line-height: 22px; font-size: 12px; margin-right: 8px; flex-shrink: 0; }
+    .step-body { flex: 1; }
+    .step-body b { color: #0f3460; }
+    .prereq { background: #f0f7ff; border: 1px solid #bcd4f5; border-radius: 6px; padding: 14px 18px; margin-bottom: 10px; }
+    .verify { background: #f0fff4; border: 1px solid #9ae6b4; border-radius: 6px; padding: 14px 18px; }
+    .cleanup { background: #fff5f5; border: 1px solid #feb2b2; border-radius: 6px; padding: 14px 18px; }
+    .exam { background: #fffbea; border: 1px solid #f6e05e; border-radius: 6px; padding: 14px 18px; }
+    code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-family: 'Courier New', monospace; font-size: 12px; }
+    pre { background: #f4f4f4; border-radius: 6px; padding: 12px 16px; margin: 10px 0; font-family: 'Courier New', monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; }
+    .diagram { margin: 18px 0; }
+    @media print { body { padding: 20px 24px; } }
+  </style>
+</head>
+<body>
+  <h1>Lab 04 — Decoupled Architecture &amp; Queue Processing</h1>
+  <div class="meta">Services: Amazon SQS · AWS Lambda · Amazon CloudWatch &nbsp;|&nbsp; Region: eu-central-1 &nbsp;|&nbsp; Estimated time: 45 min</div>
+
+  <h2>Goal</h2>
+  <p>Learn why decoupling is critical in distributed systems by connecting a message queue (SQS) to a serverless compute engine (Lambda) via an Event Source Mapping. You will manually send messages to the queue and watch Lambda automatically pick them up and process them — with full observability via CloudWatch Logs. This lab maps directly to SAA Domain 3 (High-Performing Architectures) and Domain 4 (Cost-Optimized Architectures).</p>
+
+  <h2>Architecture</h2>
+  <div class="diagram">
+    <div class="mermaid">
+flowchart LR
+    Producer(["👤 You\n(SQS Console)"]) -->|SendMessage| SQS["📨 SQS Standard Queue\nlab04-orders"]
+    SQS -->|Event Source\nMapping poll| Lambda["λ Lambda\nFunction\n(batch size: 5)"]
+    Lambda -->|Log output| CW["📊 CloudWatch\nLogs"]
+    SQS -.->|Visibility timeout\n+ retry| SQS
+    style SQS fill:#FF4F8B,color:#fff,stroke:#cc3d6e
+    style Lambda fill:#FF9900,color:#fff,stroke:#cc7a00
+    style CW fill:#759C3E,color:#fff,stroke:#5a7a2f
+    style Producer fill:#0f3460,color:#fff,stroke:#0a2540
+    </div>
+  </div>
+
+  <h2>Prerequisites</h2>
+  <div class="prereq">
+    <ul>
+      <li>AWS Console open, region set to <b>EU (Frankfurt) eu-central-1</b></li>
+      <li>Instructor pre-created <code>SAA-Lab-Lambda-SQS-Role</code> (Lambda trust + SQS ReceiveMessage/DeleteMessage + CloudWatch Logs)</li>
+    </ul>
+  </div>
+
+  <h2>Steps</h2>
+
+  <h3>Part A — Create the SQS Queue</h3>
+  <div class="step"><span class="step-num">1</span><div class="step-body">Open <b>Amazon SQS</b> → <b>Create queue</b>. Type: <b>Standard</b>. Name: <code>lab04-orders</code>.</div></div>
+  <div class="step"><span class="step-num">2</span><div class="step-body">Leave all settings as default. Note the <b>Visibility timeout</b> (30 seconds by default) — this is how long a message is hidden from other consumers after being picked up. Click <b>Create queue</b>.</div></div>
+
+  <h3>Part B — Create the Lambda Function</h3>
+  <div class="step"><span class="step-num">3</span><div class="step-body">Open <b>Lambda</b> → <b>Create function</b>. Name: <code>lab04-order-processor</code>. Runtime: <b>Python 3.12</b>. Existing role: <code>SAA-Lab-Lambda-SQS-Role</code>. Click <b>Create function</b>.</div></div>
+  <div class="step"><span class="step-num">4</span><div class="step-body">Replace the code with the following and click <b>Deploy</b>:
+<pre>import json
+
+def lambda_handler(event, context):
+    for record in event["Records"]:
+        body = record["body"]
+        print(f"Processing order: {body}")
+        # In a real system you would process the order here
+    print(f"Batch complete — processed {len(event['Records'])} message(s)")
+    return {"statusCode": 200}</pre></div></div>
+
+  <h3>Part C — Wire SQS to Lambda via Event Source Mapping</h3>
+  <div class="step"><span class="step-num">5</span><div class="step-body">Still in Lambda → your function → <b>Configuration</b> tab → <b>Triggers</b> → <b>Add trigger</b>.</div></div>
+  <div class="step"><span class="step-num">6</span><div class="step-body">Source: <b>SQS</b>. SQS queue: select <code>lab04-orders</code>. <b>Batch size:</b> 5. Leave <b>Activate trigger</b> checked. Click <b>Add</b>.</div></div>
+
+  <h3>Part D — Send Test Messages and Observe</h3>
+  <div class="step"><span class="step-num">7</span><div class="step-body">Open <b>SQS</b> → <code>lab04-orders</code> → <b>Send and receive messages</b> → <b>Send message</b>. Message body:
+<pre>{"orderId": "1001", "item": "AWS T-Shirt", "qty": 2}</pre>
+Click <b>Send message</b>. Repeat with 2–3 more messages.</div></div>
+  <div class="step"><span class="step-num">8</span><div class="step-body">Open <b>Lambda</b> → <code>lab04-order-processor</code> → <b>Monitor</b> → <b>View CloudWatch logs</b>. Click the latest log stream.</div></div>
+  <div class="step"><span class="step-num">9</span><div class="step-body">Confirm you see log lines like <code>Processing order: {"orderId": "1001" ...}</code> and <code>Batch complete — processed X message(s)</code>.</div></div>
+  <div class="step"><span class="step-num">10</span><div class="step-body">Back in the SQS console, check the <b>Messages available</b> counter — it should be <b>0</b> (Lambda automatically deleted messages after successful processing).</div></div>
+
+  <h2>Verification</h2>
+  <div class="verify">
+    <ul>
+      <li>CloudWatch log stream shows each message body being printed</li>
+      <li>SQS <b>Messages available</b> drops to 0 after Lambda processes the batch</li>
+      <li>Lambda <b>Monitor</b> tab shows invocations with 0 errors</li>
+    </ul>
+  </div>
+
+  <h2>Cleanup</h2>
+  <div class="cleanup">
+    <ol>
+      <li>Lambda → <code>lab04-order-processor</code> → <b>Configuration</b> → <b>Triggers</b> → remove the SQS trigger</li>
+      <li>Lambda → delete function</li>
+      <li>SQS → <code>lab04-orders</code> → <b>Delete</b></li>
+    </ol>
+  </div>
+
+  <h2>Key Exam Concepts</h2>
+  <div class="exam">
+    <ul>
+      <li><b>Decoupling:</b> The producer (sending messages) and consumer (Lambda) are completely independent — one can go offline without affecting the other</li>
+      <li><b>Visibility timeout:</b> After Lambda receives a message, it becomes invisible for the visibility timeout duration; if Lambda fails, the message reappears and is retried</li>
+      <li><b>Event Source Mapping:</b> Lambda polls SQS on your behalf — you don't manage polling infrastructure</li>
+      <li><b>Standard vs FIFO queues:</b> Standard = at-least-once delivery + best-effort ordering; FIFO = exactly-once + strict ordering (lower throughput)</li>
+      <li><b>Dead Letter Queue (DLQ):</b> Messages that fail after N retries go to the DLQ for inspection — always configure one in production</li>
+    </ul>
+  </div>
+
+  <script>mermaid.initialize({ startOnLoad: true, theme: 'default' });</script>
+</body>
+</html>

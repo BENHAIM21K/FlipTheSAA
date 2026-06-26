@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab 03 — Event-Driven Image Analysis: S3 → Lambda → Rekognition → SNS</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 14px; color: #1a1a2e; background: #fff; max-width: 860px; margin: 0 auto; padding: 40px 32px; }
+    h1 { font-size: 26px; color: #0f3460; border-bottom: 3px solid #e94560; padding-bottom: 10px; margin-bottom: 6px; }
+    .meta { font-size: 12px; color: #666; margin-bottom: 28px; }
+    h2 { font-size: 16px; color: #0f3460; margin: 28px 0 10px; border-left: 4px solid #e94560; padding-left: 10px; }
+    h3 { font-size: 13px; color: #333; margin: 18px 0 6px; }
+    p, li { line-height: 1.7; margin-bottom: 6px; }
+    ul, ol { padding-left: 22px; }
+    ol li { margin-bottom: 10px; }
+    .step { display: flex; align-items: flex-start; margin-bottom: 14px; }
+    .step-num { display: inline-block; background: #0f3460; color: #fff; border-radius: 50%; width: 22px; height: 22px; text-align: center; line-height: 22px; font-size: 12px; margin-right: 8px; flex-shrink: 0; }
+    .step-body { flex: 1; }
+    .step-body b { color: #0f3460; }
+    .prereq { background: #f0f7ff; border: 1px solid #bcd4f5; border-radius: 6px; padding: 14px 18px; margin-bottom: 10px; }
+    .verify { background: #f0fff4; border: 1px solid #9ae6b4; border-radius: 6px; padding: 14px 18px; }
+    .cleanup { background: #fff5f5; border: 1px solid #feb2b2; border-radius: 6px; padding: 14px 18px; }
+    .exam { background: #fffbea; border: 1px solid #f6e05e; border-radius: 6px; padding: 14px 18px; }
+    code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-family: 'Courier New', monospace; font-size: 12px; }
+    pre { background: #f4f4f4; border-radius: 6px; padding: 12px 16px; margin: 10px 0; font-family: 'Courier New', monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; }
+    .diagram { margin: 18px 0; }
+    @media print { body { padding: 20px 24px; } }
+  </style>
+</head>
+<body>
+  <h1>Lab 03 — Event-Driven Image Analysis &amp; Pub/Sub</h1>
+  <div class="meta">Services: S3 · Lambda · Amazon Rekognition · Amazon SNS &nbsp;|&nbsp; Region: eu-central-1 &nbsp;|&nbsp; Estimated time: 60 min</div>
+
+  <h2>Goal</h2>
+  <p>Build an event-driven pipeline that automatically analyzes images using AI the moment they are uploaded to S3. When a file lands in your bucket, S3 triggers a Lambda function which calls Rekognition to detect objects, scenes, and concepts in the image, then publishes the results to an SNS topic — which sends you an email. This pattern is the foundation of async, decoupled, event-driven architectures tested in SAA Domain 3.</p>
+
+  <h2>Architecture</h2>
+  <div class="diagram">
+    <div class="mermaid">
+flowchart LR
+    User(["👤 Student"]) -->|Upload image| S3["🪣 S3 Bucket\neu-central-1"]
+    S3 -->|s3:ObjectCreated\nevent| Lambda["λ Lambda\nFunction"]
+    Lambda -->|DetectLabels API| Rekognition["🔍 Amazon\nRekognition"]
+    Rekognition -->|Labels + confidence| Lambda
+    Lambda -->|Publish message| SNS["📢 SNS Topic"]
+    SNS -->|Email notification| Email(["📧 Student Email"])
+    style S3 fill:#3F8624,color:#fff,stroke:#2d6218
+    style Lambda fill:#FF9900,color:#fff,stroke:#cc7a00
+    style Rekognition fill:#8C4FFF,color:#fff,stroke:#6a36cc
+    style SNS fill:#FF4F8B,color:#fff,stroke:#cc3d6e
+    style User fill:#0f3460,color:#fff,stroke:#0a2540
+    style Email fill:#0f3460,color:#fff,stroke:#0a2540
+    </div>
+  </div>
+
+  <h2>Prerequisites</h2>
+  <div class="prereq">
+    <ul>
+      <li>AWS Console open, region set to <b>EU (Frankfurt) eu-central-1</b></li>
+      <li>Your instructor pre-created <code>SAA-Lab-Lambda-Rekognition-Role</code> (Lambda trust + Rekognition + SNS Publish + S3 GetObject)</li>
+      <li>Have a JPEG or PNG image ready to upload (any photo from your phone works)</li>
+      <li>Have access to your email inbox during the lab</li>
+    </ul>
+  </div>
+
+  <h2>Steps</h2>
+
+  <h3>Part A — Create an SNS Topic and Subscribe Your Email</h3>
+  <div class="step"><span class="step-num">1</span><div class="step-body">Open <b>Amazon SNS</b> → <b>Topics</b> → <b>Create topic</b>. Type: <b>Standard</b>. Name: <code>lab03-image-alerts</code>. Click <b>Create topic</b>.</div></div>
+  <div class="step"><span class="step-num">2</span><div class="step-body">On the topic page click <b>Create subscription</b>. Protocol: <b>Email</b>. Endpoint: your email address. Click <b>Create subscription</b>.</div></div>
+  <div class="step"><span class="step-num">3</span><div class="step-body">Check your inbox for a confirmation email from AWS and click <b>Confirm subscription</b>. The subscription status must show <b>Confirmed</b> before continuing.</div></div>
+  <div class="step"><span class="step-num">4</span><div class="step-body">Copy the <b>Topic ARN</b> — you will paste it into the Lambda code.</div></div>
+
+  <h3>Part B — Create the Lambda Function</h3>
+  <div class="step"><span class="step-num">5</span><div class="step-body">Open <b>Lambda</b> → <b>Create function</b> → Author from scratch. Name: <code>lab03-image-analyzer</code>. Runtime: <b>Python 3.12</b>. Existing role: <code>SAA-Lab-Lambda-Rekognition-Role</code>. Click <b>Create function</b>.</div></div>
+  <div class="step"><span class="step-num">6</span><div class="step-body">Replace the code with the following. Replace <code>YOUR_SNS_TOPIC_ARN</code> with the ARN you copied. Click <b>Deploy</b>.
+<pre>import boto3, json
+
+SNS_TOPIC_ARN = "YOUR_SNS_TOPIC_ARN"
+rekognition = boto3.client("rekognition", region_name="eu-central-1")
+sns = boto3.client("sns", region_name="eu-central-1")
+
+def lambda_handler(event, context):
+    record = event["Records"][0]["s3"]
+    bucket = record["bucket"]["name"]
+    key = record["object"]["key"]
+
+    response = rekognition.detect_labels(
+        Image={"S3Object": {"Bucket": bucket, "Name": key}},
+        MaxLabels=10,
+        MinConfidence=75,
+    )
+
+    labels = [f"{l['Name']} ({l['Confidence']:.1f}%)" for l in response["Labels"]]
+    message = f"Image: s3://{bucket}/{key}\n\nDetected labels:\n" + "\n".join(f"  - {l}" for l in labels)
+
+    sns.publish(
+        TopicArn=SNS_TOPIC_ARN,
+        Subject="[Lab 03] Image Analysis Complete",
+        Message=message,
+    )
+    return {"statusCode": 200, "labels": labels}</pre></div></div>
+
+  <h3>Part C — Create the S3 Bucket and Wire the Event</h3>
+  <div class="step"><span class="step-num">7</span><div class="step-body">Open <b>S3</b> → <b>Create bucket</b>. Name: <code>lab03-images-yourname</code>. Region: eu-central-1. Leave all defaults. Click <b>Create bucket</b>.</div></div>
+  <div class="step"><span class="step-num">8</span><div class="step-body">Open the bucket → <b>Properties</b> tab → scroll to <b>Event notifications</b> → <b>Create event notification</b>.</div></div>
+  <div class="step"><span class="step-num">9</span><div class="step-body">Name: <code>trigger-lambda-on-upload</code>. Event types: check <b>All object create events</b>. Destination: <b>Lambda function</b> → select <code>lab03-image-analyzer</code>. Click <b>Save changes</b>.</div></div>
+
+  <h3>Part D — Test the Pipeline</h3>
+  <div class="step"><span class="step-num">10</span><div class="step-body">Open the bucket → <b>Upload</b> → <b>Add files</b> → upload any JPEG image → click <b>Upload</b>.</div></div>
+  <div class="step"><span class="step-num">11</span><div class="step-body">Wait 10–30 seconds, then check your inbox. You should receive an email listing the detected objects.</div></div>
+  <div class="step"><span class="step-num">12</span><div class="step-body">In Lambda → <code>lab03-image-analyzer</code> → <b>Monitor</b> tab → <b>View CloudWatch logs</b> to see the full execution log.</div></div>
+
+  <h2>Verification</h2>
+  <div class="verify">
+    <ul>
+      <li>Email arrives within 30 seconds of upload containing a list of detected labels</li>
+      <li>CloudWatch log group <code>/aws/lambda/lab03-image-analyzer</code> shows a successful invocation with <code>statusCode: 200</code></li>
+    </ul>
+  </div>
+
+  <h2>Cleanup</h2>
+  <div class="cleanup">
+    <ol>
+      <li>S3 → your bucket → delete all objects → delete the bucket</li>
+      <li>Lambda → <code>lab03-image-analyzer</code> → <b>Delete</b></li>
+      <li>SNS → <code>lab03-image-alerts</code> → delete subscriptions → delete topic</li>
+    </ol>
+  </div>
+
+  <h2>Key Exam Concepts</h2>
+  <div class="exam">
+    <ul>
+      <li><b>Event-driven decoupling:</b> S3, Lambda, and SNS are all independent services; replacing any one of them does not require changing the others</li>
+      <li><b>S3 Event Notifications:</b> Can target Lambda, SQS, or SNS — know which trigger goes to which service</li>
+      <li><b>Amazon Rekognition:</b> Fully managed ML vision service — no model training needed; key for image/video analysis questions</li>
+      <li><b>SNS Fan-out:</b> A single SNS Publish can trigger multiple subscribers (email + SQS + Lambda) simultaneously</li>
+      <li><b>Asynchronous invocation:</b> S3-triggered Lambda is asynchronous — Lambda retries on failure; events can be sent to a Dead Letter Queue</li>
+    </ul>
+  </div>
+
+  <script>mermaid.initialize({ startOnLoad: true, theme: 'default' });</script>
+</body>
+</html>

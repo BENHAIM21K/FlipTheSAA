@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab 02 — Serverless Trio: API Gateway + Lambda + DynamoDB</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 14px; color: #1a1a2e; background: #fff; max-width: 860px; margin: 0 auto; padding: 40px 32px; }
+    h1 { font-size: 26px; color: #0f3460; border-bottom: 3px solid #e94560; padding-bottom: 10px; margin-bottom: 6px; }
+    .meta { font-size: 12px; color: #666; margin-bottom: 28px; }
+    h2 { font-size: 16px; color: #0f3460; margin: 28px 0 10px; border-left: 4px solid #e94560; padding-left: 10px; }
+    h3 { font-size: 13px; color: #333; margin: 18px 0 6px; }
+    p, li { line-height: 1.7; margin-bottom: 6px; }
+    ul, ol { padding-left: 22px; }
+    ol li { margin-bottom: 10px; }
+    .step { display: flex; align-items: flex-start; margin-bottom: 14px; }
+    .step-num { display: inline-block; background: #0f3460; color: #fff; border-radius: 50%; width: 22px; height: 22px; text-align: center; line-height: 22px; font-size: 12px; margin-right: 8px; flex-shrink: 0; }
+    .step-body { flex: 1; }
+    .step-body b { color: #0f3460; }
+    .prereq { background: #f0f7ff; border: 1px solid #bcd4f5; border-radius: 6px; padding: 14px 18px; margin-bottom: 10px; }
+    .verify { background: #f0fff4; border: 1px solid #9ae6b4; border-radius: 6px; padding: 14px 18px; }
+    .cleanup { background: #fff5f5; border: 1px solid #feb2b2; border-radius: 6px; padding: 14px 18px; }
+    .exam { background: #fffbea; border: 1px solid #f6e05e; border-radius: 6px; padding: 14px 18px; }
+    code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-family: 'Courier New', monospace; font-size: 12px; }
+    pre { background: #f4f4f4; border-radius: 6px; padding: 12px 16px; margin: 10px 0; font-family: 'Courier New', monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; }
+    .diagram { margin: 18px 0; }
+    @media print { body { padding: 20px 24px; } }
+  </style>
+</head>
+<body>
+  <h1>Lab 02 — The Serverless Web Application Trio</h1>
+  <div class="meta">Services: API Gateway (HTTP) · AWS Lambda (Python) · Amazon DynamoDB &nbsp;|&nbsp; Region: eu-central-1 &nbsp;|&nbsp; Estimated time: 60 min</div>
+
+  <h2>Goal</h2>
+  <p>Build a fully serverless CRUD backend with zero servers to manage. You will create an HTTP API endpoint, wire it to a Lambda function, and persist data in DynamoDB — all without provisioning or paying for idle compute. This trio powers most modern AWS-native applications and is a core pattern tested heavily in the SAA exam under Domain 3 (Design High-Performing Architectures).</p>
+
+  <h2>Architecture</h2>
+  <div class="diagram">
+    <div class="mermaid">
+flowchart LR
+    Client(["👤 HTTP Client\n(Browser / curl)"]) -->|POST /items| APIGW["🔀 API Gateway\nHTTP API"]
+    APIGW -->|Proxy event| Lambda["λ Lambda\nFunction\n(Python 3.12)"]
+    Lambda -->|PutItem / GetItem| DDB["📋 DynamoDB\nTable\n(On-Demand)"]
+    DDB -->|Item data| Lambda
+    Lambda -->|JSON response| APIGW
+    APIGW -->|200 OK| Client
+    style APIGW fill:#FF9900,color:#fff,stroke:#cc7a00
+    style Lambda fill:#FF9900,color:#fff,stroke:#cc7a00
+    style DDB fill:#3F8624,color:#fff,stroke:#2d6218
+    style Client fill:#0f3460,color:#fff,stroke:#0a2540
+    </div>
+  </div>
+
+  <h2>Prerequisites</h2>
+  <div class="prereq">
+    <ul>
+      <li>AWS Console open, region set to <b>EU (Frankfurt) eu-central-1</b></li>
+      <li>You will need to create a Lambda Execution Role — your instructor has pre-created <code>SAA-Lab-Lambda-Basic-Role</code> with CloudWatch Logs + DynamoDB access</li>
+    </ul>
+  </div>
+
+  <h2>Steps</h2>
+
+  <h3>Part A — Create the DynamoDB Table</h3>
+  <div class="step"><span class="step-num">1</span><div class="step-body">Open <b>DynamoDB</b> → <b>Create table</b>.</div></div>
+  <div class="step"><span class="step-num">2</span><div class="step-body"><b>Table name:</b> <code>lab02-items</code> &nbsp;|&nbsp; <b>Partition key:</b> <code>itemId</code> (String).</div></div>
+  <div class="step"><span class="step-num">3</span><div class="step-body">Under <b>Table settings</b> → select <b>Customize settings</b> → <b>Capacity mode</b>: choose <b>On-demand</b>. Click <b>Create table</b>.</div></div>
+
+  <h3>Part B — Create the Lambda Function</h3>
+  <div class="step"><span class="step-num">4</span><div class="step-body">Open <b>Lambda</b> → <b>Create function</b> → <b>Author from scratch</b>.</div></div>
+  <div class="step"><span class="step-num">5</span><div class="step-body"><b>Function name:</b> <code>lab02-crud-handler</code> &nbsp;|&nbsp; <b>Runtime:</b> Python 3.12.</div></div>
+  <div class="step"><span class="step-num">6</span><div class="step-body">Under <b>Permissions</b> → <b>Change default execution role</b> → <b>Use an existing role</b> → select <code>SAA-Lab-Lambda-Basic-Role</code>. Click <b>Create function</b>.</div></div>
+  <div class="step"><span class="step-num">7</span><div class="step-body">In the code editor, replace the default code with the following and click <b>Deploy</b>:
+<pre>import json, boto3, uuid
+
+ddb = boto3.resource("dynamodb")
+table = ddb.Table("lab02-items")
+
+def lambda_handler(event, context):
+    method = event.get("requestContext", {}).get("http", {}).get("method", "GET")
+    if method == "POST":
+        body = json.loads(event.get("body", "{}"))
+        item_id = str(uuid.uuid4())
+        table.put_item(Item={"itemId": item_id, **body})
+        return {"statusCode": 201, "body": json.dumps({"itemId": item_id})}
+    elif method == "GET":
+        result = table.scan()
+        return {"statusCode": 200, "body": json.dumps(result["Items"])}
+    return {"statusCode": 405, "body": "Method Not Allowed"}</pre>
+  </div></div>
+
+  <h3>Part C — Create the HTTP API Gateway</h3>
+  <div class="step"><span class="step-num">8</span><div class="step-body">Open <b>API Gateway</b> → <b>Create API</b> → choose <b>HTTP API</b> → <b>Build</b>.</div></div>
+  <div class="step"><span class="step-num">9</span><div class="step-body">Click <b>Add integration</b> → select <b>Lambda</b> → choose <code>lab02-crud-handler</code>.</div></div>
+  <div class="step"><span class="step-num">10</span><div class="step-body">Under <b>Configure routes</b>: set Method <b>ANY</b>, Resource path <b>/items</b>. Click <b>Next</b> → <b>Next</b> → <b>Create</b>.</div></div>
+  <div class="step"><span class="step-num">11</span><div class="step-body">Copy the <b>Invoke URL</b> shown on the API detail page (e.g. <code>https://abc123.execute-api.eu-central-1.amazonaws.com</code>).</div></div>
+
+  <h3>Part D — Test the API</h3>
+  <div class="step"><span class="step-num">12</span><div class="step-body">Open CloudShell (or a terminal) and run:
+<pre>curl -X POST https://&lt;your-invoke-url&gt;/items \
+  -H "Content-Type: application/json" \
+  -d '{"name": "my first item", "category": "test"}'</pre>
+You should receive a JSON response with a new <code>itemId</code>.</div></div>
+  <div class="step"><span class="step-num">13</span><div class="step-body">Run a GET request to list all items:
+<pre>curl https://&lt;your-invoke-url&gt;/items</pre></div></div>
+  <div class="step"><span class="step-num">14</span><div class="step-body">Open <b>DynamoDB</b> → <b>Explore items</b> on your <code>lab02-items</code> table — confirm the item appears.</div></div>
+
+  <h2>Verification</h2>
+  <div class="verify">
+    <ul>
+      <li>POST returns <code>201</code> with a UUID <code>itemId</code></li>
+      <li>GET returns a JSON array containing your item</li>
+      <li>Item visible in DynamoDB console → Explore items</li>
+    </ul>
+  </div>
+
+  <h2>Cleanup</h2>
+  <div class="cleanup">
+    <ol>
+      <li>API Gateway → your API → <b>Delete</b></li>
+      <li>Lambda → <code>lab02-crud-handler</code> → <b>Delete</b></li>
+      <li>DynamoDB → <code>lab02-items</code> → <b>Delete table</b></li>
+    </ol>
+  </div>
+
+  <h2>Key Exam Concepts</h2>
+  <div class="exam">
+    <ul>
+      <li><b>HTTP API vs REST API:</b> HTTP APIs are cheaper and lower-latency; REST APIs offer more features (usage plans, caching, AWS WAF integration)</li>
+      <li><b>Lambda execution role:</b> The role the function assumes at runtime — must include permissions for every AWS service the function calls</li>
+      <li><b>DynamoDB On-Demand:</b> No capacity planning; scales instantly; billed per request — ideal for unpredictable or low-traffic workloads</li>
+      <li><b>Serverless = no idle cost:</b> Lambda and DynamoDB On-Demand charge nothing when not in use — key differentiator from EC2-based architectures</li>
+      <li><b>Proxy integration:</b> API Gateway passes the full HTTP event to Lambda and returns Lambda's response as-is — simplest integration type</li>
+    </ul>
+  </div>
+
+  <script>mermaid.initialize({ startOnLoad: true, theme: 'default' });</script>
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab 01 — Static Website: S3 + CloudFront</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 14px; color: #1a1a2e; background: #fff; max-width: 860px; margin: 0 auto; padding: 40px 32px; }
+    h1 { font-size: 26px; color: #0f3460; border-bottom: 3px solid #e94560; padding-bottom: 10px; margin-bottom: 6px; }
+    .meta { font-size: 12px; color: #666; margin-bottom: 28px; }
+    h2 { font-size: 16px; color: #0f3460; margin: 28px 0 10px; border-left: 4px solid #e94560; padding-left: 10px; }
+    h3 { font-size: 13px; color: #333; margin: 18px 0 6px; }
+    p, li { line-height: 1.7; margin-bottom: 6px; }
+    ul, ol { padding-left: 22px; }
+    ol li { margin-bottom: 10px; }
+    .step-num { display: inline-block; background: #0f3460; color: #fff; border-radius: 50%; width: 22px; height: 22px; text-align: center; line-height: 22px; font-size: 12px; margin-right: 8px; flex-shrink: 0; }
+    .step { display: flex; align-items: flex-start; margin-bottom: 14px; }
+    .step-body { flex: 1; }
+    .step-body b { color: #0f3460; }
+    .prereq { background: #f0f7ff; border: 1px solid #bcd4f5; border-radius: 6px; padding: 14px 18px; margin-bottom: 10px; }
+    .verify { background: #f0fff4; border: 1px solid #9ae6b4; border-radius: 6px; padding: 14px 18px; }
+    .cleanup { background: #fff5f5; border: 1px solid #feb2b2; border-radius: 6px; padding: 14px 18px; }
+    .exam { background: #fffbea; border: 1px solid #f6e05e; border-radius: 6px; padding: 14px 18px; }
+    .note { background: #fff8e1; border: 1px solid #ffe082; border-radius: 6px; padding: 10px 14px; margin: 8px 0 14px; font-size: 13px; }
+    code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-family: 'Courier New', monospace; font-size: 12px; }
+    .diagram { margin: 18px 0; }
+    .screenshot { max-width: 100%; border: 1px solid #dde; border-radius: 6px; margin: 10px 0 18px; display: block; }
+    @media print {
+      body { padding: 20px 24px; }
+      .diagram svg { max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Lab 01 — Static Website Hosting &amp; Global Distribution</h1>
+  <div class="meta">Services: Amazon S3 &amp; Amazon CloudFront &nbsp;|&nbsp; Region: eu-central-1 &nbsp;|&nbsp; Estimated time: 40 min</div>
+
+  <h2>Goal</h2>
+  <p>In this lab you will host a static HTML website on Amazon S3 and distribute it globally using Amazon CloudFront with Origin Access Control (OAC). By the end, your website will be reachable via a CloudFront URL while the S3 bucket remains completely private — a pattern used by every production static site on AWS. This directly maps to SAA Domain 2 (Design Resilient Architectures) and Domain 1 (Design Secure Architectures).</p>
+
+  <h2>Architecture</h2>
+  <div class="diagram">
+    <img src="guide-screenshots/lab01-architecture.png" class="screenshot" alt="Architecture diagram: User → CloudFront → S3 with OAC" />
+  </div>
+
+  <h2>Prerequisites</h2>
+  <div class="prereq">
+    <ul>
+      <li>You are logged into the AWS Console as your student IAM user</li>
+      <li>Your region is set to <b>EU (Frankfurt) eu-central-1</b> (top-right corner of the console)</li>
+      <li>You have a simple HTML file ready, or use the example below</li>
+    </ul>
+  </div>
+
+  <h2>Steps</h2>
+
+  <h3>Part A — Create an S3 Bucket</h3>
+
+  <div class="step"><span class="step-num">1</span><div class="step-body">Open the <b>S3</b> console and click <b>Create bucket</b>.</div></div>
+
+  <div class="step"><span class="step-num">2</span><div class="step-body">
+    Under <b>Bucket namespace</b>, select <b>Account Regional namespace (recommended)</b>.<br>
+    In the <b>Bucket name prefix</b> field, enter: <code>&lt;your-name&gt;-&lt;last-name&gt;-static-website</code><br>
+    Use your real first and last name in <b>lowercase</b> — for example: <code>jane-doe-static-website</code>.<br>
+    AWS automatically appends <code>-123456789012-eu-central-1-an</code> to form the full bucket name. You do not need to type this suffix.
+    <img src="guide-screenshots/lab01-step02-s3-bucket-name.png" class="screenshot" alt="S3 bucket name prefix entry showing Account Regional namespace and example name" />
+  </div></div>
+
+  <div class="step"><span class="step-num">3</span><div class="step-body">Under <b>Object Ownership</b>, leave <b>ACLs disabled</b> (default).</div></div>
+
+  <div class="step"><span class="step-num">4</span><div class="step-body">
+    Under <b>Block Public Access settings</b> — leave all boxes <b>checked</b> (default). The bucket stays private; CloudFront will access it using OAC.
+    <div class="note">
+      <b>Expected — Default Encryption notice:</b> After the bucket is created, you may see a banner reading <em>"Insufficient permissions to apply Default Encryption — You need <code>s3:PutEncryptionConfiguration</code>…"</em> This is expected and intentional. S3 already applies server-side encryption (SSE-S3) to all objects by default — you do not need to configure it manually. Skip the Default Encryption section and continue to the next step.
+    </div>
+  </div></div>
+
+  <div class="step"><span class="step-num">5</span><div class="step-body">Leave all other settings as default and click <b>Create bucket</b>. Then open your new bucket → <b>Upload</b> → <b>Add files</b>, upload an <code>index.html</code> file, and click <b>Upload</b>.</div></div>
+
+  <h3>Part B — Create a CloudFront Distribution</h3>
+
+  <div class="step"><span class="step-num">6</span><div class="step-body">
+    Open the <b>CloudFront</b> console (search bar → "CloudFront"). Click <b>Create distribution</b>.<br>
+    A plan selection page appears. Scroll to the bottom and select <b>Pay as you go</b>, then click <b>Next</b>.
+    <img src="guide-screenshots/lab01-step06-cloudfront-plan.png" class="screenshot" alt="CloudFront plan selection — Pay as you go option selected at the bottom" />
+  </div></div>
+
+  <div class="step"><span class="step-num">7</span><div class="step-body">
+    On the <b>"Get started"</b> page, fill in:
+    <ul>
+      <li><b>Distribution name</b>: enter the same prefix you used for your S3 bucket (e.g. <code>jane-doe-static-website</code>)</li>
+      <li><b>Distribution type</b>: select <b>Single website or app</b></li>
+      <li><b>Domain section</b>: you will see <em>"Access denied to route53:ListHostedZonesByName"</em> — this is expected. Leave the domain field blank.</li>
+    </ul>
+    <img src="guide-screenshots/lab01-step07-cloudfront-distribution-name.png" class="screenshot" alt="CloudFront Get started page showing distribution name, type, and expected Route53 access denied error" />
+    Click <b>Next</b>.
+  </div></div>
+
+  <div class="step"><span class="step-num">8</span><div class="step-body">
+    On the <b>Origin</b> page:
+    <ul>
+      <li><b>Origin type</b>: select <b>S3</b></li>
+      <li>Click <b>Browse S3</b> and select your recently created bucket</li>
+      <li>Under <b>Origin access</b>: select <b>Origin access control settings (recommended)</b> → click <b>Create new OAC</b> → accept the defaults → click <b>Create</b></li>
+      <li>Leave all other origin settings as default</li>
+    </ul>
+    Click <b>Next</b>.
+  </div></div>
+
+  <div class="step"><span class="step-num">9</span><div class="step-body">
+    On the <b>"Enable security"</b> page, select <b>Do not enable security protections</b> and click <b>Next</b>.
+    <img src="guide-screenshots/lab01-step09-cloudfront-security.png" class="screenshot" alt="CloudFront Enable security page — Do not enable security protections selected" />
+  </div></div>
+
+  <div class="step"><span class="step-num">10</span><div class="step-body">
+    Review the summary and click <b>Create distribution</b>.
+    <img src="guide-screenshots/lab01-step10-distribution-created.png" class="screenshot" alt="Post-creation banners: S3 policy update needed, success, and pricing plan warning" />
+    <b>If the banners appear:</b>
+    <ul>
+      <li><b>Yellow</b> — <em>"The S3 bucket policy needs to be updated"</em>: click <b>Copy policy</b>, then click <b>"Go to S3 bucket permissions to update policy"</b> and proceed to step 11</li>
+      <li><b>Green</b> — <em>"Successfully created new distribution."</em> ✓</li>
+      <li><b>Yellow</b> — <em>"Distribution was successfully created, but the pricing plan subscription could not be created."</em> — expected, ignore it</li>
+    </ul>
+    <b>If the banners do not appear:</b>
+    <ol>
+      <li>From your distribution page, click the <b>Origins</b> tab</li>
+      <li>Select your existing origin and click <b>Edit</b></li>
+      <li>Under <b>Origin access</b>, click <b>Copy policy</b></li>
+      <li>Open a new tab, go to <b>S3</b> → your bucket → <b>Permissions</b> tab → <b>Bucket policy</b> → <b>Edit</b>, paste the policy, and click <b>Save changes</b></li>
+    </ol>
+  </div></div>
+
+  <h3>Part C — Update the S3 Bucket Policy</h3>
+
+  <div class="step"><span class="step-num">11</span><div class="step-body">In your bucket's <b>Permissions</b> tab, scroll to <b>Bucket policy</b> and click <b>Edit</b>. Paste the copied OAC policy and click <b>Save changes</b>.</div></div>
+
+  <h3>Part D — Configure the Distribution</h3>
+
+  <div class="step"><span class="step-num">12</span><div class="step-body">Go back to <b>CloudFront → Distributions</b>. Find your distribution (identified by your bucket name in the <b>Origin</b> column) and click on it. Wait until <b>Status</b> shows <b>Enabled</b> (2–5 minutes).</div></div>
+
+  <div class="step"><span class="step-num">13</span><div class="step-body">
+    Go to the <b>General</b> tab → click <b>Edit</b>. Make the following changes:
+    <ul>
+      <li>Scroll down to <b>Default root object</b> and type <code>index.html</code></li>
+    </ul>
+    <img src="guide-screenshots/lab01-step13-edit-default-root-object.png" class="screenshot" alt="Edit settings — General section with index.html entered as Default root object" />
+    <ul>
+      <li>Continue scrolling to <b>Connectivity → Price class</b> and select <b>Use only North America and Europe</b></li>
+      <li>Leave all other settings as default</li>
+    </ul>
+    <img src="guide-screenshots/lab01-step13-edit-price-class.png" class="screenshot" alt="Edit settings — Connectivity section showing Price class set to North America and Europe" />
+    Click <b>Save changes</b>.
+  </div></div>
+
+  <h3>Part E — Test</h3>
+
+  <div class="step"><span class="step-num">14</span><div class="step-body">Back on the distribution page, copy the <b>Distribution domain name</b> (e.g. <code>d1abc.cloudfront.net</code>). Open a new browser tab, paste the domain name, and press Enter. Your HTML page should appear over HTTPS.</div></div>
+
+  <h2>Verification</h2>
+  <div class="verify">
+    <ul>
+      <li>Visiting <code>https://&lt;your-domain&gt;.cloudfront.net</code> shows your HTML page over HTTPS</li>
+      <li>Visiting <code>https://&lt;your-bucket-full-name&gt;.s3.eu-central-1.amazonaws.com/index.html</code> returns <b>AccessDenied</b> — the bucket is private</li>
+    </ul>
+  </div>
+
+  <h2>Key Exam Concepts</h2>
+  <div class="exam">
+    <ul>
+      <li><b>OAC vs OAI:</b> Origin Access Control is the modern replacement for Origin Access Identity — expect exam questions on the difference</li>
+      <li><b>S3 Block Public Access:</b> Blocks public ACLs and policies; required alongside OAC for a fully private origin</li>
+      <li><b>CloudFront edge caching:</b> Reduces latency by serving cached content from 400+ edge locations globally</li>
+      <li><b>HTTPS enforcement:</b> "Redirect HTTP to HTTPS" is the recommended viewer protocol policy for any public distribution</li>
+      <li><b>Default root object:</b> Without this, a request to <code>/</code> returns 403; setting it to <code>index.html</code> maps the root path correctly</li>
+    </ul>
+  </div>
+
+</body>
+</html>

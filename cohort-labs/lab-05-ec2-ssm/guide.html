@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab 05 — Secure Compute: EC2 + SSM Session Manager</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 14px; color: #1a1a2e; background: #fff; max-width: 860px; margin: 0 auto; padding: 40px 32px; }
+    h1 { font-size: 26px; color: #0f3460; border-bottom: 3px solid #e94560; padding-bottom: 10px; margin-bottom: 6px; }
+    .meta { font-size: 12px; color: #666; margin-bottom: 28px; }
+    h2 { font-size: 16px; color: #0f3460; margin: 28px 0 10px; border-left: 4px solid #e94560; padding-left: 10px; }
+    h3 { font-size: 13px; color: #333; margin: 18px 0 6px; }
+    p, li { line-height: 1.7; margin-bottom: 6px; }
+    ul, ol { padding-left: 22px; }
+    ol li { margin-bottom: 10px; }
+    .step { display: flex; align-items: flex-start; margin-bottom: 14px; }
+    .step-num { display: inline-block; background: #0f3460; color: #fff; border-radius: 50%; width: 22px; height: 22px; text-align: center; line-height: 22px; font-size: 12px; margin-right: 8px; flex-shrink: 0; }
+    .step-body { flex: 1; }
+    .step-body b { color: #0f3460; }
+    .prereq { background: #f0f7ff; border: 1px solid #bcd4f5; border-radius: 6px; padding: 14px 18px; margin-bottom: 10px; }
+    .verify { background: #f0fff4; border: 1px solid #9ae6b4; border-radius: 6px; padding: 14px 18px; }
+    .cleanup { background: #fff5f5; border: 1px solid #feb2b2; border-radius: 6px; padding: 14px 18px; }
+    .exam { background: #fffbea; border: 1px solid #f6e05e; border-radius: 6px; padding: 14px 18px; }
+    .highlight { background: #e8f4f8; border-left: 4px solid #0f3460; padding: 10px 14px; margin: 10px 0; border-radius: 0 6px 6px 0; font-weight: 500; }
+    code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-family: 'Courier New', monospace; font-size: 12px; }
+    pre { background: #f4f4f4; border-radius: 6px; padding: 12px 16px; margin: 10px 0; font-family: 'Courier New', monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; }
+    .diagram { margin: 18px 0; }
+    @media print { body { padding: 20px 24px; } }
+  </style>
+</head>
+<body>
+  <h1>Lab 05 — Secure Compute Infrastructure</h1>
+  <div class="meta">Services: Amazon EC2 · AWS Systems Manager (Session Manager) · IAM Instance Profile &nbsp;|&nbsp; Region: eu-central-1 &nbsp;|&nbsp; Estimated time: 45 min</div>
+
+  <h2>Goal</h2>
+  <p>Launch a secure EC2 instance with zero open inbound ports — no SSH (port 22), no HTTP (port 80) exposed to the internet. You will access the instance through AWS Systems Manager Session Manager, which routes traffic through AWS's secure control plane rather than the public network. Apache web server is installed automatically via User Data. This lab demonstrates the modern enterprise baseline for compute access control, mapping to SAA Domain 1 (Design Secure Architectures).</p>
+
+  <div class="highlight">Security highlight: The Security Group has 0 inbound rules. This is intentional and the correct pattern for managed fleets.</div>
+
+  <h2>Architecture</h2>
+  <div class="diagram">
+    <div class="mermaid">
+flowchart LR
+    You(["👤 You\n(Browser Console)"]) -->|SSM Session| SSM["🔧 AWS Systems Manager\nSession Manager"]
+    SSM -->|Secure channel\n(no open ports)| EC2["🖥️ EC2 t3.micro\nAmazon Linux 2\nApache running"]
+    EC2 -->|IAM Instance\nProfile| IAMRole["🔑 SAA-Lab-EC2-SSM-Role\n(AmazonSSMManagedInstanceCore)"]
+    EC2 -.->|SG: 0 inbound rules| SG["🛡️ Security Group\n0 inbound rules\nAll outbound allowed"]
+    style SSM fill:#FF9900,color:#fff,stroke:#cc7a00
+    style EC2 fill:#F58536,color:#fff,stroke:#cc6a25
+    style IAMRole fill:#DD344C,color:#fff,stroke:#b0293c
+    style SG fill:#666,color:#fff,stroke:#444
+    style You fill:#0f3460,color:#fff,stroke:#0a2540
+    </div>
+  </div>
+
+  <h2>Prerequisites</h2>
+  <div class="prereq">
+    <ul>
+      <li>AWS Console open, region set to <b>EU (Frankfurt) eu-central-1</b></li>
+      <li>Instructor pre-created <code>SAA-Lab-EC2-SSM-Role</code> with the AWS managed policy <code>AmazonSSMManagedInstanceCore</code> attached</li>
+      <li>No key pair needed — this is the point of the lab</li>
+    </ul>
+  </div>
+
+  <h2>Steps</h2>
+
+  <h3>Part A — Create a Security Group with Zero Inbound Rules</h3>
+  <div class="step"><span class="step-num">1</span><div class="step-body">Open <b>EC2</b> → <b>Security Groups</b> (left sidebar) → <b>Create security group</b>.</div></div>
+  <div class="step"><span class="step-num">2</span><div class="step-body">Name: <code>lab05-ssm-only</code>. Description: <code>Zero inbound rules - SSM access only</code>. VPC: select the <b>Default VPC</b>.</div></div>
+  <div class="step"><span class="step-num">3</span><div class="step-body">Under <b>Inbound rules</b>: do <b>not</b> add any rules. Under <b>Outbound rules</b>: leave the default "All traffic" rule. Click <b>Create security group</b>.</div></div>
+
+  <h3>Part B — Launch the EC2 Instance</h3>
+  <div class="step"><span class="step-num">4</span><div class="step-body">Open <b>EC2</b> → <b>Instances</b> → <b>Launch instances</b>.</div></div>
+  <div class="step"><span class="step-num">5</span><div class="step-body">Name: <code>lab05-web-server</code>. AMI: <b>Amazon Linux 2023 AMI</b> (first option). Instance type: <b>t3.micro</b>.</div></div>
+  <div class="step"><span class="step-num">6</span><div class="step-body">Key pair: <b>Proceed without a key pair</b>.</div></div>
+  <div class="step"><span class="step-num">7</span><div class="step-body">Network settings → click <b>Edit</b>. Security group: select <b>Select existing security group</b> → choose <code>lab05-ssm-only</code>.</div></div>
+  <div class="step"><span class="step-num">8</span><div class="step-body">Expand <b>Advanced details</b>. IAM instance profile: select <code>SAA-Lab-EC2-SSM-Role</code>.</div></div>
+  <div class="step"><span class="step-num">9</span><div class="step-body">Scroll to <b>User data</b>. Paste the following script:
+<pre>#!/bin/bash
+dnf update -y
+dnf install -y httpd
+systemctl start httpd
+systemctl enable httpd
+echo "&lt;h1&gt;Hello from Lab 05! Instance: $(hostname -f)&lt;/h1&gt;" &gt; /var/www/html/index.html</pre>
+Click <b>Launch instance</b>.</div></div>
+
+  <h3>Part C — Connect via Session Manager</h3>
+  <div class="step"><span class="step-num">10</span><div class="step-body">Wait ~2 minutes for the instance to initialize. In EC2 → Instances, check the instance state shows <b>Running</b> and Status checks show <b>2/2 checks passed</b>.</div></div>
+  <div class="step"><span class="step-num">11</span><div class="step-body">Select your instance → click <b>Connect</b> → choose the <b>Session Manager</b> tab → click <b>Connect</b>.</div></div>
+  <div class="step"><span class="step-num">12</span><div class="step-body">A browser-based terminal opens. Run:
+<pre>curl http://localhost</pre>
+You should see: <code>&lt;h1&gt;Hello from Lab 05! Instance: ip-x-x-x-x.eu-central-1.compute.internal&lt;/h1&gt;</code></div></div>
+  <div class="step"><span class="step-num">13</span><div class="step-body">Also verify Apache is running:
+<pre>systemctl status httpd</pre></div></div>
+
+  <h2>Verification</h2>
+  <div class="verify">
+    <ul>
+      <li>Session Manager tab shows a live terminal — without any key pair or open ports</li>
+      <li><code>curl http://localhost</code> returns the Apache HTML page</li>
+      <li>EC2 Security Group → Inbound rules tab shows <b>No inbound rules</b></li>
+    </ul>
+  </div>
+
+  <h2>Cleanup</h2>
+  <div class="cleanup">
+    <ol>
+      <li>EC2 → your instance → <b>Instance state</b> → <b>Terminate instance</b></li>
+      <li>EC2 → Security Groups → <code>lab05-ssm-only</code> → <b>Delete security group</b></li>
+    </ol>
+  </div>
+
+  <h2>Key Exam Concepts</h2>
+  <div class="exam">
+    <ul>
+      <li><b>IAM Instance Profile:</b> A container that attaches an IAM Role to an EC2 instance — the instance receives temporary credentials via the metadata service (IMDS)</li>
+      <li><b>AmazonSSMManagedInstanceCore:</b> The AWS managed policy that grants SSM Agent on the instance permission to communicate with the SSM service</li>
+      <li><b>Session Manager vs SSH:</b> Session Manager requires no open inbound port, no key pair, is fully audited via CloudTrail, and can be restricted per user via IAM</li>
+      <li><b>User Data:</b> A bootstrap script that runs once at instance launch as root — used for software installation, configuration, and service startup</li>
+      <li><b>Security Group — stateful:</b> If outbound is allowed, response traffic is allowed back in automatically — this is why outbound-only rules let SSM work with 0 inbound rules</li>
+    </ul>
+  </div>
+
+  <script>mermaid.initialize({ startOnLoad: true, theme: 'default' });</script>
+</body>
+</html>
