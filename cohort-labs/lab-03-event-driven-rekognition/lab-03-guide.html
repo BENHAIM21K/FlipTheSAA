@@ -15,7 +15,7 @@
     p, li { line-height: 1.7; margin-bottom: 6px; }
     ul, ol { padding-left: 22px; }
     ol li { margin-bottom: 10px; }
-    .step { display: flex; align-items: flex-start; margin-bottom: 14px; }
+    .step { display: flex; align-items: flex-start; margin-bottom: 18px; }
     .step-num { display: inline-block; background: #0f3460; color: #fff; border-radius: 50%; width: 22px; height: 22px; text-align: center; line-height: 22px; font-size: 12px; margin-right: 8px; flex-shrink: 0; }
     .step-body { flex: 1; }
     .step-body b { color: #0f3460; }
@@ -23,9 +23,15 @@
     .verify { background: #f0fff4; border: 1px solid #9ae6b4; border-radius: 6px; padding: 14px 18px; }
     .cleanup { background: #fff5f5; border: 1px solid #feb2b2; border-radius: 6px; padding: 14px 18px; }
     .exam { background: #fffbea; border: 1px solid #f6e05e; border-radius: 6px; padding: 14px 18px; }
+    .warning { background: #fff8e1; border: 1px solid #ffcc02; border-radius: 6px; padding: 12px 16px; margin: 10px 0; font-size: 13px; }
+    .naming { background: #e8f4fd; border: 1px solid #90caf9; border-radius: 6px; padding: 12px 16px; margin: 10px 0 18px; font-size: 13px; }
     code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-family: 'Courier New', monospace; font-size: 12px; }
     pre { background: #f4f4f4; border-radius: 6px; padding: 12px 16px; margin: 10px 0; font-family: 'Courier New', monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; }
     .diagram { margin: 18px 0; }
+    .screenshot { display: block; width: 100%; max-width: 720px; border: 1px solid #ddd; border-radius: 5px; margin-top: 10px; }
+    table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+    th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; font-size: 13px; }
+    th { background: #f0f7ff; color: #0f3460; }
     @media print { body { padding: 20px 24px; } }
   </style>
 </head>
@@ -34,13 +40,13 @@
   <div class="meta">Services: S3 · Lambda · Amazon Rekognition · Amazon SNS &nbsp;|&nbsp; Region: eu-central-1 &nbsp;|&nbsp; Estimated time: 60 min</div>
 
   <h2>Goal</h2>
-  <p>Build an event-driven pipeline that automatically analyzes images using AI the moment they are uploaded to S3. When a file lands in your bucket, S3 triggers a Lambda function which calls Rekognition to detect objects, scenes, and concepts in the image, then publishes the results to an SNS topic — which sends you an email. This pattern is the foundation of async, decoupled, event-driven architectures tested in SAA Domain 3.</p>
+  <p>Build an event-driven pipeline that automatically analyzes images using AI the moment they are uploaded to S3. When a <code>.png</code> file lands in your bucket, S3 triggers a Lambda function which calls Rekognition to detect objects and scenes, then publishes a personalized report to an SNS topic — which sends you an email. This pattern is the foundation of async, decoupled, event-driven architectures tested in SAA Domain 3.</p>
 
   <h2>Architecture</h2>
   <div class="diagram">
     <div class="mermaid">
 flowchart LR
-    User(["👤 Student"]) -->|Upload image| S3["🪣 S3 Bucket\neu-central-1"]
+    User(["👤 Student"]) -->|Upload .png| S3["🪣 S3 Bucket\neu-central-1"]
     S3 -->|s3:ObjectCreated\nevent| Lambda["λ Lambda\nFunction"]
     Lambda -->|DetectLabels API| Rekognition["🔍 Amazon\nRekognition"]
     Rekognition -->|Labels + confidence| Lambda
@@ -59,84 +65,201 @@ flowchart LR
   <div class="prereq">
     <ul>
       <li>AWS Console open, region set to <b>EU (Frankfurt) eu-central-1</b></li>
-      <li>Your instructor pre-created <code>SAA-Lab-Lambda-Rekognition-Role</code> (Lambda trust + Rekognition + SNS Publish + S3 GetObject)</li>
-      <li>Have a JPEG or PNG image ready to upload (any photo from your phone works)</li>
-      <li>Have access to your email inbox during the lab</li>
+      <li>Your instructor pre-created <code>SAA-Lab-Lambda-Rekognition-Role</code> (Lambda trust + Rekognition DetectLabels + SNS Publish + S3 GetObject + CloudWatch Logs)</li>
+      <li>A <b>.png</b> image ready to upload (any photo saved as PNG works)</li>
+      <li>Access to a <b>personal</b> email inbox during the lab (see note in Step 3)</li>
     </ul>
+  </div>
+
+  <div class="naming">
+    <b>Naming convention — read before you start:</b> Replace <code>firstname-lastname</code> with your actual first and last name, lowercase, hyphen-separated (e.g. <code>john-doe</code>). All three resources share the same base name. The lab policy enforces this pattern and will deny actions on resources named differently.
+    <table style="margin-top:10px;">
+      <tr><th>Resource</th><th>Name to use</th></tr>
+      <tr><td>SNS topic</td><td><code>firstname-lastname-lab3</code></td></tr>
+      <tr><td>Lambda function</td><td><code>firstname-lastname-lab3</code></td></tr>
+      <tr><td>S3 bucket prefix</td><td><code>firstname-lastname-lab3</code> (AWS appends an account suffix automatically)</td></tr>
+      <tr><td>Event notification</td><td><code>get-image-to-rekognition</code></td></tr>
+    </table>
   </div>
 
   <h2>Steps</h2>
 
   <h3>Part A — Create an SNS Topic and Subscribe Your Email</h3>
-  <div class="step"><span class="step-num">1</span><div class="step-body">Open <b>Amazon SNS</b> → <b>Topics</b> → <b>Create topic</b>. Type: <b>Standard</b>. Name: <code>lab03-image-alerts</code>. Click <b>Create topic</b>.</div></div>
-  <div class="step"><span class="step-num">2</span><div class="step-body">On the topic page click <b>Create subscription</b>. Protocol: <b>Email</b>. Endpoint: your email address. Click <b>Create subscription</b>.</div></div>
-  <div class="step"><span class="step-num">3</span><div class="step-body">Check your inbox for a confirmation email from AWS and click <b>Confirm subscription</b>. The subscription status must show <b>Confirmed</b> before continuing.</div></div>
-  <div class="step"><span class="step-num">4</span><div class="step-body">Copy the <b>Topic ARN</b> — you will paste it into the Lambda code.</div></div>
+
+  <div class="step"><span class="step-num">1</span><div class="step-body">
+    Open <b>Amazon SNS</b> → <b>Topics</b> → <b>Create topic</b>.<br>
+    Type: <b>Standard</b> &nbsp;|&nbsp; Name: <code>firstname-lastname-lab3</code><br>
+    Leave all other settings at their defaults. Click <b>Create topic</b>.<br>
+    <b>Copy the Topic ARN</b> shown on the topic details page — you will need it in step 6.
+    <img src="guide-screenshots/Screenshot 2026-06-27 203011.png" alt="SNS Create Topic — select Standard and enter name" class="screenshot" />
+  </div></div>
+
+  <div class="step"><span class="step-num">2</span><div class="step-body">
+    In the left navigation click <b>Subscriptions</b> → <b>Create subscription</b>.<br>
+    Topic ARN: select your <code>firstname-lastname-lab3</code> topic.<br>
+    Protocol: <b>Email</b> &nbsp;|&nbsp; Endpoint: your email address.<br>
+    Click <b>Create subscription</b>.
+    <img src="guide-screenshots/Screenshot 2026-06-27 203242.png" alt="SNS Create Subscription — topic, email protocol, endpoint" class="screenshot" />
+  </div></div>
+
+  <div class="step"><span class="step-num">3</span><div class="step-body">
+    Check your inbox for an <b>AWS Notification — Subscription Confirmation</b> email and click <b>Confirm subscription</b>. The subscription status in the console must show <b>Confirmed</b> before continuing.
+    <div class="warning" style="margin-top:8px;">
+      <b>⚠️ Subscription immediately deactivated?</b> Some email security scanners (Google Workspace, corporate mail filters) automatically follow every link in an email — including the unsubscribe link — which deactivates the subscription before you can act. If this happens:<br>
+      1. Go to <b>SNS → Subscriptions</b>, select the deleted subscription, click <b>Request confirmation</b> to re-send the email.<br>
+      2. Open the confirmation email on your <b>phone</b> (where link scanners are less aggressive) and confirm from there.<br>
+      3. Alternatively, use a personal Gmail or Outlook account that does not pre-scan links.
+    </div>
+  </div></div>
 
   <h3>Part B — Create the Lambda Function</h3>
-  <div class="step"><span class="step-num">5</span><div class="step-body">Open <b>Lambda</b> → <b>Create function</b> → Author from scratch. Name: <code>lab03-image-analyzer</code>. Runtime: <b>Python 3.12</b>. Existing role: <code>SAA-Lab-Lambda-Rekognition-Role</code>. Click <b>Create function</b>.</div></div>
-  <div class="step"><span class="step-num">6</span><div class="step-body">Replace the code with the following. Replace <code>YOUR_SNS_TOPIC_ARN</code> with the ARN you copied. Click <b>Deploy</b>.
-<pre>import boto3, json
 
-SNS_TOPIC_ARN = "YOUR_SNS_TOPIC_ARN"
+  <div class="step"><span class="step-num">4</span><div class="step-body">
+    Open <b>Lambda</b> in a <b>new browser tab</b> → <b>Create function</b> → <b>Author from scratch</b>.<br>
+    Function name: <code>firstname-lastname-lab3</code><br>
+    Runtime: <b>Python 3.14</b><br>
+    Under <b>Permissions</b>, the page notes you can set a custom execution role under <b>Additional settings</b> — scroll down, expand <b>Additional settings</b>, change <b>Execution role</b> to <b>Use an existing role</b>, and select <code>SAA-Lab-Lambda-Rekognition-Role</code>.<br>
+    Leave all other defaults and click <b>Create function</b>.
+    <img src="guide-screenshots/Screenshot 2026-06-27 203524.png" alt="Lambda Create Function — function name and Python 3.14 runtime" class="screenshot" />
+  </div></div>
+
+  <div class="step"><span class="step-num">5</span><div class="step-body">
+    In the <b>Code</b> tab, replace all the default code with the following. <b>Do not click Deploy yet.</b>
+<pre>import boto3
+import os
+import urllib.parse
+from botocore.exceptions import ClientError
+
 rekognition = boto3.client("rekognition", region_name="eu-central-1")
 sns = boto3.client("sns", region_name="eu-central-1")
 
 def lambda_handler(event, context):
     record = event["Records"][0]["s3"]
     bucket = record["bucket"]["name"]
-    key = record["object"]["key"]
+    key = urllib.parse.unquote_plus(record["object"]["key"])
 
-    response = rekognition.detect_labels(
-        Image={"S3Object": {"Bucket": bucket, "Name": key}},
-        MaxLabels=10,
-        MinConfidence=75,
+    student_name = os.environ.get("STUDENT_NAME", "Student")
+    sns_topic_arn = os.environ["SNS_TOPIC_ARN"]
+
+    try:
+        response = rekognition.detect_labels(
+            Image={"S3Object": {"Bucket": bucket, "Name": key}},
+            MaxLabels=10,
+            MinConfidence=75,
+        )
+    except ClientError as e:
+        error_code = e.response["Error"]["Code"]
+        if error_code == "InvalidImageFormatException":
+            sns.publish(
+                TopicArn=sns_topic_arn,
+                Subject="[Lab 03] Upload Failed — Invalid Image Format",
+                Message=(
+                    f"Hi {student_name},\n\n"
+                    f"Your uploaded file '{key}' could not be analyzed.\n\n"
+                    f"Rekognition only supports JPEG and PNG files. "
+                    f"Make sure your image is a real .png or .jpg — "
+                    f"files renamed from HEIC, WebP, or BMP will not work.\n\n"
+                    f"Please convert your image to JPEG or PNG and upload again."
+                ),
+            )
+        raise
+
+    labels = [l["Name"] for l in response["Labels"]]
+    numbered = "\n".join(f"{i + 1}. {label}" for i, label in enumerate(labels))
+
+    message = (
+        f"Hi {student_name},\n\n"
+        f"Rekognition has classified the following things in your uploaded image:\n\n"
+        f"{numbered}"
     )
 
-    labels = [f"{l['Name']} ({l['Confidence']:.1f}%)" for l in response["Labels"]]
-    message = f"Image: s3://{bucket}/{key}\n\nDetected labels:\n" + "\n".join(f"  - {l}" for l in labels)
-
     sns.publish(
-        TopicArn=SNS_TOPIC_ARN,
+        TopicArn=sns_topic_arn,
         Subject="[Lab 03] Image Analysis Complete",
         Message=message,
     )
-    return {"statusCode": 200, "labels": labels}</pre></div></div>
+    return {"statusCode": 200, "labels": labels}</pre>
+    <div class="warning" style="margin-top:8px;">
+      <b>⚠️ Make sure your image is a genuine JPEG or PNG.</b> Rekognition will reject files that merely have a <code>.png</code> extension but are actually HEIC (iPhone photos), WebP, or BMP. Use a screenshot (Windows Snipping Tool / macOS Cmd+Shift+4) or export the image from a photo editor as PNG/JPEG. The updated code above sends you a helpful email if the format is wrong instead of silently failing.
+    </div>
+  </div></div>
+
+  <div class="step"><span class="step-num">6</span><div class="step-body">
+    Click the <b>Configuration</b> tab → <b>Environment variables</b> → <b>Edit</b> → <b>Add environment variable</b>. Add <b>two</b> variables:
+    <ul style="margin-top:8px;">
+      <li><b>Key:</b> <code>SNS_TOPIC_ARN</code> &nbsp;|&nbsp; <b>Value:</b> the Topic ARN you copied in step 1</li>
+      <li><b>Key:</b> <code>STUDENT_NAME</code> &nbsp;|&nbsp; <b>Value:</b> your first name (e.g. <code>Alice</code>)</li>
+    </ul>
+    Click <b>Save</b>.
+    <img src="guide-screenshots/Screenshot 2026-06-27 203907.png" alt="Lambda — Edit environment variables with SNS ARN" class="screenshot" />
+    <img src="guide-screenshots/Screenshot 2026-06-27 203944.png" alt="Lambda — Configuration tab showing saved environment variables" class="screenshot" style="margin-top:8px;" />
+  </div></div>
+
+  <div class="step"><span class="step-num">7</span><div class="step-body">
+    Click the <b>Code</b> tab → click <b>Deploy</b>. Wait for the banner confirming the function was updated successfully.
+  </div></div>
 
   <h3>Part C — Create the S3 Bucket and Wire the Event</h3>
-  <div class="step"><span class="step-num">7</span><div class="step-body">Open <b>S3</b> → <b>Create bucket</b>. Name: <code>lab03-images-yourname</code>. Region: eu-central-1. Leave all defaults. Click <b>Create bucket</b>.</div></div>
-  <div class="step"><span class="step-num">8</span><div class="step-body">Open the bucket → <b>Properties</b> tab → scroll to <b>Event notifications</b> → <b>Create event notification</b>.</div></div>
-  <div class="step"><span class="step-num">9</span><div class="step-body">Name: <code>trigger-lambda-on-upload</code>. Event types: check <b>All object create events</b>. Destination: <b>Lambda function</b> → select <code>lab03-image-analyzer</code>. Click <b>Save changes</b>.</div></div>
+
+  <div class="step"><span class="step-num">8</span><div class="step-body">
+    Open <b>S3</b> in a <b>new browser tab</b> → <b>Create bucket</b>.<br>
+    Leave <b>Bucket namespace</b> on <b>Account Regional namespace (recommended)</b>.<br>
+    <b>Bucket name prefix:</b> <code>firstname-lastname-lab3</code> — AWS will automatically append your account ID and region as a suffix. Leave all other defaults and click <b>Create bucket</b>.
+    <img src="guide-screenshots/Screenshot 2026-06-27 204115.png" alt="S3 Create Bucket — Account Regional namespace and name prefix" class="screenshot" />
+  </div></div>
+
+  <div class="step"><span class="step-num">9</span><div class="step-body">
+    Open the bucket → <b>Properties</b> tab → scroll to <b>Event notifications</b> → <b>Create event notification</b>.<br>
+    <b>Event name:</b> <code>get-image-to-rekognition</code><br>
+    Leave <b>Prefix</b> empty. Under <b>Suffix</b>, enter <code>.png</code> — this ensures only PNG uploads trigger the pipeline.<br>
+    Event types: check <b>All object create events</b>.
+    <img src="guide-screenshots/Screenshot 2026-06-27 204757.png" alt="S3 Event Notification — name, .png suffix, all object create events" class="screenshot" />
+    Scroll down to <b>Destination</b>: select <b>Lambda function</b> → <b>Choose from your Lambda functions</b> → select <code>firstname-lastname-lab3</code>.<br>
+    Click <b>Save changes</b>.
+    <img src="guide-screenshots/Screenshot 2026-06-27 204908.png" alt="S3 Event Notification — Lambda function destination" class="screenshot" style="margin-top:8px;" />
+  </div></div>
 
   <h3>Part D — Test the Pipeline</h3>
-  <div class="step"><span class="step-num">10</span><div class="step-body">Open the bucket → <b>Upload</b> → <b>Add files</b> → upload any JPEG image → click <b>Upload</b>.</div></div>
-  <div class="step"><span class="step-num">11</span><div class="step-body">Wait 10–30 seconds, then check your inbox. You should receive an email listing the detected objects.</div></div>
-  <div class="step"><span class="step-num">12</span><div class="step-body">In Lambda → <code>lab03-image-analyzer</code> → <b>Monitor</b> tab → <b>View CloudWatch logs</b> to see the full execution log.</div></div>
+
+  <div class="step"><span class="step-num">10</span><div class="step-body">
+    Before uploading, make sure your image is a genuine <b>PNG or JPG</b>. Phone photos (HEIC), WebP screenshots, and renamed files will cause Rekognition to fail.<br><br>
+    <b>Convert your image first:</b> go to <a href="https://cloudconvert.com/" target="_blank">cloudconvert.com</a>, upload your photo, choose <b>PNG</b> or <b>JPG</b> as the output format, convert and download. Then upload the converted file to S3.
+    <div class="warning" style="margin-top:8px;">
+      ⚠️ Also make sure the <code>SNS_TOPIC_ARN</code> environment variable contains the <b>full ARN</b> — e.g. <code>arn:aws:sns:eu-central-1:123456789012:john-doe-lab3</code> — not just the topic name. You can verify this in Lambda → Configuration → Environment variables.
+    </div>
+  </div></div>
+
+  <div class="step"><span class="step-num">11</span><div class="step-body">
+    In your S3 bucket click the <b>Objects</b> tab → <b>Upload</b> → <b>Add files</b> → select your converted <b>.png</b> or <b>.jpg</b> file → click <b>Upload</b>.
+  </div></div>
+
+  <div class="step"><span class="step-num">12</span><div class="step-body">
+    Wait 10–30 seconds, then check your inbox. You should receive an email that opens with <i>"Hi [your name],"</i> followed by a numbered list of objects Rekognition detected in the image.
+  </div></div>
+
+  <div class="step"><span class="step-num">13</span><div class="step-body">
+    In Lambda → <code>firstname-lastname-lab3</code> → <b>Monitor</b> tab → <b>View CloudWatch logs</b> to see the full execution log and confirm <code>statusCode: 200</code>.
+  </div></div>
 
   <h2>Verification</h2>
   <div class="verify">
     <ul>
-      <li>Email arrives within 30 seconds of upload containing a list of detected labels</li>
-      <li>CloudWatch log group <code>/aws/lambda/lab03-image-analyzer</code> shows a successful invocation with <code>statusCode: 200</code></li>
+      <li>Email arrives within 30 seconds of upload, opens with <code>Hi [your name],</code> and contains a numbered list of detected objects</li>
+      <li>CloudWatch log group <code>/aws/lambda/firstname-lastname-lab3</code> shows a successful invocation with <code>statusCode: 200</code></li>
+      <li>Uploading a <code>.jpg</code> file does <b>not</b> trigger the pipeline (suffix filter working)</li>
     </ul>
   </div>
 
-  <h2>Cleanup</h2>
-  <div class="cleanup">
-    <ol>
-      <li>S3 → your bucket → delete all objects → delete the bucket</li>
-      <li>Lambda → <code>lab03-image-analyzer</code> → <b>Delete</b></li>
-      <li>SNS → <code>lab03-image-alerts</code> → delete subscriptions → delete topic</li>
-    </ol>
-  </div>
+
 
   <h2>Key Exam Concepts</h2>
   <div class="exam">
     <ul>
       <li><b>Event-driven decoupling:</b> S3, Lambda, and SNS are all independent services; replacing any one of them does not require changing the others</li>
-      <li><b>S3 Event Notifications:</b> Can target Lambda, SQS, or SNS — know which trigger goes to which service</li>
+      <li><b>S3 Event Notifications:</b> Can target Lambda, SQS, or SNS — suffix/prefix filters prevent processing unintended objects</li>
       <li><b>Amazon Rekognition:</b> Fully managed ML vision service — no model training needed; key for image/video analysis questions</li>
       <li><b>SNS Fan-out:</b> A single SNS Publish can trigger multiple subscribers (email + SQS + Lambda) simultaneously</li>
+      <li><b>Lambda environment variables:</b> Use env vars for configuration values (ARNs, feature flags) — never hardcode sensitive values in code</li>
       <li><b>Asynchronous invocation:</b> S3-triggered Lambda is asynchronous — Lambda retries on failure; events can be sent to a Dead Letter Queue</li>
     </ul>
   </div>
