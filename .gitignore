@@ -62,3 +62,6 @@ AWS Icons/
 
 # students.txt kept local — contains real student IAM usernames
 cohort-labs/**/students.txt
+
+# Graphify knowledge graph output
+graphify-out/

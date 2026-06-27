@@ -21,12 +21,12 @@
     .step-body b { color: #0f3460; }
     .prereq { background: #f0f7ff; border: 1px solid #bcd4f5; border-radius: 6px; padding: 14px 18px; margin-bottom: 10px; }
     .verify { background: #f0fff4; border: 1px solid #9ae6b4; border-radius: 6px; padding: 14px 18px; }
-    .cleanup { background: #fff5f5; border: 1px solid #feb2b2; border-radius: 6px; padding: 14px 18px; }
     .exam { background: #fffbea; border: 1px solid #f6e05e; border-radius: 6px; padding: 14px 18px; }
     .highlight { background: #e8f4f8; border-left: 4px solid #0f3460; padding: 10px 14px; margin: 10px 0; border-radius: 0 6px 6px 0; font-weight: 500; }
     code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-family: 'Courier New', monospace; font-size: 12px; }
     pre { background: #f4f4f4; border-radius: 6px; padding: 12px 16px; margin: 10px 0; font-family: 'Courier New', monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; }
     .diagram { margin: 18px 0; }
+    .screenshot { max-width: 100%; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; display: block; }
     @media print { body { padding: 20px 24px; } }
   </style>
 </head>
@@ -35,23 +35,50 @@
   <div class="meta">Services: Amazon EC2 · AWS Systems Manager (Session Manager) · IAM Instance Profile &nbsp;|&nbsp; Region: eu-central-1 &nbsp;|&nbsp; Estimated time: 45 min</div>
 
   <h2>Goal</h2>
-  <p>Launch a secure EC2 instance with zero open inbound ports — no SSH (port 22), no HTTP (port 80) exposed to the internet. You will access the instance through AWS Systems Manager Session Manager, which routes traffic through AWS's secure control plane rather than the public network. Apache web server is installed automatically via User Data. This lab demonstrates the modern enterprise baseline for compute access control, mapping to SAA Domain 1 (Design Secure Architectures).</p>
+  <p>Launch a secure EC2 instance with <b>no SSH access</b> — no key pair, no port 22 open. You will access the instance through AWS Systems Manager Session Manager, which routes traffic through AWS's secure control plane rather than the public network. Apache web server is installed automatically via User Data. This lab demonstrates the modern enterprise baseline for compute access control, mapping to SAA Domain 1 (Design Secure Architectures).</p>
 
-  <div class="highlight">Security highlight: The Security Group has 0 inbound rules. This is intentional and the correct pattern for managed fleets.</div>
+  <div class="highlight">Security highlight: No key pair is created or attached. Access is granted exclusively through IAM — if your IAM user loses session access, so does the instance.</div>
 
   <h2>Architecture</h2>
   <div class="diagram">
     <div class="mermaid">
-flowchart LR
-    You(["👤 You\n(Browser Console)"]) -->|SSM Session| SSM["🔧 AWS Systems Manager\nSession Manager"]
-    SSM -->|Secure channel\n(no open ports)| EC2["🖥️ EC2 t3.micro\nAmazon Linux 2\nApache running"]
-    EC2 -->|IAM Instance\nProfile| IAMRole["🔑 SAA-Lab-EC2-SSM-Role\n(AmazonSSMManagedInstanceCore)"]
-    EC2 -.->|SG: 0 inbound rules| SG["🛡️ Security Group\n0 inbound rules\nAll outbound allowed"]
-    style SSM fill:#FF9900,color:#fff,stroke:#cc7a00
+flowchart TB
+    User(["👤 You\n(Browser)"])
+    Internet(["🌐 Internet"])
+
+    subgraph AWSCloud["AWS Cloud"]
+        SSMService["🔧 SSM Service\nSession Manager\n(managed by AWS)"]
+
+        subgraph VPC["VPC — Hands-On-Labs-vpc (10.0.0.0/22)"]
+            IGW["🔀 Internet Gateway"]
+
+            subgraph Subnet["Public Subnet — eu-central-1a"]
+                EC2["🖥️ EC2 t3.micro\nAmazon Linux 2023\nApache on :80\nPublic IP assigned"]
+                SG["🛡️ Lab-SG\nInbound: HTTP 80 · HTTPS 443\nOutbound: HTTPS 443"]
+            end
+
+            IAMProfile["🔑 IAM Instance Profile\nSAA-Lab-EC2-SSM-Role\n(AmazonSSMManagedInstanceCore)"]
+        end
+    end
+
+    User -- "① SSM Console" --> SSMService
+    SSMService -- "② Secure session\n(no inbound port needed)" --> EC2
+    EC2 -- "③ Outbound HTTPS 443\n(agent calls home)" --> SSMService
+    EC2 -. "credentials\nvia IMDS" .-> IAMProfile
+    EC2 -. "attached" .-> SG
+    Internet -- "④ HTTP :80\n(Apache page)" --> IGW
+    IGW --> EC2
+
+    style SSMService fill:#FF9900,color:#fff,stroke:#cc7a00
     style EC2 fill:#F58536,color:#fff,stroke:#cc6a25
-    style IAMRole fill:#DD344C,color:#fff,stroke:#b0293c
-    style SG fill:#666,color:#fff,stroke:#444
-    style You fill:#0f3460,color:#fff,stroke:#0a2540
+    style IAMProfile fill:#DD344C,color:#fff,stroke:#b0293c
+    style SG fill:#555,color:#fff,stroke:#333
+    style IGW fill:#8C4FFF,color:#fff,stroke:#6a3acc
+    style User fill:#0f3460,color:#fff,stroke:#0a2540
+    style Internet fill:#1a6b3c,color:#fff,stroke:#145730
+    style VPC fill:#f0f7ff,stroke:#4a90d9,color:#0f3460
+    style Subnet fill:#e8f4e8,stroke:#5a9e5a,color:#1a4d1a
+    style AWSCloud fill:#fffbf0,stroke:#FF9900,color:#333
     </div>
   </div>
 
@@ -59,57 +86,87 @@ flowchart LR
   <div class="prereq">
     <ul>
       <li>AWS Console open, region set to <b>EU (Frankfurt) eu-central-1</b></li>
-      <li>Instructor pre-created <code>SAA-Lab-EC2-SSM-Role</code> with the AWS managed policy <code>AmazonSSMManagedInstanceCore</code> attached</li>
-      <li>No key pair needed — this is the point of the lab</li>
+      <li>Instructor pre-created <code>SAA-Lab-EC2-SSM-Role</code> with <code>AmazonSSMManagedInstanceCore</code> attached</li>
+      <li>Instructor pre-created <code>Lab-SG</code> security group (HTTP 80 + HTTPS 443 inbound, HTTPS 443 outbound)</li>
+      <li><b>No key pair needed</b> — this is the point of the lab</li>
     </ul>
   </div>
 
   <h2>Steps</h2>
 
-  <h3>Part A — Create a Security Group with Zero Inbound Rules</h3>
-  <div class="step"><span class="step-num">1</span><div class="step-body">Open <b>EC2</b> → <b>Security Groups</b> (left sidebar) → <b>Create security group</b>.</div></div>
-  <div class="step"><span class="step-num">2</span><div class="step-body">Name: <code>lab05-ssm-only</code>. Description: <code>Zero inbound rules - SSM access only</code>. VPC: select the <b>Default VPC</b>.</div></div>
-  <div class="step"><span class="step-num">3</span><div class="step-body">Under <b>Inbound rules</b>: do <b>not</b> add any rules. Under <b>Outbound rules</b>: leave the default "All traffic" rule. Click <b>Create security group</b>.</div></div>
+  <h3>Part A — Launch the EC2 Instance</h3>
 
-  <h3>Part B — Launch the EC2 Instance</h3>
-  <div class="step"><span class="step-num">4</span><div class="step-body">Open <b>EC2</b> → <b>Instances</b> → <b>Launch instances</b>.</div></div>
-  <div class="step"><span class="step-num">5</span><div class="step-body">Name: <code>lab05-web-server</code>. AMI: <b>Amazon Linux 2023 AMI</b> (first option). Instance type: <b>t3.micro</b>.</div></div>
-  <div class="step"><span class="step-num">6</span><div class="step-body">Key pair: <b>Proceed without a key pair</b>.</div></div>
-  <div class="step"><span class="step-num">7</span><div class="step-body">Network settings → click <b>Edit</b>. Security group: select <b>Select existing security group</b> → choose <code>lab05-ssm-only</code>.</div></div>
-  <div class="step"><span class="step-num">8</span><div class="step-body">Expand <b>Advanced details</b>. IAM instance profile: select <code>SAA-Lab-EC2-SSM-Role</code>.</div></div>
-  <div class="step"><span class="step-num">9</span><div class="step-body">Scroll to <b>User data</b>. Paste the following script:
+  <div class="step"><span class="step-num">1</span><div class="step-body">Open <b>EC2</b> → <b>Instances</b> → <b>Launch instances</b>.</div></div>
+
+  <div class="step"><span class="step-num">2</span><div class="step-body">
+    Name your instance using the format: <code>&lt;firstname&gt;-&lt;lastname&gt;-lab</code><br>
+    Example: <code>john-doe-lab</code><br><br>
+    AMI: leave as <b>Amazon Linux 2023 AMI</b> (the default). Instance type: confirm <b>t3.micro</b>.
+    <img src="guide-screenshots/lab05-step02-ami-instance-type.png" alt="AMI and instance type selection" class="screenshot">
+  </div></div>
+
+  <div class="step"><span class="step-num">3</span><div class="step-body">
+    Key pair: open the dropdown and select <b>Proceed without a key pair (Not recommended)</b>. Do not create a new key pair.
+    <img src="guide-screenshots/lab05-step03-key-pair.png" alt="Proceed without a key pair" class="screenshot">
+  </div></div>
+
+  <div class="step"><span class="step-num">4</span><div class="step-body">
+    Under <b>Network settings</b> → click <b>Edit</b>.<br>
+    In the <b>Firewall (security groups)</b> section, choose <b>Select existing security group</b>, then select <b>Lab-SG</b> from the dropdown.<br>
+    Leave all other network settings as default.
+    <img src="guide-screenshots/lab05-step04-network-settings.png" alt="Network settings — select Lab-SG" class="screenshot">
+  </div></div>
+
+  <div class="step"><span class="step-num">5</span><div class="step-body">
+    Under <b>Configure storage</b>: leave the default <b>1x 8 GiB gp3</b>. Do not change the volume type or size.
+    <img src="guide-screenshots/lab05-step05-storage.png" alt="Storage — 8 GiB gp3 default" class="screenshot">
+  </div></div>
+
+  <div class="step"><span class="step-num">6</span><div class="step-body">
+    Scroll down and expand <b>Advanced details</b>.<br><br>
+    <b>IAM instance profile</b>: select <code>SAA-Lab-EC2-SSM-Role</code><br><br>
+    Leave <b>Purchasing option</b>, <b>Placement group</b>, and all other fields as default.
+    <img src="guide-screenshots/lab05-step06-iam-instance-profile.png" alt="Advanced details — IAM instance profile" class="screenshot">
+  </div></div>
+
+  <div class="step"><span class="step-num">7</span><div class="step-body">
+    Scroll to the very bottom of Advanced details to the <b>User data</b> field. Paste the script below, then click <b>Launch instance</b>:
 <pre>#!/bin/bash
 dnf update -y
 dnf install -y httpd
 systemctl start httpd
 systemctl enable httpd
 echo "&lt;h1&gt;Hello from Lab 05! Instance: $(hostname -f)&lt;/h1&gt;" &gt; /var/www/html/index.html</pre>
-Click <b>Launch instance</b>.</div></div>
+    <img src="guide-screenshots/lab05-step07-user-data.png" alt="User data script" class="screenshot">
+  </div></div>
 
-  <h3>Part C — Connect via Session Manager</h3>
-  <div class="step"><span class="step-num">10</span><div class="step-body">Wait ~2 minutes for the instance to initialize. In EC2 → Instances, check the instance state shows <b>Running</b> and Status checks show <b>2/2 checks passed</b>.</div></div>
-  <div class="step"><span class="step-num">11</span><div class="step-body">Select your instance → click <b>Connect</b> → choose the <b>Session Manager</b> tab → click <b>Connect</b>.</div></div>
-  <div class="step"><span class="step-num">12</span><div class="step-body">A browser-based terminal opens. Run:
+  <h3>Part B — Connect via Session Manager</h3>
+
+  <div class="step"><span class="step-num">8</span><div class="step-body">Wait ~2 minutes for the instance to initialize. In <b>EC2 → Instances</b>, confirm your instance shows <b>Running</b> and Status checks show <b>2/2 checks passed</b>.</div></div>
+
+  <div class="step"><span class="step-num">9</span><div class="step-body">Select your instance → click <b>Connect</b> → choose the <b>Session Manager</b> tab → click <b>Connect</b>.</div></div>
+
+  <div class="step"><span class="step-num">10</span><div class="step-body">A browser-based terminal opens. Run:
 <pre>curl http://localhost</pre>
 You should see: <code>&lt;h1&gt;Hello from Lab 05! Instance: ip-x-x-x-x.eu-central-1.compute.internal&lt;/h1&gt;</code></div></div>
-  <div class="step"><span class="step-num">13</span><div class="step-body">Also verify Apache is running:
+
+  <div class="step"><span class="step-num">11</span><div class="step-body">Verify Apache is running:
 <pre>systemctl status httpd</pre></div></div>
+
+  <div class="step"><span class="step-num">12</span><div class="step-body">Go back to your instance summary and copy the <b>Public IPv4 address</b>. Open a new browser tab and navigate to:
+<pre>http://&lt;your-public-ip&gt;</pre>
+You should see the same Apache page served publicly — over HTTP, with no SSH or interactive access exposed.
+  </div></div>
 
   <h2>Verification</h2>
   <div class="verify">
     <ul>
-      <li>Session Manager tab shows a live terminal — without any key pair or open ports</li>
-      <li><code>curl http://localhost</code> returns the Apache HTML page</li>
-      <li>EC2 Security Group → Inbound rules tab shows <b>No inbound rules</b></li>
+      <li>Session Manager tab shows a live terminal — without any key pair or SSH port</li>
+      <li><code>curl http://localhost</code> returns the Apache HTML page from inside the instance</li>
+      <li><code>http://&lt;public-ip&gt;</code> loads the Apache page in the browser — HTTP (80) only, no SSH (22) or RDP (3389)</li>
+      <li>EC2 → your instance → <b>Security</b> tab → Security groups shows <code>Lab-SG</code></li>
+      <li>EC2 → your instance → <b>Security</b> tab → IAM Role shows <code>SAA-Lab-EC2-SSM-Role</code></li>
     </ul>
-  </div>
-
-  <h2>Cleanup</h2>
-  <div class="cleanup">
-    <ol>
-      <li>EC2 → your instance → <b>Instance state</b> → <b>Terminate instance</b></li>
-      <li>EC2 → Security Groups → <code>lab05-ssm-only</code> → <b>Delete security group</b></li>
-    </ol>
   </div>
 
   <h2>Key Exam Concepts</h2>
@@ -119,7 +176,8 @@ You should see: <code>&lt;h1&gt;Hello from Lab 05! Instance: ip-x-x-x-x.eu-centr
       <li><b>AmazonSSMManagedInstanceCore:</b> The AWS managed policy that grants SSM Agent on the instance permission to communicate with the SSM service</li>
       <li><b>Session Manager vs SSH:</b> Session Manager requires no open inbound port, no key pair, is fully audited via CloudTrail, and can be restricted per user via IAM</li>
       <li><b>User Data:</b> A bootstrap script that runs once at instance launch as root — used for software installation, configuration, and service startup</li>
-      <li><b>Security Group — stateful:</b> If outbound is allowed, response traffic is allowed back in automatically — this is why outbound-only rules let SSM work with 0 inbound rules</li>
+      <li><b>Security Group — stateful:</b> Outbound HTTPS (443) is allowed, so SSM response traffic is automatically permitted back — this is why SSM works with no inbound SSH rule</li>
+      <li><b>NACL — stateless:</b> Unlike Security Groups, NACLs do not track connections. For SSM to work through a NACL you must explicitly allow <em>both</em> outbound TCP 443 (agent → AWS endpoints) <em>and</em> inbound TCP 1024–65535 (ephemeral return ports from AWS back to the instance)</li>
     </ul>
   </div>
 
