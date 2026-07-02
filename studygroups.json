@@ -39,6 +39,123 @@
   },
   "studyGroups": [
     {
+      "number": 3,
+      "name": "Study Group #5",
+      "dateRange": "AUG 2026 – OCT 2026",
+      "description": "AWS Solutions Architect Associate study cohort — 11 lessons covering all SAA-C03 domains.",
+      "lessons": [
+        {
+          "number": 11,
+          "topic": "Mock Exam Practice",
+          "date": "TBD",
+          "recording": { "url": "", "label": "Lesson 11 Recording" },
+          "summary": { "url": "", "label": "Lesson 11 AI Summary" }
+        },
+        {
+          "number": 10,
+          "topic": "Mock Exam Practice",
+          "date": "TBD",
+          "recording": { "url": "", "label": "Lesson 10 Recording" },
+          "summary": { "url": "", "label": "Lesson 10 AI Summary" }
+        },
+        {
+          "number": 9,
+          "topic": "Mock Exam Practice",
+          "date": "TBD",
+          "recording": { "url": "", "label": "Lesson 9 Recording" },
+          "summary": { "url": "", "label": "Lesson 9 AI Summary" }
+        },
+        {
+          "number": 8,
+          "topic": "Disaster Recovery & Migrations, More Solution Architectures, Other Services",
+          "date": "TBD",
+          "recording": { "url": "", "label": "Lesson 8 Recording" },
+          "summary": { "url": "", "label": "Lesson 8 AI Summary" },
+          "presentation": { "url": "", "label": "Lesson 8 Slides (PDF)" },
+          "homework": [
+            { "url": "", "label": "Lesson 8 Quiz" }
+          ]
+        },
+        {
+          "number": 7,
+          "topic": "Serverless, Databases, Data & Analytics",
+          "date": "TBD",
+          "recording": { "url": "", "label": "Lesson 7 Recording" },
+          "summary": { "url": "", "label": "Lesson 7 AI Summary" },
+          "presentation": { "url": "", "label": "Lesson 7 Slides (PDF)" },
+          "homework": [
+            { "url": "", "label": "Lesson 7 Quiz" }
+          ]
+        },
+        {
+          "number": 6,
+          "topic": "Containers, Caching, Messaging & Queuing",
+          "date": "TBD",
+          "recording": { "url": "", "label": "Lesson 6 Recording" },
+          "summary": { "url": "", "label": "Lesson 6 AI Summary" },
+          "presentation": { "url": "", "label": "Lesson 6 Slides (PDF)" },
+          "homework": [
+            { "url": "", "label": "Lesson 6 Quiz" }
+          ]
+        },
+        {
+          "number": 5,
+          "topic": "Networking, VPCs & Security",
+          "date": "TBD",
+          "recording": { "url": "", "label": "Lesson 5 Recording" },
+          "summary": { "url": "", "label": "Lesson 5 AI Summary" },
+          "presentation": { "url": "", "label": "Lesson 5 Slides (PDF)" },
+          "homework": [
+            { "url": "", "label": "Lesson 5 Quiz" }
+          ]
+        },
+        {
+          "number": 4,
+          "topic": "High Availability, Scalability & Decoupling",
+          "date": "TBD",
+          "recording": { "url": "", "label": "Lesson 4 Recording" },
+          "summary": { "url": "", "label": "Lesson 4 AI Summary" },
+          "presentation": { "url": "", "label": "Lesson 4 Slides (PDF)" },
+          "homework": [
+            { "url": "", "label": "Lesson 4 Quiz" }
+          ]
+        },
+        {
+          "number": 3,
+          "topic": "S3, CloudFront & Global Infrastructure",
+          "date": "TBD",
+          "recording": { "url": "", "label": "Lesson 3 Recording" },
+          "summary": { "url": "", "label": "Lesson 3 AI Summary" },
+          "presentation": { "url": "", "label": "Lesson 3 Slides (PDF)" },
+          "homework": [
+            { "url": "", "label": "Lesson 3 Quiz" }
+          ]
+        },
+        {
+          "number": 2,
+          "topic": "EC2 Advanced, EBS, EFS & RDS",
+          "date": "TBD",
+          "recording": { "url": "", "label": "Lesson 2 Recording" },
+          "summary": { "url": "", "label": "Lesson 2 AI Summary" },
+          "presentation": { "url": "", "label": "Lesson 2 Slides (PDF)" },
+          "homework": [
+            { "url": "", "label": "Lesson 2 Quiz" }
+          ]
+        },
+        {
+          "number": 1,
+          "topic": "IAM, EC2 & Storage Fundamentals",
+          "date": "TBD",
+          "recording": { "url": "", "label": "Lesson 1 Recording" },
+          "summary": { "url": "", "label": "Lesson 1 AI Summary" },
+          "presentation": { "url": "", "label": "Lesson 1 Slides (PDF)" },
+          "homework": [
+            { "url": "", "label": "Lesson 1 Quiz" }
+          ]
+        }
+      ]
+    },
+    {
       "number": 2,
       "name": "Study Group #4",
       "dateRange": "APR 2026 – JUL 2026",
@@ -48,29 +165,29 @@
           "number": 11,
           "topic": "Mock Exam Practice",
           "date": "Jul 1, 2026",
-          "recording": { "url": "", "label": "Lesson 11 Recording" },
-          "summary": { "url": "", "label": "Lesson 11 AI Summary" }
+          "recording": { "url": "https://drive.google.com/file/d/1vrtYCFvWxeYwJclJEuwqhnYMd2gFyEuG/view?usp=drive_link", "label": "Lesson 11 Recording" },
+          "summary": { "url": "https://drive.google.com/file/d/1UpQxAdu_S7tY8cVGnQZr2E6XYlvpiDfW/view?usp=drive_link", "label": "Lesson 11 AI Summary" }
         },
         {
           "number": 10,
           "topic": "Mock Exam Practice",
           "date": "Jun 24, 2026",
-          "recording": { "url": "", "label": "Lesson 10 Recording" },
-          "summary": { "url": "", "label": "Lesson 10 AI Summary" }
+          "recording": { "url": "https://drive.google.com/file/d/1cwXjBuv7DNQD5UtoSrlrdTd0ZGmZNQRw/view?usp=drive_link", "label": "Lesson 10 Recording" },
+          "summary": { "url": "https://drive.google.com/file/d/1py0sGZYdNJtNvJthujitiGO4fbVeKCN-/view?usp=drive_link", "label": "Lesson 10 AI Summary" }
         },
         {
           "number": 9,
           "topic": "Mock Exam Practice",
           "date": "Jun 17, 2026",
-          "recording": { "url": "", "label": "Lesson 9 Recording" },
-          "summary": { "url": "", "label": "Lesson 9 AI Summary" }
+          "recording": { "url": "https://drive.google.com/file/d/1HNFBvDj_UYFeJ-AdOwgEtEhQc0hIj_53/view?usp=drive_link", "label": "Lesson 9 Recording" },
+          "summary": { "url": "https://drive.google.com/file/d/1459DOQhmQqIWS4mrG5Ly4FUkdS97-qtK/view?usp=drive_link", "label": "Lesson 9 AI Summary" }
         },
         {
           "number": 8,
           "topic": "Disaster Recovery & Migrations, More Solution Architectures, Other Services",
           "date": "Jun 10, 2026",
-          "recording": { "url": "", "label": "Lesson 8 Recording" },
-          "summary": { "url": "", "label": "Lesson 8 AI Summary" },
+          "recording": { "url": "https://drive.google.com/file/d/1GGj1TzF9EQ5t0W033QPmeVBRaiaWEOKQ/view?usp=drive_link", "label": "Lesson 8 Recording" },
+          "summary": { "url": "https://drive.google.com/file/d/1HR35OBic5C14D-2Oz6W_JqN17A_Oz5m4/view?usp=drive_link", "label": "Lesson 8 AI Summary" },
           "presentation": { "url": "https://drive.google.com/file/d/1Ls5fVCG8h45_14M_eeceNI9MOZTO-L0z/view?usp=drive_link", "label": "Lesson 8 Slides (PDF)" },
           "homework": [
             { "url": "https://docs.google.com/forms/d/e/1FAIpQLSfUhKlLqPIObvCqvTTs8nH18uf1IE_i1UMp6nx2GMzmsld9hQ/viewform?usp=dialog", "label": "Lesson 8 Quiz" }
