@@ -65,3 +65,9 @@ cohort-labs/**/students.txt
 
 # Graphify knowledge graph output
 graphify-out/
+
+# Internal ops scripts and IAM policy documents — kept local only, not published
+scripts/
+cohort-labs/scripts/
+cohort-labs/**/iam-policy.json
+docs/EXPLANATION-GENERATION.md
