@@ -42,33 +42,66 @@
       "number": 3,
       "name": "Study Group #5",
       "dateRange": "AUG 2026 – OCT 2026",
-      "description": "AWS Solutions Architect Associate study cohort — 11 lessons covering all SAA-C03 domains.",
+      "description": "AWS Solutions Architect Associate study cohort — 11 lessons + 3 hands-on labs covering all SAA-C03 domains.",
       "lessons": [
         {
-          "number": 11,
+          "number": 14,
           "topic": "Mock Exam Practice",
-          "date": "TBD",
+          "date": "Oct 21, 2026",
+          "recording": { "url": "", "label": "Lesson 14 Recording" },
+          "summary": { "url": "", "label": "Lesson 14 AI Summary" }
+        },
+        {
+          "number": 13,
+          "topic": "Mock Exam Practice",
+          "date": "Oct 14, 2026",
+          "recording": { "url": "", "label": "Lesson 13 Recording" },
+          "summary": { "url": "", "label": "Lesson 13 AI Summary" }
+        },
+        {
+          "number": 12,
+          "topic": "Mock Exam Practice",
+          "date": "Oct 6, 2026",
+          "recording": { "url": "", "label": "Lesson 12 Recording" },
+          "summary": { "url": "", "label": "Lesson 12 AI Summary" }
+        },
+        {
+          "number": 11,
+          "topic": "Disaster Recovery & Migrations, More Solution Architectures, Other Services",
+          "date": "Sep 23, 2026",
           "recording": { "url": "", "label": "Lesson 11 Recording" },
-          "summary": { "url": "", "label": "Lesson 11 AI Summary" }
+          "summary": { "url": "", "label": "Lesson 11 AI Summary" },
+          "presentation": { "url": "", "label": "Lesson 11 Slides (PDF)" },
+          "homework": [
+            { "url": "", "label": "Lesson 11 Quiz" }
+          ]
         },
         {
           "number": 10,
-          "topic": "Mock Exam Practice",
-          "date": "TBD",
+          "topic": "Monitoring, IAM Advanced & Cloud Security",
+          "date": "Sep 16, 2026",
           "recording": { "url": "", "label": "Lesson 10 Recording" },
-          "summary": { "url": "", "label": "Lesson 10 AI Summary" }
+          "summary": { "url": "", "label": "Lesson 10 AI Summary" },
+          "presentation": { "url": "", "label": "Lesson 10 Slides (PDF)" },
+          "homework": [
+            { "url": "", "label": "Lesson 10 Quiz" }
+          ]
         },
         {
           "number": 9,
-          "topic": "Mock Exam Practice",
-          "date": "TBD",
+          "topic": "Data, Analytics & Machine Learning on AWS",
+          "date": "Sep 9, 2026",
           "recording": { "url": "", "label": "Lesson 9 Recording" },
-          "summary": { "url": "", "label": "Lesson 9 AI Summary" }
+          "summary": { "url": "", "label": "Lesson 9 AI Summary" },
+          "presentation": { "url": "", "label": "Lesson 9 Slides (PDF)" },
+          "homework": [
+            { "url": "", "label": "Lesson 9 Quiz" }
+          ]
         },
         {
           "number": 8,
-          "topic": "Disaster Recovery & Migrations, More Solution Architectures, Other Services",
-          "date": "TBD",
+          "topic": "Hands-On Lab — Event-Driven Rekognition + Lambda",
+          "date": "Sep 7, 2026",
           "recording": { "url": "", "label": "Lesson 8 Recording" },
           "summary": { "url": "", "label": "Lesson 8 AI Summary" },
           "presentation": { "url": "", "label": "Lesson 8 Slides (PDF)" },
@@ -78,8 +111,8 @@
         },
         {
           "number": 7,
-          "topic": "Serverless, Databases, Data & Analytics",
-          "date": "TBD",
+          "topic": "Integration, Messaging, Containers & Serverless",
+          "date": "Sep 2, 2026",
           "recording": { "url": "", "label": "Lesson 7 Recording" },
           "summary": { "url": "", "label": "Lesson 7 AI Summary" },
           "presentation": { "url": "", "label": "Lesson 7 Slides (PDF)" },
@@ -89,8 +122,8 @@
         },
         {
           "number": 6,
-          "topic": "Containers, Caching, Messaging & Queuing",
-          "date": "TBD",
+          "topic": "Hands-On Lab — S3 + CloudFront",
+          "date": "Aug 31, 2026",
           "recording": { "url": "", "label": "Lesson 6 Recording" },
           "summary": { "url": "", "label": "Lesson 6 AI Summary" },
           "presentation": { "url": "", "label": "Lesson 6 Slides (PDF)" },
@@ -100,8 +133,8 @@
         },
         {
           "number": 5,
-          "topic": "Networking, VPCs & Security",
-          "date": "TBD",
+          "topic": "Advanced S3, Security & Global Delivery",
+          "date": "Aug 26, 2026",
           "recording": { "url": "", "label": "Lesson 5 Recording" },
           "summary": { "url": "", "label": "Lesson 5 AI Summary" },
           "presentation": { "url": "", "label": "Lesson 5 Slides (PDF)" },
@@ -111,8 +144,8 @@
         },
         {
           "number": 4,
-          "topic": "High Availability, Scalability & Decoupling",
-          "date": "TBD",
+          "topic": "Hands-On Lab — EC2 & SSM",
+          "date": "Aug 24, 2026",
           "recording": { "url": "", "label": "Lesson 4 Recording" },
           "summary": { "url": "", "label": "Lesson 4 AI Summary" },
           "presentation": { "url": "", "label": "Lesson 4 Slides (PDF)" },
@@ -122,8 +155,8 @@
         },
         {
           "number": 3,
-          "topic": "S3, CloudFront & Global Infrastructure",
-          "date": "TBD",
+          "topic": "Route 53 & S3 Basics",
+          "date": "Aug 19, 2026",
           "recording": { "url": "", "label": "Lesson 3 Recording" },
           "summary": { "url": "", "label": "Lesson 3 AI Summary" },
           "presentation": { "url": "", "label": "Lesson 3 Slides (PDF)" },
@@ -133,8 +166,8 @@
         },
         {
           "number": 2,
-          "topic": "EC2 Advanced, EBS, EFS & RDS",
-          "date": "TBD",
+          "topic": "High Availability, Load Balancing & Databases",
+          "date": "Aug 12, 2026",
           "recording": { "url": "", "label": "Lesson 2 Recording" },
           "summary": { "url": "", "label": "Lesson 2 AI Summary" },
           "presentation": { "url": "", "label": "Lesson 2 Slides (PDF)" },
@@ -145,7 +178,7 @@
         {
           "number": 1,
           "topic": "IAM, EC2 & Storage Fundamentals",
-          "date": "TBD",
+          "date": "Aug 5, 2026",
           "recording": { "url": "", "label": "Lesson 1 Recording" },
           "summary": { "url": "", "label": "Lesson 1 AI Summary" },
           "presentation": { "url": "", "label": "Lesson 1 Slides (PDF)" },
