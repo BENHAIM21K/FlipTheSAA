@@ -14,7 +14,17 @@ Host a static HTML website on Amazon S3 and distribute it globally using Amazon 
 
 - Logged into the AWS Console as your student IAM user
 - Region set to **EU (Frankfurt) eu-central-1**
-- A simple HTML file ready to upload
+- An `index.html` file ready to upload — see below if you don't have one yet
+
+> **Don't have an `index.html` yet? Generate one with AI:**
+> 1. Open your AI tool of choice (ChatGPT, Claude, Gemini, etc.)
+> 2. Paste this prompt, picking any product you like:
+>    ```
+>    You are a professional frontend developer. Create a website for me to sell [pick anything — shoes, cars, planes, watches, etc.]. Global users should be able to browse and purchase the item, with a variety of listings showing different images, descriptions, and prices. Use only HTML — no frameworks, no backend, no JavaScript required.
+>    ```
+> 3. Copy the generated code into VS Code (or your preferred IDE), and save the file as `index.html`
+>
+> This is the file you'll upload to S3 in Part A, Step 5 below.
 
 ---
 
