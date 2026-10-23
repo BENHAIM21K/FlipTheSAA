@@ -219,7 +219,19 @@ function renderStage() {
 
   if (openEl) {
     const where = /drive\.google|docs\.google/.test(url) ? 'Open in Google Drive' : 'Open in a new tab';
-    openEl.innerHTML = `<a class="card-link-ext" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${where} ${icon('arrow-up-right')}</a>`;
+    // The Fullscreen button is phone-only (CSS hides it above 640px): see goFullscreen()
+    const fs = isVideo && embed && document.fullscreenEnabled
+      ? `<button class="btn stage-fs-btn" type="button" id="stageFsBtn">${icon('maximize')} Fullscreen</button>`
+      : '';
+    openEl.innerHTML = `<a class="card-link-ext" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${where} ${icon('arrow-up-right')}</a>${fs}`;
+    const fsBtn = document.getElementById('stageFsBtn');
+    if (fsBtn) {
+      fsBtn.onclick = () => {
+        // One tap means playing and fullscreen, even before Play has been pressed
+        if (!stage.querySelector('iframe')) mountFrame(stage, embed, item.label || 'Lesson recording', true);
+        goFullscreen(stage);
+      };
+    }
   }
 
   if (!embed) {
@@ -272,10 +284,41 @@ function mountFrame(stage, src, title, autoplay) {
   stage.appendChild(iframe);
 }
 
+let fsExitHooked = false;
+
+/**
+ * WHAT IT DOES: Puts the player on the whole screen, in landscape where the browser allows it
+ *
+ * WHY WE NEED IT: Drive's embedded player drops its seek bar, captions and quality menu
+ * when the frame is small, which is every phone. We can't reach inside the iframe, so
+ * size is the only lever we have. The stage is fullscreened rather than the iframe
+ * because it is our own element and the iframe already fills it.
+ */
+function goFullscreen(stage) {
+  const req = stage.requestFullscreen || stage.webkitRequestFullscreen;
+  if (!req) return;
+  if (!fsExitHooked) {
+    fsExitHooked = true;
+    // Let the phone rotate freely again once the player no longer fills the screen
+    document.addEventListener('fullscreenchange', () => {
+      if (document.fullscreenElement) return;
+      try { screen.orientation?.unlock?.(); } catch (e) {}
+    });
+  }
+  Promise.resolve(req.call(stage))
+    .then(() => screen.orientation?.lock?.('landscape'))
+    .catch(() => {});  // plenty of browsers refuse the lock; the fullscreen itself still stands
+}
+
 /** Removes a playing video so it stops when you change lesson, tab or screen */
 function stopPlayback() {
   const stage = document.getElementById('theaterStage');
   if (stage && stage.querySelector('iframe')) stage.innerHTML = '';
+  // Don't leave anyone stranded on a fullscreen empty stage
+  if (document.fullscreenElement || document.webkitFullscreenElement) {
+    const exit = document.exitFullscreen || document.webkitExitFullscreen;
+    if (exit) Promise.resolve(exit.call(document)).catch(() => {});
+  }
 }
 
 /**
