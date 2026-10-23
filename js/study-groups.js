@@ -219,19 +219,7 @@ function renderStage() {
 
   if (openEl) {
     const where = /drive\.google|docs\.google/.test(url) ? 'Open in Google Drive' : 'Open in a new tab';
-    // The Fullscreen button is phone-only (CSS hides it above 640px): see goFullscreen()
-    const fs = isVideo && embed && document.fullscreenEnabled
-      ? `<button class="btn stage-fs-btn" type="button" id="stageFsBtn">${icon('maximize')} Fullscreen</button>`
-      : '';
-    openEl.innerHTML = `<a class="card-link-ext" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${where} ${icon('arrow-up-right')}</a>${fs}`;
-    const fsBtn = document.getElementById('stageFsBtn');
-    if (fsBtn) {
-      fsBtn.onclick = () => {
-        // One tap means playing and fullscreen, even before Play has been pressed
-        if (!stage.querySelector('iframe')) mountFrame(stage, embed, item.label || 'Lesson recording', true);
-        goFullscreen(stage);
-      };
-    }
+    openEl.innerHTML = `<a class="card-link-ext" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${where} ${icon('arrow-up-right')}</a>`;
   }
 
   if (!embed) {
@@ -246,20 +234,32 @@ function renderStage() {
   }
 
   if (isVideo) {
-    // The poster names the lesson and offers a real, labelled button (the whole stage is the hit area).
+    // The poster names the lesson and offers a real, labelled control (the whole stage is the hit area).
     // Behind it, a frame from the recording; without one the poster stays plain dark.
-    const where = /drive\.google/.test(url) ? 'Plays from Google Drive' : /youtube/.test(embed) ? 'Plays from YouTube' : 'Plays in the page';
+    // On phones the poster links straight out to Drive instead of mounting the frame:
+    // Drive's embedded player hides its seek bar, captions and quality menu at phone
+    // sizes, and fullscreen doesn't bring them back. A real link, not a scripted open,
+    // so it can go to the Drive app and survive a long-press.
+    const toDrive = /drive\.google/.test(url) && window.matchMedia('(max-width: 640px)').matches;
+    const where = toDrive ? 'Opens in a new tab'
+      : /drive\.google/.test(url) ? 'Plays from Google Drive'
+      : /youtube/.test(embed) ? 'Plays from YouTube' : 'Plays in the page';
+    const face = toDrive ? 'Open in Google Drive' : 'Play recording';
     const thumb = thumbnailUrl(embed);
+    const tag = toDrive ? 'a' : 'button';
+    const attrs = toDrive
+      ? `href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer"`
+      : 'type="button"';
     stage.innerHTML = `
-      <button type="button" class="stage-poster${thumb ? ' has-thumb' : ''}" id="stagePlayBtn" aria-label="Play the lesson ${escapeHtml(lesson.number)} recording">
+      <${tag} ${attrs} class="stage-poster${thumb ? ' has-thumb' : ''}" id="stagePlayBtn" aria-label="${face}: lesson ${escapeHtml(lesson.number)} recording">
         ${thumb ? `<img class="stage-poster-img" src="${escapeHtml(thumb)}" alt="" decoding="async" referrerpolicy="no-referrer" />` : ''}
         <span class="stage-poster-title" dir="auto">Lesson ${escapeHtml(lesson.number)}${lesson.topic ? ` · ${escapeHtml(lesson.topic)}` : ''}</span>
         ${lesson.date ? `<span class="stage-poster-date">${escapeHtml(lesson.date)}</span>` : ''}
-        <span class="stage-play-btn"><svg class="stage-play-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.6v14.8a1 1 0 0 0 1.52.85l12.1-7.4a1 1 0 0 0 0-1.7L8.52 3.75A1 1 0 0 0 7 4.6z" fill="#0b0c0e"/></svg>Play recording</span>
+        <span class="stage-play-btn"><svg class="stage-play-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.6v14.8a1 1 0 0 0 1.52.85l12.1-7.4a1 1 0 0 0 0-1.7L8.52 3.75A1 1 0 0 0 7 4.6z" fill="#0b0c0e"/></svg>${face}</span>
         <span class="stage-poster-sub">${where}</span>
-      </button>`;
+      </${tag}>`;
     const poster = document.getElementById('stagePlayBtn');
-    poster.onclick = () => mountFrame(stage, embed, item.label || 'Lesson recording', true);
+    if (!toDrive) poster.onclick = () => mountFrame(stage, embed, item.label || 'Lesson recording', true);
     // The frame fades in when it arrives. Some recordings have no thumbnail (Drive answers 404): keep the plain poster
     const img = poster.querySelector('.stage-poster-img');
     img?.addEventListener('load', () => img.classList.add('is-loaded'));
@@ -284,41 +284,10 @@ function mountFrame(stage, src, title, autoplay) {
   stage.appendChild(iframe);
 }
 
-let fsExitHooked = false;
-
-/**
- * WHAT IT DOES: Puts the player on the whole screen, in landscape where the browser allows it
- *
- * WHY WE NEED IT: Drive's embedded player drops its seek bar, captions and quality menu
- * when the frame is small, which is every phone. We can't reach inside the iframe, so
- * size is the only lever we have. The stage is fullscreened rather than the iframe
- * because it is our own element and the iframe already fills it.
- */
-function goFullscreen(stage) {
-  const req = stage.requestFullscreen || stage.webkitRequestFullscreen;
-  if (!req) return;
-  if (!fsExitHooked) {
-    fsExitHooked = true;
-    // Let the phone rotate freely again once the player no longer fills the screen
-    document.addEventListener('fullscreenchange', () => {
-      if (document.fullscreenElement) return;
-      try { screen.orientation?.unlock?.(); } catch (e) {}
-    });
-  }
-  Promise.resolve(req.call(stage))
-    .then(() => screen.orientation?.lock?.('landscape'))
-    .catch(() => {});  // plenty of browsers refuse the lock; the fullscreen itself still stands
-}
-
 /** Removes a playing video so it stops when you change lesson, tab or screen */
 function stopPlayback() {
   const stage = document.getElementById('theaterStage');
   if (stage && stage.querySelector('iframe')) stage.innerHTML = '';
-  // Don't leave anyone stranded on a fullscreen empty stage
-  if (document.fullscreenElement || document.webkitFullscreenElement) {
-    const exit = document.exitFullscreen || document.webkitExitFullscreen;
-    if (exit) Promise.resolve(exit.call(document)).catch(() => {});
-  }
 }
 
 /**

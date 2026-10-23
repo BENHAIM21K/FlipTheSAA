@@ -1316,10 +1316,6 @@ a { color: inherit; }
 .theater-stage.is-doc { height: min(78vh, 760px); }
 .theater-stage.is-empty { aspect-ratio: auto; height: auto; min-height: 240px; display: grid; place-items: center; }
 .theater-stage iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-/* Fullscreen is sized by the browser, so the 16:9 ratio and the phone full-bleed margin
-   must both get out of the way. Two classes keep this ahead of the ≤640px rule below. */
-.theater-stage.is-video:fullscreen { aspect-ratio: auto; width: 100%; height: 100%; margin-inline: 0; border-radius: 0; background: #000; }
-.theater-stage.is-video:-webkit-full-screen { aspect-ratio: auto; width: 100%; height: 100%; margin-inline: 0; border-radius: 0; background: #000; }
 /* The video poster: lesson name + date, a labelled Play button, where it plays from.
    The whole stage is the button; the light pill inside is its visible face. */
 .stage-poster {
@@ -1335,6 +1331,7 @@ a { color: inherit; }
   background: #0b0c0e;
   color: #f1f3f4;
   text-align: center;
+  text-decoration: none;  /* on phones the poster is an <a> out to Drive, not a <button> */
   cursor: pointer;
 }
 .stage-poster-title { max-width: 52ch; font-size: 18px; line-height: 24px; font-weight: 600; }
@@ -1382,10 +1379,7 @@ a { color: inherit; }
 .stage-empty > .icon { margin: 0 auto 10px; color: var(--faint); }
 .stage-empty-title { color: var(--text); font-weight: 600; margin-bottom: 4px; }
 .stage-empty .btn { margin-top: 12px; }
-.theater-open { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
 .theater-open:empty { display: none; }
-/* Phones only: Drive's inline player hides its controls at small sizes (see study-groups.js) */
-.stage-fs-btn { display: none; }
 .card-link-ext { display: inline-flex; align-items: center; gap: 4px; color: var(--muted); font-size: 13px; text-decoration: none; }
 .card-link-ext:hover { color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
 .theater-actions { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -1938,9 +1932,6 @@ a { color: inherit; }
 
   .sg-cohort-card { flex-direction: column; align-items: flex-start; }
   .theater-actions .btn { flex: 1 1 100%; }
-  /* The recording gets the full width of the screen: the sheet's 16px side padding back */
-  .theater-stage.is-video { margin-inline: -16px; border-radius: 0; }
-  .stage-fs-btn { display: inline-flex; }
   .stage-poster { gap: 4px; padding: 16px; }
   .stage-poster-title { font-size: 15px; line-height: 20px; }
   .stage-play-btn { margin-top: 10px; }
