@@ -4,7 +4,7 @@
     "_howToAddExternalLink": [
       "1. Add a new object to the 'externalLinks' array.",
       "2. Set 'type' to one of: 'youtube', 'linkedin', 'github', 'platform'.",
-      "3. Fill in 'name', 'description', and 'url'.",
+      "3. Fill in 'name', 'description', and 'url'. For a 'platform', you can add 'logo': put a square PNG/SVG in assets/resource-logos/ and set 'logo' to its path.",
       "4. Upload resources.json to S3 and hard-refresh the site."
     ],
     "_howToAddCheatsheetEntry": [
@@ -22,15 +22,25 @@
       "externalLinks[].type": "Category: 'youtube', 'linkedin', 'github', or 'platform'.",
       "externalLinks[].description": "Short note on why it's useful for SAA prep.",
       "externalLinks[].url": "Full URL to the resource.",
+      "externalLinks[].logo": "OPTIONAL. Path to the platform's logo, e.g. 'assets/resource-logos/kodekloud.png' (square, about 64x64 px, PNG or SVG). Shown on the card; without it platforms show a screen icon. YouTube, GitHub and LinkedIn links don't need it: they show the brand's own logo.",
       "cheatsheet[].service": "AWS service name.",
       "cheatsheet[].icon": "Emoji fallback shown if the image fails to load.",
       "cheatsheet[].iconImg": "Path to the PNG icon in assets/service-icons/. Omit if no icon available.",
       "cheatsheet[].category": "Service family category for filtering.",
       "cheatsheet[].description": "One-line description of what the service does.",
-      "cheatsheet[].keywords": "Array of exam-relevant keywords and synonyms for search."
+      "cheatsheet[].keywords": "Array of exam-relevant keywords and synonyms for search.",
+      "cheatsheet[].practiceTopic": "OPTIONAL. The Practice topic for this service's 'Practice questions' button, when its name doesn't match a topic on its own.",
+      "comparisons[]": "'Commonly confused' sets shown in Resources. id, title, question (one line on why they get confused), columns (the services), rows [{label, values (one per column)}], pick (when to choose each), traps (exam traps), practiceTopics (Practice tab topic names), cheatsheet (cheat-sheet service names that link to this comparison)."
     }
   },
   "externalLinks": [
+    {
+      "name": "FlipTheScript AWS SAA Playlist",
+      "type": "youtube",
+      "description": "Our own study-group lessons on YouTube: the FlipTheScript AWS Solutions Architect Associate playlist.",
+      "url": "https://www.youtube.com/playlist?list=PLMWdwVOajttc",
+      "logo": "assets/resource-logos/flipthescript.jpg"
+    },
     {
       "name": "Stephane Maarek",
       "type": "youtube",
@@ -46,12 +56,14 @@
     {
       "name": "TutorialsDojo",
       "type": "platform",
+      "logo": "assets/resource-logos/tutorialsdojo.png",
       "description": "Best practice exam questions for SAA-C03. Detailed explanations on every answer.",
       "url": "https://tutorialsdojo.com/aws-solutions-architect-associate/"
     },
     {
       "name": "AWS Skill Builder",
       "type": "platform",
+      "logo": "assets/resource-logos/aws-skill-builder.png",
       "description": "Official AWS learning platform with free SAA exam prep content and practice questions.",
       "url": "https://skillbuilder.aws/"
     },
@@ -112,6 +124,7 @@
     {
       "name": "KodeKloud",
       "type": "platform",
+      "logo": "assets/resource-logos/kodekloud.svg",
       "description": "Hands-on DevOps and cloud learning platform with 1,250+ browser-based labs covering AWS, Kubernetes, Docker, Terraform, and more.",
       "url": "https://kodekloud.com/"
     },
@@ -255,5 +268,199 @@
 
     { "service": "Elastic Transcoder", "icon": "🎬", "category": "Media", "description": "Convert media files stored in S3 into formats required by consumer playback devices", "keywords": ["transcoding", "video", "audio", "S3", "pipeline", "preset", "thumbnail", "MP4", "HLS"] },
     { "service": "Kinesis Video Streams", "icon": "🎥", "iconImg": "assets/service-icons/kinesis-video-streams.png", "category": "Media", "description": "Capture, process, and store video streams for analytics and machine learning", "keywords": ["video", "streaming", "real-time", "WebRTC", "playback", "Rekognition", "fragments", "IoT", "cameras"] }
+  ],
+  "comparisons": [
+    {
+      "id": "sg-vs-nacl",
+      "title": "Security groups vs network ACLs",
+      "question": "Both filter traffic in a VPC. The exam asks which one can block a specific IP, and why return traffic fails.",
+      "columns": ["Security group", "Network ACL"],
+      "rows": [
+        { "label": "Applies to", "values": ["An instance's network interface", "A whole subnet"] },
+        { "label": "State", "values": ["Stateful: return traffic is allowed automatically", "Stateless: return traffic needs its own rule (ephemeral ports 1024–65535)"] },
+        { "label": "Rule types", "values": ["Allow rules only", "Allow and deny rules"] },
+        { "label": "Evaluation", "values": ["All rules are evaluated together", "Rules are evaluated in number order; the first match wins"] },
+        { "label": "Default", "values": ["A new group denies all inbound and allows all outbound", "The default NACL allows everything; a new custom NACL denies everything until you add rules"] },
+        { "label": "Can reference", "values": ["Other security groups (e.g. allow traffic from the ALB's group)", "CIDR ranges only"] }
+      ],
+      "pick": [
+        "Security group: control which sources can reach specific instances, especially by referencing another tier's security group.",
+        "Network ACL: block a specific IP address or range at the subnet edge (security groups can't deny)."
+      ],
+      "traps": [
+        "\"Block one malicious IP\" → a NACL deny rule. Security groups have no deny rules.",
+        "Outbound responses failing through a custom NACL usually means the ephemeral port range isn't allowed."
+      ],
+      "practiceTopics": ["Security groups and NACLs", "VPC"],
+      "cheatsheet": ["VPC", "Network Firewall"]
+    },
+    {
+      "id": "messaging",
+      "title": "SQS vs SNS vs EventBridge vs Kinesis Data Streams",
+      "question": "All four move messages between components. The difference is who pulls, who gets a copy, and whether the data can be replayed.",
+      "columns": ["SQS", "SNS", "EventBridge", "Kinesis Data Streams"],
+      "rows": [
+        { "label": "Model", "values": ["Queue: consumers poll and each message is processed once", "Pub/sub: pushes a copy to every subscriber", "Event bus: rules route matching events to targets", "Stream: ordered records that many consumers read independently"] },
+        { "label": "Retention", "values": ["Up to 14 days (default 4)", "None: delivered or lost (use an SQS subscription to keep it)", "None by default; optional archive and replay", "24 hours by default, up to 365 days; consumers can re-read"] },
+        { "label": "Ordering", "values": ["FIFO queues: strict order, exactly-once processing", "FIFO topics (with SQS FIFO subscribers)", "No ordering guarantee", "Ordered within a shard (by partition key)"] },
+        { "label": "Typical sources", "values": ["Your application", "Your application, CloudWatch alarms, S3 events", "AWS service events, SaaS partners, schedules, other accounts", "High-volume producers: clickstreams, logs, IoT"] },
+        { "label": "Scaling", "values": ["Fully managed, nearly unlimited throughput (standard)", "Fully managed", "Fully managed", "Provisioned shards, or on-demand mode"] }
+      ],
+      "pick": [
+        "SQS: decouple tiers and buffer spikes so a slow consumer never drops work.",
+        "SNS: fan one message out to many subscribers (email, SMS, Lambda, several SQS queues).",
+        "EventBridge: react to AWS or SaaS events with content-based rules, or run scheduled jobs.",
+        "Kinesis Data Streams: real-time analytics where several applications read the same ordered data, with replay."
+      ],
+      "traps": [
+        "Fan-out to several queues that each process every message → SNS topic with SQS subscriptions.",
+        "\"Multiple consumers must read the same records, in order, and replay them\" → Kinesis, not SQS.",
+        "\"Trigger on an EC2 state change or an AWS API call\" → EventBridge rule."
+      ],
+      "practiceTopics": ["SQS", "SNS", "EventBridge", "Kinesis"],
+      "cheatsheet": ["SQS", "SNS", "EventBridge", "Kinesis", "Amazon MQ"]
+    },
+    {
+      "id": "storage",
+      "title": "EBS vs EFS vs FSx vs S3",
+      "question": "Block, file and object storage. Most questions turn on how many clients need access, which OS they run, and from where.",
+      "columns": ["EBS", "EFS", "FSx", "S3"],
+      "rows": [
+        { "label": "Storage type", "values": ["Block volume", "File system (NFS)", "File system: Windows (SMB), Lustre, NetApp ONTAP, OpenZFS", "Object storage (HTTP API)"] },
+        { "label": "Who can attach", "values": ["One EC2 instance in the same AZ (io1/io2 Multi-Attach within one AZ)", "Thousands of Linux clients across AZs and on-premises", "Windows or Linux clients, depending on the FSx type", "Anything that can call the API, from anywhere"] },
+        { "label": "Scope", "values": ["One Availability Zone", "Regional (multi-AZ), or One Zone", "Single-AZ or Multi-AZ, depending on the type", "Regional, 11 nines of durability"] },
+        { "label": "Capacity", "values": ["You provision the size", "Grows and shrinks automatically", "You provision capacity", "Unlimited"] },
+        { "label": "Typical use", "values": ["Boot volumes, databases on EC2", "Shared content and home directories for Linux", "Windows file shares with Active Directory; HPC scratch on Lustre", "Backups, data lakes, static websites, media"] }
+      ],
+      "pick": [
+        "EBS: low-latency disk for a single instance.",
+        "EFS: a shared POSIX file system for many Linux instances across AZs.",
+        "FSx for Windows File Server: SMB shares with Active Directory. FSx for Lustre: high-performance computing, linked to S3.",
+        "S3: durable, cheap storage accessed over HTTP, with lifecycle tiers down to Glacier."
+      ],
+      "traps": [
+        "Windows + SMB + Active Directory → FSx for Windows File Server. EFS is NFS for Linux only.",
+        "\"Shared file system across AZs\" rules out EBS, which is tied to one AZ.",
+        "HPC that reads and writes S3 data at high throughput → FSx for Lustre."
+      ],
+      "practiceTopics": ["EBS", "EFS", "FSx", "S3"],
+      "cheatsheet": ["EBS", "EFS", "FSx", "S3", "Storage Gateway"]
+    },
+    {
+      "id": "load-balancers",
+      "title": "ALB vs NLB vs GWLB",
+      "question": "Three load balancers for three layers. The deciding words are usually HTTP routing, static IP, or third-party appliances.",
+      "columns": ["Application LB", "Network LB", "Gateway LB"],
+      "rows": [
+        { "label": "Layer", "values": ["7: HTTP, HTTPS, gRPC", "4: TCP, UDP, TLS", "3: IP packets (GENEVE on port 6081)"] },
+        { "label": "Routing", "values": ["By path, host, header, query string; Lambda can be a target", "By port; millions of requests per second at very low latency", "Sends traffic through a fleet of virtual appliances and back"] },
+        { "label": "Static IP", "values": ["No: a DNS name (put Global Accelerator in front for static IPs)", "Yes: one static IP per AZ, Elastic IPs supported", "Not applicable"] },
+        { "label": "Typical use", "values": ["Web apps, microservices, containers", "Gaming, IoT, non-HTTP protocols, IP allow-listing", "Third-party firewalls, IDS/IPS, deep packet inspection"] }
+      ],
+      "pick": [
+        "ALB: route HTTP requests by URL or host to different services.",
+        "NLB: extreme performance, TCP/UDP, or clients that need a fixed IP address.",
+        "GWLB: insert and scale third-party network appliances transparently."
+      ],
+      "traps": [
+        "\"Customers allow-list our IP addresses\" → NLB (Elastic IPs) or Global Accelerator, not ALB.",
+        "\"Route /api to one service and /images to another\" → ALB path-based routing."
+      ],
+      "practiceTopics": ["ELB", "Auto Scaling"],
+      "cheatsheet": ["ELB", "Global Accelerator"]
+    },
+    {
+      "id": "cloudfront-vs-ga",
+      "title": "CloudFront vs Global Accelerator",
+      "question": "Both use the AWS edge network to make a global app faster. Only one of them caches.",
+      "columns": ["CloudFront", "Global Accelerator"],
+      "rows": [
+        { "label": "What it does", "values": ["CDN: caches content at edge locations close to users", "Routes TCP/UDP traffic over the AWS backbone to the nearest healthy regional endpoint"] },
+        { "label": "Caching", "values": ["Yes", "No"] },
+        { "label": "Protocols", "values": ["HTTP and HTTPS (including WebSocket)", "TCP and UDP"] },
+        { "label": "IP addresses", "values": ["Changing edge IPs behind a DNS name", "Two static anycast IP addresses"] },
+        { "label": "Failover", "values": ["Origin groups fail over between origins", "Health checks shift traffic between Regions in under a minute"] },
+        { "label": "Typical use", "values": ["Websites, video, APIs, S3 static content", "Gaming, VoIP, IoT, multi-Region apps needing static IPs"] }
+      ],
+      "pick": [
+        "CloudFront: cache static or dynamic web content near users and protect an S3 origin (OAC).",
+        "Global Accelerator: non-HTTP traffic, static IPs, or fast Regional failover without caching."
+      ],
+      "traps": [
+        "UDP game traffic with global users → Global Accelerator. CloudFront doesn't carry UDP.",
+        "\"Cache images close to users\" → CloudFront. Global Accelerator never caches."
+      ],
+      "practiceTopics": ["CloudFront", "Global Accelerator"],
+      "cheatsheet": ["CloudFront", "Global Accelerator"]
+    },
+    {
+      "id": "rds-ha",
+      "title": "RDS Multi-AZ vs read replicas",
+      "question": "One is for availability, the other for read scaling. Questions usually describe the goal, not the feature.",
+      "columns": ["Multi-AZ", "Read replicas"],
+      "rows": [
+        { "label": "Purpose", "values": ["High availability: automatic failover", "Scale reads; cross-Region replicas also help disaster recovery"] },
+        { "label": "Replication", "values": ["Synchronous", "Asynchronous"] },
+        { "label": "Serve reads?", "values": ["Single standby: no. Multi-AZ DB cluster: two readable standbys", "Yes, each replica has its own endpoint"] },
+        { "label": "Failover", "values": ["Automatic; the endpoint name stays the same", "Manual: promote a replica to a standalone database"] },
+        { "label": "Location", "values": ["Another AZ in the same Region", "Same AZ, another AZ, or another Region"] }
+      ],
+      "pick": [
+        "Multi-AZ: survive an AZ or instance failure with no application change.",
+        "Read replicas: offload reporting or read-heavy traffic from the primary."
+      ],
+      "traps": [
+        "\"Reporting queries slow down the production database\" → read replica, not Multi-AZ.",
+        "\"Automatic failover with no change to the connection string\" → Multi-AZ."
+      ],
+      "practiceTopics": ["RDS", "Aurora", "Multi-AZ"],
+      "cheatsheet": ["RDS", "Aurora"]
+    },
+    {
+      "id": "vpn-vs-dx",
+      "title": "Site-to-Site VPN vs Direct Connect",
+      "question": "Two ways to connect a data center to AWS. Time to set up, consistency and encryption decide it.",
+      "columns": ["Site-to-Site VPN", "Direct Connect"],
+      "rows": [
+        { "label": "Path", "values": ["Encrypted IPsec tunnels over the public internet", "A private, dedicated connection through a Direct Connect location"] },
+        { "label": "Setup time", "values": ["Minutes to hours", "Weeks to months"] },
+        { "label": "Bandwidth", "values": ["Up to 1.25 Gbps per tunnel", "Dedicated 1, 10 or 100 Gbps; hosted 50 Mbps to 10 Gbps"] },
+        { "label": "Encryption", "values": ["Built in (IPsec)", "Not encrypted by default: add MACsec or run a VPN over it"] },
+        { "label": "Latency", "values": ["Varies with the internet", "Consistent"] }
+      ],
+      "pick": [
+        "VPN: a quick, low-cost hybrid link, or a backup path for Direct Connect.",
+        "Direct Connect: large, steady transfers with consistent performance."
+      ],
+      "traps": [
+        "\"Encrypt traffic over Direct Connect\" → a VPN over the DX connection (or MACsec).",
+        "\"Need connectivity this week\" → VPN. Direct Connect takes weeks to provision."
+      ],
+      "practiceTopics": ["VPC", "Disaster recovery"],
+      "cheatsheet": ["Site-to-Site VPN", "Direct Connect", "Transit Gateway"]
+    },
+    {
+      "id": "secrets",
+      "title": "Secrets Manager vs Parameter Store",
+      "question": "Both store secrets encrypted with KMS. Rotation and cost separate them.",
+      "columns": ["Secrets Manager", "SSM Parameter Store"],
+      "rows": [
+        { "label": "Automatic rotation", "values": ["Built in (RDS, Aurora, Redshift, DocumentDB; Lambda for others)", "No native rotation"] },
+        { "label": "Cost", "values": ["Per secret per month, plus API calls", "Standard parameters free; advanced parameters paid"] },
+        { "label": "Size limit", "values": ["64 KB per secret", "4 KB standard, 8 KB advanced"] },
+        { "label": "Cross-Region replication", "values": ["Yes", "No"] },
+        { "label": "Typical use", "values": ["Database credentials that must rotate", "Configuration values, feature flags, non-rotating secrets (SecureString)"] }
+      ],
+      "pick": [
+        "Secrets Manager: credentials that must rotate automatically.",
+        "Parameter Store: configuration and simple secrets at the lowest cost."
+      ],
+      "traps": [
+        "\"Rotate the database password automatically every 30 days\" → Secrets Manager.",
+        "\"Store configuration values cheaply\" → Parameter Store standard tier."
+      ],
+      "practiceTopics": ["Secrets Manager", "Systems Manager", "KMS"],
+      "cheatsheet": ["Secrets Manager", "Systems Manager", "KMS"]
+    }
   ]
 }

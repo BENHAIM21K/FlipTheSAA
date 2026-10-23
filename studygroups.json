@@ -14,8 +14,8 @@
       "3. Fill in: number, topic, date.",
       "4. Paste Google Drive share link into recording.url and/or summary.url.",
       "5. Leave any unused 'url' as empty string '' — the button will be hidden automatically.",
-      "6. 'homework' is an array: [ { url, label }, { url, label } ] — typically quiz first, then homework image.",
-      "7. For lessons 9-11: omit the 'presentation', 'links', and 'homework' keys entirely.",
+      "6. 'quizzes' is an array of quiz links: [ { url, label } ] — a Google Form or a Quizlet set.",
+      "7. Lessons without slides, links or quizzes can omit the 'presentation', 'links' and 'quizzes' keys entirely.",
       "7. Upload studygroups.json to S3 and hard-refresh the site."
     ],
     "_fields": {
@@ -33,9 +33,25 @@
       "lessons[].presentation.url": "Relative S3 path, e.g. 'assets/presentations/filename.pdf'. Empty '' hides it.",
       "lessons[].presentation.label": "Button text, e.g. 'Lesson 8 Slides (PDF)'.",
       "lessons[].links": "Array of useful links. Each: { 'label': 'Link text', 'url': 'https://...', 'type': 'youtube' or 'docs' }. Empty array [] hides the section.",
-      "lessons[].homework": "Array of homework links. Each: { 'url': '...', 'label': '...' }. Typically 2 items: quiz + homework image. Empty url '' hides that button. Empty array [] or omit key for lessons 9-11."
+      "lessons[].quizzes": "Array of quiz links shown as buttons under the player. Each: { 'url': '...', 'label': '...' }, e.g. a Google Form quiz or a Quizlet set. Empty url '' hides that button; omit the key when there is none.",
+      "lessons[].practiceTopics": "OPTIONAL. Practice topics for this one lesson's 'Practice this lesson' button, overriding the curriculum below. Use topic names exactly as they appear in the Practice tab's Section filter.",
+      "curriculum": "Lesson title → practice topics. The same lesson titles repeat in every cohort, so the 'Practice this lesson' button is set up once here. Titles must match lessons[].topic exactly. A title mapped to [\"TIMED\"] offers a timed mock exam instead."
     },
     "_tip": "Any field with url set to empty string '' is automatically hidden from the UI. You never need to delete a field — just clear the url."
+  },
+  "curriculum": {
+    "IAM, EC2 & Storage Fundamentals": ["IAM", "EC2", "EC2 pricing", "EBS", "EFS"],
+    "High Availability, Load Balancing & Databases": ["ELB", "Auto Scaling", "Multi-AZ", "RDS", "Aurora", "ElastiCache"],
+    "Route 53 & S3 Basics": ["Route 53", "S3"],
+    "Advanced S3, Security & Global Delivery": ["S3", "S3 replication", "S3 costs", "KMS", "CloudFront", "Global Accelerator"],
+    "Integration, Messaging, Containers & Serverless": ["SQS", "SNS", "EventBridge", "Step Functions", "Kinesis", "ECS", "EKS", "Lambda", "DynamoDB"],
+    "Data, Analytics & Machine Learning on AWS": ["Athena", "Glue", "Redshift", "OpenSearch", "Analytics (general)", "Rekognition", "Polly"],
+    "Monitoring, IAM Advanced & Cloud Security": ["CloudWatch", "CloudTrail", "Config", "Organizations", "IAM Identity Center", "Cognito", "Secrets Manager", "Certificate Manager (ACM)", "WAF and Shield", "GuardDuty", "Security Hub", "Network Firewall", "Systems Manager"],
+    "Disaster Recovery & Migrations, More Solution Architectures, Other Services": ["Disaster recovery", "Multi-Region", "AWS Backup", "Migration (DMS, MGN)", "DataSync", "Snow Family", "Storage Gateway", "CloudFormation"],
+    "Hands-On Lab — S3 + CloudFront": ["S3", "CloudFront"],
+    "Hands-On Lab — EC2 & SSM": ["EC2", "Systems Manager"],
+    "Hands-On Lab — Event-Driven Rekognition + Lambda": ["Lambda", "S3", "SNS", "Rekognition"],
+    "Mock Exam Practice": ["TIMED"]
   },
   "studyGroups": [
     {
@@ -48,64 +64,64 @@
           "number": 14,
           "topic": "Mock Exam Practice",
           "date": "Oct 21, 2026",
-          "recording": { "url": "", "label": "Lesson 14 Recording" },
+          "recording": { "url": "https://drive.google.com/file/d/1qbVOMm_bwlrV9RhHpqIb-6BM3FhVOPIA/view", "label": "Lesson 14 Recording" },
           "summary": { "url": "", "label": "Lesson 14 AI Summary" }
         },
         {
           "number": 13,
           "topic": "Mock Exam Practice",
           "date": "Oct 14, 2026",
-          "recording": { "url": "", "label": "Lesson 13 Recording" },
+          "recording": { "url": "https://drive.google.com/file/d/1nmL_aw9Vr5WqhAFvYd1ElsyHXSHq7rFR/view", "label": "Lesson 13 Recording" },
           "summary": { "url": "", "label": "Lesson 13 AI Summary" }
         },
         {
           "number": 12,
           "topic": "Mock Exam Practice",
           "date": "Oct 6, 2026",
-          "recording": { "url": "", "label": "Lesson 12 Recording" },
+          "recording": { "url": "https://drive.google.com/file/d/17_KRUilfiI5_uQwU1b2NtsQF4VP_RU7v/view", "label": "Lesson 12 Recording" },
           "summary": { "url": "", "label": "Lesson 12 AI Summary" }
         },
         {
           "number": 11,
           "topic": "Disaster Recovery & Migrations, More Solution Architectures, Other Services",
           "date": "Sep 23, 2026",
-          "recording": { "url": "", "label": "Lesson 11 Recording" },
+          "recording": { "url": "https://drive.google.com/file/d/1mRODjnfDRroPxZ4ajZaRaUZMsl6m_64y/view", "label": "Lesson 11 Recording" },
           "summary": { "url": "", "label": "Lesson 11 AI Summary" },
           "presentation": { "url": "", "label": "Lesson 11 Slides (PDF)" },
-          "homework": [
-            { "url": "", "label": "Lesson 11 Quiz" }
+          "quizzes": [
+            { "url": "https://quizlet.com/il/1194203384/lesson-8-aws-disaster-recovery-strategies-and-key-services-overview-flash-cards/?i=77kjtf&x=1jqt", "label": "Quizlet flashcards" }
           ]
         },
         {
           "number": 10,
           "topic": "Monitoring, IAM Advanced & Cloud Security",
           "date": "Sep 16, 2026",
-          "recording": { "url": "", "label": "Lesson 10 Recording" },
+          "recording": { "url": "https://drive.google.com/file/d/10h0grqdckFc-JcU5PZNTabejsdZYAF_F/view", "label": "Lesson 10 Recording" },
           "summary": { "url": "", "label": "Lesson 10 AI Summary" },
           "presentation": { "url": "", "label": "Lesson 10 Slides (PDF)" },
-          "homework": [
-            { "url": "", "label": "Lesson 10 Quiz" }
+          "quizzes": [
+            { "url": "https://quizlet.com/il/1194203357/lesson-7-aws-kms-and-vpc-security-key-management-networking-and-compliance-flash-cards/?i=77kjtf&x=1jqt", "label": "Quizlet flashcards" }
           ]
         },
         {
           "number": 9,
           "topic": "Data, Analytics & Machine Learning on AWS",
           "date": "Sep 9, 2026",
-          "recording": { "url": "", "label": "Lesson 9 Recording" },
+          "recording": { "url": "https://drive.google.com/file/d/1thKlC1MCNK3Vx6QjLEjvCNlergZGP4jY/view", "label": "Lesson 9 Recording" },
           "summary": { "url": "", "label": "Lesson 9 AI Summary" },
           "presentation": { "url": "", "label": "Lesson 9 Slides (PDF)" },
-          "homework": [
-            { "url": "", "label": "Lesson 9 Quiz" }
+          "quizzes": [
+            { "url": "https://quizlet.com/il/1194203269/lesson-6-comprehensive-aws-database-monitoring-and-security-services-guide-flash-cards/?i=77kjtf&x=1jqt", "label": "Quizlet flashcards" }
           ]
         },
         {
           "number": 8,
           "topic": "Hands-On Lab — Event-Driven Rekognition + Lambda",
           "date": "Sep 7, 2026",
-          "recording": { "url": "", "label": "Lesson 8 Recording" },
+          "recording": { "url": "https://drive.google.com/file/d/1uWKdU7lb8tYGIM7ad5Ll-eHuU-49e5mA/view", "label": "Lesson 8 Recording" },
           "summary": { "url": "", "label": "Lesson 8 AI Summary" },
           "presentation": { "url": "", "label": "Lesson 8 Slides (PDF)" },
-          "homework": [
+          "quizzes": [
             { "url": "", "label": "Lesson 8 Quiz" }
           ]
         },
@@ -113,21 +129,21 @@
           "number": 7,
           "topic": "Integration, Messaging, Containers & Serverless",
           "date": "Sep 2, 2026",
-          "recording": { "url": "", "label": "Lesson 7 Recording" },
+          "recording": { "url": "https://drive.google.com/file/d/1cX9msvVcXxtr743rAdfhRyHsf9Sg2lL4/view", "label": "Lesson 7 Recording" },
           "summary": { "url": "", "label": "Lesson 7 AI Summary" },
           "presentation": { "url": "", "label": "Lesson 7 Slides (PDF)" },
-          "homework": [
-            { "url": "", "label": "Lesson 7 Quiz" }
+          "quizzes": [
+            { "url": "https://quizlet.com/il/1194203032/lesson-5-aws-messaging-and-data-streaming-services-sqs-sns-kinesis-and-more-flash-cards/?i=77kjtf&x=1jqt", "label": "Quizlet flashcards" }
           ]
         },
         {
           "number": 6,
           "topic": "Hands-On Lab — S3 + CloudFront",
           "date": "Aug 31, 2026",
-          "recording": { "url": "", "label": "Lesson 6 Recording" },
+          "recording": { "url": "https://drive.google.com/file/d/13h3M6wvfINpYn_tcNMXFheH7VoyEbKL3/view", "label": "Lesson 6 Recording" },
           "summary": { "url": "", "label": "Lesson 6 AI Summary" },
           "presentation": { "url": "", "label": "Lesson 6 Slides (PDF)" },
-          "homework": [
+          "quizzes": [
             { "url": "", "label": "Lesson 6 Quiz" }
           ]
         },
@@ -135,21 +151,21 @@
           "number": 5,
           "topic": "Advanced S3, Security & Global Delivery",
           "date": "Aug 26, 2026",
-          "recording": { "url": "", "label": "Lesson 5 Recording" },
+          "recording": { "url": "https://drive.google.com/file/d/1tfr4NTtxUnIaSQ4Kk1XqvkNC4VsFcSJH/view", "label": "Lesson 5 Recording" },
           "summary": { "url": "", "label": "Lesson 5 AI Summary" },
           "presentation": { "url": "", "label": "Lesson 5 Slides (PDF)" },
-          "homework": [
-            { "url": "", "label": "Lesson 5 Quiz" }
+          "quizzes": [
+            { "url": "https://quizlet.com/il/1194202880/lesson-4-comprehensive-guide-to-amazon-s3-lifecycle-security-and-performance-features-flash-cards/?i=77kjtf&x=1jqt", "label": "Quizlet flashcards" }
           ]
         },
         {
           "number": 4,
           "topic": "Hands-On Lab — EC2 & SSM",
           "date": "Aug 24, 2026",
-          "recording": { "url": "", "label": "Lesson 4 Recording" },
+          "recording": { "url": "https://drive.google.com/file/d/1zH65xK_Mg7-2C7_rlG7LtWEhopsJFNli/view", "label": "Lesson 4 Recording" },
           "summary": { "url": "", "label": "Lesson 4 AI Summary" },
           "presentation": { "url": "", "label": "Lesson 4 Slides (PDF)" },
-          "homework": [
+          "quizzes": [
             { "url": "", "label": "Lesson 4 Quiz" }
           ]
         },
@@ -157,33 +173,33 @@
           "number": 3,
           "topic": "Route 53 & S3 Basics",
           "date": "Aug 19, 2026",
-          "recording": { "url": "", "label": "Lesson 3 Recording" },
+          "recording": { "url": "https://drive.google.com/file/d/1JxeC5EYR5vN6OwU2998ltkPrHzYpOgpH/view", "label": "Lesson 3 Recording" },
           "summary": { "url": "", "label": "Lesson 3 AI Summary" },
           "presentation": { "url": "", "label": "Lesson 3 Slides (PDF)" },
-          "homework": [
-            { "url": "", "label": "Lesson 3 Quiz" }
+          "quizzes": [
+            { "url": "https://quizlet.com/il/1193129713/lesson-3-aws-s3-and-route-53-storage-policies-and-dns-routing-flash-cards/?i=77kjtf&x=1jqt", "label": "Quizlet flashcards" }
           ]
         },
         {
           "number": 2,
           "topic": "High Availability, Load Balancing & Databases",
           "date": "Aug 12, 2026",
-          "recording": { "url": "", "label": "Lesson 2 Recording" },
+          "recording": { "url": "https://drive.google.com/file/d/1-rckwz08SK6V0RKFKMwalZPJ-gFweoZD/view", "label": "Lesson 2 Recording" },
           "summary": { "url": "", "label": "Lesson 2 AI Summary" },
           "presentation": { "url": "", "label": "Lesson 2 Slides (PDF)" },
-          "homework": [
-            { "url": "", "label": "Lesson 2 Quiz" }
+          "quizzes": [
+            { "url": "https://quizlet.com/il/1194202003/lesson-2-aws-high-availability-load-balancers-auto-scaling-rds-elasticache-key-concepts-and-best-practices-flash-cards/?i=77kjtf&x=1jqt", "label": "Quizlet flashcards" }
           ]
         },
         {
           "number": 1,
           "topic": "IAM, EC2 & Storage Fundamentals",
           "date": "Aug 5, 2026",
-          "recording": { "url": "", "label": "Lesson 1 Recording" },
+          "recording": { "url": "https://drive.google.com/file/d/1C-8BDzzUmHjEUQ5y-Ne-3sJuooET0Rlj/view", "label": "Lesson 1 Recording" },
           "summary": { "url": "", "label": "Lesson 1 AI Summary" },
           "presentation": { "url": "", "label": "Lesson 1 Slides (PDF)" },
-          "homework": [
-            { "url": "", "label": "Lesson 1 Quiz" }
+          "quizzes": [
+            { "url": "https://quizlet.com/il/1194201456/lesson-1-aws-iam-ec2-and-storage-key-concepts-for-security-and-optimization-flash-cards/?i=77kjtf&x=1jqt", "label": "Quizlet flashcards" }
           ]
         }
       ]
@@ -222,7 +238,7 @@
           "recording": { "url": "https://drive.google.com/file/d/1GGj1TzF9EQ5t0W033QPmeVBRaiaWEOKQ/view?usp=drive_link", "label": "Lesson 8 Recording" },
           "summary": { "url": "https://drive.google.com/file/d/1HR35OBic5C14D-2Oz6W_JqN17A_Oz5m4/view?usp=drive_link", "label": "Lesson 8 AI Summary" },
           "presentation": { "url": "https://drive.google.com/file/d/1Ls5fVCG8h45_14M_eeceNI9MOZTO-L0z/view?usp=drive_link", "label": "Lesson 8 Slides (PDF)" },
-          "homework": [
+          "quizzes": [
             { "url": "https://docs.google.com/forms/d/e/1FAIpQLSfUhKlLqPIObvCqvTTs8nH18uf1IE_i1UMp6nx2GMzmsld9hQ/viewform?usp=dialog", "label": "Lesson 8 Quiz" }
           ]
         },
@@ -233,7 +249,7 @@
           "recording": { "url": "https://drive.google.com/file/d/1r3hstYtF7WbQec6-T3mESNKWRTMYpluj/view?usp=drive_link", "label": "Lesson 7 Recording" },
           "summary": { "url": "https://drive.google.com/file/d/16PnhRQiN_xCNtOFDRVoPcg9grLfpswHU/view?usp=drive_link", "label": "Lesson 7 AI Summary" },
           "presentation": { "url": "https://drive.google.com/file/d/1HEk9ut6I22ih_XMyk4BnbCXN6qVoTHYM/view?usp=drive_link", "label": "Lesson 7 Slides (PDF)" },
-          "homework": [
+          "quizzes": [
             { "url": "https://docs.google.com/forms/d/e/1FAIpQLSfaNrTSKtCoZuDjml_Q7Cwe_9DeheRu3FFwZlXzGs9yRDoF5w/viewform?usp=dialog", "label": "Lesson 7 Quiz" }
           ]
         },
@@ -244,7 +260,7 @@
           "recording": { "url": "https://drive.google.com/file/d/1ByEkACe4_xwqscMGMA8m2akcPF-ShH5W/view?usp=drive_link", "label": "Lesson 6 Recording" },
           "summary": { "url": "https://drive.google.com/file/d/1x9SNq4LcxC-qTzRoKyVJ3snseObadoZA/view?usp=drive_link", "label": "Lesson 6 AI Summary" },
           "presentation": { "url": "https://drive.google.com/file/d/1izvUfRqMPdD-Z7j09LSpgfyCdU3gnSS_/view?usp=drive_link", "label": "Lesson 6 Slides (PDF)" },
-          "homework": [
+          "quizzes": [
             { "url": "https://docs.google.com/forms/d/e/1FAIpQLScwDgmyjT_QcCqzkMu7F6ZJypdgvonJhce3WXhqy0gYGHyJcg/viewform?usp=dialog", "label": "Lesson 6 Quiz" }
           ]
         },
@@ -255,7 +271,7 @@
           "recording": { "url": "https://drive.google.com/file/d/1ZoxpgfMreFZK3sLgAxxu304Hos9NV8t5/view?usp=drive_link", "label": "Lesson 5 Recording" },
           "summary": { "url": "https://drive.google.com/file/d/1G_nKNHlZA9_a7zLR-HEANWzw1AuAGJLp/view?usp=drive_link", "label": "Lesson 5 AI Summary" },
           "presentation": { "url": "https://drive.google.com/file/d/1IYb4SK54tGgcvZZAJ0Vpq8rtnKDmaBSe/view?usp=drive_link", "label": "Lesson 5 Slides (PDF)" },
-          "homework": [
+          "quizzes": [
             { "url": "https://docs.google.com/forms/d/e/1FAIpQLScfGRYZHoVRDx4fH_gUv-1dx2m7h1av8qErQAuoA2IfhobNIQ/viewform?usp=dialog", "label": "Lesson 5 Quiz" }
           ]
         },
@@ -266,7 +282,7 @@
           "recording": { "url": "https://drive.google.com/file/d/12Py4CtlGHe-c8cYqOtRZJnPLHQUmS5Zy/view?usp=drive_link", "label": "Lesson 4 Recording" },
           "summary": { "url": "https://drive.google.com/file/d/15PX9tBeWebebW-uYsr8A837KngE1X2n6/view?usp=drive_link", "label": "Lesson 4 AI Summary" },
           "presentation": { "url": "https://drive.google.com/file/d/1UddxR-19Tpid0x8ogMxYw1uItMxttl-L/view?usp=drive_link", "label": "Lesson 4 Slides (PDF)" },
-          "homework": [
+          "quizzes": [
             { "url": "https://docs.google.com/forms/d/e/1FAIpQLSd_znglOB6yGNvxCwl6lQ8HdADZgxDGmPEh1Nk38E_3O3ZIVQ/viewform?usp=dialog", "label": "Lesson 4 Quiz" }
           ]
         },
@@ -277,7 +293,7 @@
           "recording": { "url": "https://drive.google.com/file/d/1VojHRZOleV0DUe1bgOO13gHbYVrveqgy/view?usp=drive_link", "label": "Lesson 3 Recording" },
           "summary": { "url": "https://drive.google.com/file/d/1_V81bplCGeUNoQ1exx1i5-Hhl_o6bvHj/view?usp=drive_link", "label": "Lesson 3 AI Summary" },
           "presentation": { "url": "https://drive.google.com/file/d/1kPd_gncRxX2VbGezzlJS7ms0-o2996NR/view?usp=drive_link", "label": "Lesson 3 Slides (PDF)" },
-          "homework": [
+          "quizzes": [
             { "url": "https://docs.google.com/forms/d/e/1FAIpQLScE7naR_IsnYZXt_wm5wTZQtUWvuTokthsAQUL9XnvXmUzvUg/viewform?usp=dialog", "label": "Lesson 3 Quiz" }
           ]
         },
@@ -288,7 +304,7 @@
           "recording": { "url": "https://drive.google.com/file/d/1ukGbXi6Htof7-tzieQhBLg9PZkqamYMb/view?usp=drive_link", "label": "Lesson 2 Recording" },
           "summary": { "url": "https://drive.google.com/file/d/1qbDpfWdybO29HXhM-tkWCJjMXf2SQVnb/view?usp=drive_link", "label": "Lesson 2 AI Summary" },
           "presentation": { "url": "https://drive.google.com/file/d/1qyGMPD1bs27y9DY9watFlXx0JMuKL0JA/view?usp=drive_link", "label": "Lesson 2 Slides (PDF)" },
-          "homework": [
+          "quizzes": [
             { "url": "https://docs.google.com/forms/d/e/1FAIpQLScKvHl3zdFdArcyV69FJux9ysjFAtCZ02GdwiKAjuLZr_kkkg/viewform?usp=dialog", "label": "Lesson 2 Quiz" }
           ]
         },
@@ -299,7 +315,7 @@
           "recording": { "url": "https://drive.google.com/file/d/1M8w784P6igcxxw4LRAu63T5iqS5fI5OS/view?usp=drive_link", "label": "Lesson 1 Recording" },
           "summary": { "url": "https://drive.google.com/file/d/1-nU6sULnXauHsvhzXGgpgI9vZK9kVYSa/view?usp=drive_link", "label": "Lesson 1 AI Summary" },
           "presentation": { "url": "https://drive.google.com/file/d/1cegOK0iKMdMDRvwuVbpVsxU9UX50MPTL/view?usp=drive_link", "label": "Lesson 1 Slides (PDF)" },
-          "homework": [
+          "quizzes": [
             { "url": "https://docs.google.com/forms/d/e/1FAIpQLSfn9XIb8uMeg48yDYUocIcR_vJD9Mseq4bmnlLja9AhHRcITg/viewform?usp=sharing&ouid=111223103749240751177", "label": "Lesson 1 Quiz" }
           ]
         }
@@ -341,9 +357,8 @@
           "presentation": { "url": "assets/presentations/SG3_Lesson8.pdf", "label": "Lesson 8 Slides (PDF)" },
           "links": [
             ],
-          "homework": [
-            { "url": "https://docs.google.com/forms/d/e/1FAIpQLSdObG0xH05sG_6EpIvYohfo_svOI6li254aQgQAiJqrX2mOKw/viewform?usp=sharing&ouid=111223103749240751177", "label": "Lesson 8 Quiz" },
-            { "url": "https://drive.google.com/file/d/1Nws3GZ1BN2YHBc9aRPvRA7lRm4AGOQPD/view?usp=drive_link", "label": "Lesson 8 Homework" }
+          "quizzes": [
+            { "url": "https://docs.google.com/forms/d/e/1FAIpQLSdObG0xH05sG_6EpIvYohfo_svOI6li254aQgQAiJqrX2mOKw/viewform?usp=sharing&ouid=111223103749240751177", "label": "Lesson 8 Quiz" }
           ]
         },
         {
@@ -354,8 +369,7 @@
           "summary": { "url": "https://drive.google.com/file/d/1dznBPjGsG7nHirKno66cAdEM-5ysSaRr/view?usp=drive_link", "label": "Lesson 7 AI Summary" },
           "presentation": { "url": "assets/presentations/SG3_Lesson7.pdf", "label": "Lesson 7 Slides (PDF)" },
           "links": [],
-          "homework": [{ "url": "https://docs.google.com/forms/d/e/1FAIpQLSd6WiAvByq9orCvvU261HycKhm0n_2rilurkSUrirvRVTzuBQ/viewform?usp=sharing&ouid=111223103749240751177", "label": "Lesson 7 Quiz" },
-          {"url":"https://drive.google.com/file/d/1GI2rzR6_a_llrjnJ0NGVDUFxCoiLJe8P/view?usp=drive_link", "label":"Lesson 7 Homework"}
+          "quizzes": [{ "url": "https://docs.google.com/forms/d/e/1FAIpQLSd6WiAvByq9orCvvU261HycKhm0n_2rilurkSUrirvRVTzuBQ/viewform?usp=sharing&ouid=111223103749240751177", "label": "Lesson 7 Quiz" }
         ]
         },
         {
@@ -366,8 +380,7 @@
           "summary": { "url": "https://drive.google.com/file/d/13HU324-oFhi0PgzYTRTDq5_U-y3zNlwA/view?usp=drive_link", "label": "Lesson 6 AI Summary" },
           "presentation": { "url": "assets/presentations/SG3_Lesson6.pdf", "label": "Lesson 6 Slides (PDF)" },
           "links": [],
-          "homework": [{ "url": "https://docs.google.com/forms/d/e/1FAIpQLSfDHcIeYkq6tbTvkBlz_2Quy70GSFcrMAHUsN4ZAH9B-ECOrA/viewform?usp=sharing", "label": "Lesson 6 Quiz" },
-          {"url":"https://drive.google.com/file/d/1lwJo56WI82wG6MDOL80ag6g8ccLhoW31/view?usp=drive_link", "label":"Lesson 6 Homework"}
+          "quizzes": [{ "url": "https://docs.google.com/forms/d/e/1FAIpQLSfDHcIeYkq6tbTvkBlz_2Quy70GSFcrMAHUsN4ZAH9B-ECOrA/viewform?usp=sharing", "label": "Lesson 6 Quiz" }
         ]
         },
         {
@@ -378,8 +391,7 @@
           "summary": { "url": "https://drive.google.com/file/d/1lR0tD1YPUUJ56fcAw9j3pLmKENz03fj2/view?usp=drive_link", "label": "Lesson 5 AI Summary" },
           "presentation": { "url": "assets/presentations/SG3_Lesson5.pdf", "label": "Lesson 5 Slides (PDF)" },
           "links": [],
-          "homework": [{ "url": "https://docs.google.com/forms/d/e/1FAIpQLSdgNGzXLWCpsl1vCwZdv_Ko57iCvHhhwG6J_5Bano24HoXreQ/viewform?usp=sharing&ouid=111223103749240751177", "label": "Lesson 5 Quiz" },
-          {"url":"https://drive.google.com/file/d/14NSZXCtupR5CRad_4_s758XthC4xneZA/view?usp=drive_link", "label":"Lesson 5 Homework"}
+          "quizzes": [{ "url": "https://docs.google.com/forms/d/e/1FAIpQLSdgNGzXLWCpsl1vCwZdv_Ko57iCvHhhwG6J_5Bano24HoXreQ/viewform?usp=sharing&ouid=111223103749240751177", "label": "Lesson 5 Quiz" }
         ]
         },
         {
@@ -390,8 +402,7 @@
           "summary": { "url": "https://drive.google.com/file/d/15ELTIU3wa0OVfUHxtYtGqvuKXUhSR7VI/view?usp=drive_link", "label": "Lesson 4 AI Summary" },
           "presentation": { "url": "assets/presentations/SG3_Lesson4.pdf", "label": "Lesson 4 Slides (PDF)" },
           "links": [],
-          "homework": [{ "url": "https://docs.google.com/forms/d/e/1FAIpQLSc5qos2bINNDxwUD5JWBPS4LcmLRNto7mMbjlPsbgaJB9x_4g/viewform?usp=sharing&ouid=111223103749240751177", "label": "Lesson 4 Quiz" },
-          {"url":"https://drive.google.com/file/d/1a9Vhe4gH3rRzk3QG7KNReq6RcUYmvDNp/view?usp=drive_link", "label":"Lesson 4 Homework"}
+          "quizzes": [{ "url": "https://docs.google.com/forms/d/e/1FAIpQLSc5qos2bINNDxwUD5JWBPS4LcmLRNto7mMbjlPsbgaJB9x_4g/viewform?usp=sharing&ouid=111223103749240751177", "label": "Lesson 4 Quiz" }
         ]
         },
         {
@@ -402,8 +413,7 @@
           "summary": { "url": "https://drive.google.com/file/d/1TbQgEianTFEnsHYEmtaLaRPCl_AMnIA7/view?usp=drive_link", "label": "Lesson 3 AI Summary" },
           "presentation": { "url": "assets/presentations/SG3_Lesson3.pdf", "label": "Lesson 3 Slides (PDF)" },
           "links": [],
-          "homework": [{ "url": "https://docs.google.com/forms/d/e/1FAIpQLScl8AvdF2GgX67_4TrJ-50PY18j7doD_XV_cW_pPFLNwtmsbA/viewform?usp=sharing&ouid=111223103749240751177", "label": "Lesson 3 Quiz" },
-          {"url":"https://drive.google.com/file/d/1VNx7-pI3vAmN8qnb5SUZ7DroPRz_eI9z/view?usp=drive_link", "label":"Lesson 3 Homework"}
+          "quizzes": [{ "url": "https://docs.google.com/forms/d/e/1FAIpQLScl8AvdF2GgX67_4TrJ-50PY18j7doD_XV_cW_pPFLNwtmsbA/viewform?usp=sharing&ouid=111223103749240751177", "label": "Lesson 3 Quiz" }
         ]
         },
         {
@@ -414,8 +424,7 @@
           "summary": { "url": "https://drive.google.com/file/d/1EyU3m75VEGFSyrhkRaZboBxoP-hIupdp/view?usp=drive_link", "label": "Lesson 2 AI Summary" },
           "presentation": { "url": "assets/presentations/SG3_Lesson2.pdf", "label": "Lesson 2 Slides (PDF)" },
           "links": [],
-          "homework":[ { "url": "https://docs.google.com/forms/d/e/1FAIpQLScec2fRc9dsNT-x6RoJ496YvcBswC4tttPFEFniziqlEqw58A/viewform?usp=sharing&ouid=111223103749240751177", "label": "Lesson 2 Quiz" },
-                      {"url":"https://drive.google.com/file/d/1bEbijAuQFNY9Xam9B7ljAhBRUWHgAtkW/view?usp=drive_link", "label":"Lesson 2 Homework"}
+          "quizzes": [ { "url": "https://docs.google.com/forms/d/e/1FAIpQLScec2fRc9dsNT-x6RoJ496YvcBswC4tttPFEFniziqlEqw58A/viewform?usp=sharing&ouid=111223103749240751177", "label": "Lesson 2 Quiz" }
         ]
         },
         {
@@ -426,8 +435,7 @@
           "summary": { "url": "https://docs.google.com/document/d/1CeMc0sQoRNLSBjJBqyrcSZ5K6rivqSdi/edit?usp=drive_link&ouid=111223103749240751177&rtpof=true&sd=true", "label": "Lesson 1 AI Summary" },
           "presentation": { "url": "assets/presentations/SG3_Lesson1.pdf", "label": "Lesson 1 Slides (PDF)" },
           "links": [],
-          "homework":[ { "url": "https://docs.google.com/forms/d/e/1FAIpQLScNW2BvDufubHr4Oe4SQVg4UUurRRrb2hE0QrAcRt8o6V8PKA/viewform?usp=sharing&ouid=111223103749240751177", "label": "Lesson 1 Quiz" },
-                      {"url":"https://drive.google.com/file/d/1FXiDK6FJ0XmQxsR0k_IzLtEkGXzIe5Jj/view", "label":"Lesson 1 Homework"}
+          "quizzes": [ { "url": "https://docs.google.com/forms/d/e/1FAIpQLScNW2BvDufubHr4Oe4SQVg4UUurRRrb2hE0QrAcRt8o6V8PKA/viewform?usp=sharing&ouid=111223103749240751177", "label": "Lesson 1 Quiz" }
           ]
         }
       ]

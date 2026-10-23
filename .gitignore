@@ -51,13 +51,11 @@ scripts/*-backup*.json
 scripts/*-with-explanations*.json
 scripts/generation-progress.json
 scripts/questions-with-explanations-fixed.json
-docs/QUESTION-GENERATION.md
 scripts/aws-services-list.json
 scripts/remove-duplicates.js
 
 # Binary assets served directly from S3 — do not commit
 assets/presentations/
-assetspresentations/
 AWS Icons/
 
 # students.txt kept local — contains real student IAM usernames
@@ -70,4 +68,11 @@ graphify-out/
 scripts/
 cohort-labs/scripts/
 cohort-labs/**/iam-policy.json
-docs/EXPLANATION-GENERATION.md
+
+# Internal docs and planning notes (question generation, cohort schedules) — kept local only
+docs/
+
+# Redesign working files — kept local only
+.taste-skill/
+CLAUDE.md
+REDESIGN-PROGRESS.md
