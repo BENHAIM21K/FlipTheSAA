@@ -1,78 +1,46 @@
-# OS-specific files
 .DS_Store
 Thumbs.db
 Desktop.ini
 .AppleDouble
 .LSOverride
 ._*
-
-# IDE/Editor folders
 .vscode/
 .idea/
 *.sublime-project
 *.sublime-workspace
-
-# Vim swap files
 *.swp
 *.swo
 *~
-
-# Claude AI (LOCAL CONFIGURATION - DO NOT COMMIT)
 .claude/
-
-# Logs
 *.log
-
-# Temporary and backup files
 *.tmp
 *.temp
 *.bak
 *.backup
-
-# Optional: Uncomment if you add environment files later
-# .env
-# .env.local
-# .env.*.local
-
-# Node.js
 node_modules/
 package.json
 package-lock.json
-
-# Root-level generated and backup files
 generation-progress.json
 questions-backup.json
 questions-with-explanations.json
 questions-with-explanations-backup-before-fix.json
 new-questions-*.json
-
-# Generated files and temporary data in scripts folder
 scripts/*-backup*.json
 scripts/*-with-explanations*.json
 scripts/generation-progress.json
 scripts/questions-with-explanations-fixed.json
 scripts/aws-services-list.json
 scripts/remove-duplicates.js
-
-# Binary assets served directly from S3 — do not commit
 assets/presentations/
 AWS Icons/
-
-# students.txt kept local — contains real student IAM usernames
 cohort-labs/**/students.txt
-
-# Graphify knowledge graph output
 graphify-out/
-
-# Internal ops scripts and IAM policy documents — kept local only, not published
 scripts/
 cohort-labs/scripts/
 cohort-labs/**/iam-policy.json
-
-# Internal docs and planning notes (question generation, cohort schedules) — kept local only
 docs/
-
-# Redesign working files — kept local only
+docs/aws-slides/
+AWS Certified Solutions Architect Slides*.pdf
 .taste-skill/
 CLAUDE.md
 REDESIGN-PROGRESS.md

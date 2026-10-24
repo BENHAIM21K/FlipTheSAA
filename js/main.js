@@ -325,19 +325,25 @@ document.addEventListener('click', (e) => {
 });
 
 /**
- * HAMBURGER MENU TOGGLE (Mobile)
+ * HAMBURGER MENU (Mobile): the button toggles the menu; a click outside it closes it
+ *
+ * WHY ONE HANDLER: toggling swaps the button's icon, which detaches the tapped
+ * <svg>; a separate outside-click listener then saw no hamburger ancestor and
+ * closed the menu it had just opened (taps on the icon itself "didn't work").
  */
 document.addEventListener('click', (e) => {
+  const navMenu = document.getElementById('navMenu');
+  if (!navMenu) return;
   const hamburger = e.target.closest('.nav-hamburger');
   if (hamburger) {
-    e.stopPropagation();
-    const navMenu = document.getElementById('navMenu');
-    if (navMenu) {
-      const isOpen = navMenu.classList.toggle('open');
-      hamburger.setAttribute('aria-expanded', String(isOpen));
-      hamburger.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
-      hamburger.innerHTML = icon(isOpen ? 'x' : 'menu');
-    }
+    const isOpen = navMenu.classList.toggle('open');
+    hamburger.setAttribute('aria-expanded', String(isOpen));
+    hamburger.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
+    hamburger.innerHTML = icon(isOpen ? 'x' : 'menu');
+    return;
+  }
+  if (navMenu.classList.contains('open') && !e.target.closest('.nav-menu')) {
+    closeMobileMenu();
   }
 });
 
@@ -442,7 +448,7 @@ document.addEventListener('click', async (e) => {
 });
 
 /**
- * SHARE (timed exam results): "Share your pass" opens the share dialog
+ * SHARE (timed exam results): "Share your achievement" opens the share dialog
  */
 initShareDialog();
 document.addEventListener('click', (e) => {
@@ -537,22 +543,6 @@ document.addEventListener('keydown', (e) => {
   if (!el || el !== e.target || el.tagName === 'BUTTON') return;
   e.preventDefault();
   el.click();
-});
-
-/**
- * CLOSE MOBILE MENU ON OUTSIDE CLICK
- */
-document.addEventListener('click', (e) => {
-  const navMenu = document.getElementById('navMenu');
-  const hamburger = e.target.closest('.nav-hamburger');
-  const isInsideMenu = e.target.closest('.nav-menu');
-
-  if (navMenu &&
-      navMenu.classList.contains('open') &&
-      !hamburger &&
-      !isInsideMenu) {
-    closeMobileMenu();
-  }
 });
 
 /**

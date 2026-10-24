@@ -38,8 +38,7 @@
       "name": "FlipTheScript AWS SAA Playlist",
       "type": "youtube",
       "description": "Our own study-group lessons on YouTube: the FlipTheScript AWS Solutions Architect Associate playlist.",
-      "url": "https://www.youtube.com/playlist?list=PLMWdwVOajttc",
-      "logo": "assets/resource-logos/flipthescript.jpg"
+      "url": "https://www.youtube.com/playlist?list=PLMWdwVOajttc"
     },
     {
       "name": "Stephane Maarek",

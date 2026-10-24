@@ -794,7 +794,7 @@ export function showResults(state, autoEnded) {
           ${s.passed ? '<span class="pill pill-positive">Passed</span>' : '<span class="pill pill-negative">Below 720</span>'}
         </div>
         <div class="result-meta">${gap >= 0 ? `${gap} points above` : `${-gap} points below`} the 720 pass mark · ${s.answeredTotal} of ${s.totalQuestions} answered</div>
-        ${canShare(session, s) ? `<div class="result-actions"><button class="btn btn-primary" type="button" data-share="${s.points}">${icon("share")} Share your pass</button></div>` : ''}
+        ${canShare(session, s) ? `<div class="result-actions"><button class="btn btn-primary" type="button" data-share="${s.points}">${icon("share")} Share your achievement</button></div>` : ''}
       </div>
       ${flaggedHtml}
       <h3 class="result-review-title">Review every question</h3>

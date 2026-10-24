@@ -52,7 +52,7 @@ FlipTheSAA v2.0 is a full redesign of the site, covering every tab, the code und
 - Cheat-sheet cards open a side drawer with every keyword and a "Practice this service" button
 - **Commonly confused:** 8 side-by-side comparisons (SQS vs SNS vs EventBridge vs Kinesis, ALB vs NLB vs GWLB, …) with exam traps
 
-**Share your pass**
+**Share your achievement**
 - Pass a timed mock exam and share it on LinkedIn or WhatsApp. Your post shows a certificate-style card with your score and links people to FlipTheSAA
 
 **Under the hood**
@@ -116,9 +116,9 @@ Narrow questions by:
 - **Review before submitting (Timed):** End exam lists your unanswered and flagged questions and lets you go back to them first, like the real exam's review screen.
 - **Folded setup:** while a session runs, the setup panel folds into one line ("Timed exam · 65 questions · All difficulties"), with a Change button.
 
-### Share Your Pass
+### Share Your Achievement
 
-After a timed mock exam scored 720 or above, **Share your pass** opens a share dialog. It shows a certificate-style card with your score, and the post text, which you can edit. One click opens LinkedIn or WhatsApp, and the link in the post shows the card as its preview and brings people to FlipTheSAA.
+After a timed mock exam scored 720 or above, **Share your achievement** opens a share dialog. It shows a certificate-style card with your score, and the post text, which you can edit. One click opens LinkedIn or WhatsApp, and the link in the post shows the card as its preview and brings people to FlipTheSAA.
 
 ---
 
@@ -190,7 +190,7 @@ Both filters work together — search narrows the active category, and selecting
 2. Select **Timed Exam** (always the full 65 questions)
 3. Click **Start fresh (new shuffle)** and treat it like the real thing
 4. After submitting, review every question, then go to **Performance** to see your trend, your weakest domain and your mistake drill
-5. Passed? Press **Share your pass**
+5. Passed? Press **Share your achievement**
 
 ### Catching up on a study group
 1. Go to **Study groups**

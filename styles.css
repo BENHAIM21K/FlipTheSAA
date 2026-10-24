@@ -47,7 +47,6 @@
   --grid: #e5e7ea;
 
   /* the brand mark's ground: AWS squid ink */
-  --brand-ground: #232f3e;
 
   /* type: one grotesk, a mono with one job (question IDs and the exam clock) */
   --font: "IBM Plex Sans", Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -108,7 +107,6 @@
   --pill-warning-bg: #2b2414;  --pill-warning-ink: #e5a93b;
   --pill-neutral-bg: #24282c;  --pill-neutral-ink: #f1f3f4;
   --grid: #2a2e33;
-  --brand-ground: #2c3b4f;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -140,7 +138,6 @@
     --pill-warning-bg: #2b2414;  --pill-warning-ink: #e5a93b;
     --pill-neutral-bg: #24282c;  --pill-neutral-ink: #f1f3f4;
     --grid: #2a2e33;
-    --brand-ground: #2c3b4f;
   }
 }
 
@@ -215,8 +212,7 @@ a { color: inherit; }
   text-decoration: none;
   border-radius: var(--radius-control);
 }
-.brand-mark { width: 28px; height: 28px; flex: none; }
-.brand-mark-ground { fill: var(--brand-ground); }
+.brand-mark { width: 28px; height: 28px; flex: none; border-radius: 7px; object-fit: cover; }
 .brand-text { display: flex; flex-direction: column; line-height: 16px; }
 .brand-name { font-weight: 600; font-size: 15px; letter-spacing: -0.01em; }
 .brand-scope { color: var(--faint); font-size: var(--fs-small); }
@@ -1810,6 +1806,7 @@ a { color: inherit; }
     color: var(--text);
     cursor: pointer;
   }
+  .nav-hamburger .icon { pointer-events: none; }
   .topbar-title { color: var(--text); font-weight: 600; }
   .topbar-link { display: none; }
   .icon-btn { width: 44px; height: 44px; }
