@@ -1,4 +1,5 @@
 // FlipTheSAA — Entry point: startup and event wiring
+import './debug-loader.js';  // first, so the owner's private debug mode (git-ignored js/debug.local.js) can start before the app
 import { exportProgress, importProgress } from './backup.js';
 import { EXAM_TOTAL_QUESTIONS, TAB_KEY } from './config.js';
 import { difficultyDropdown, difficultyPanel, difficultyTrigger, domainDropdown, domainPanel, domainTrigger, hintText, modeDropdown, modePanel, modeTrigger, newSessionBtn, nextBtn, prevBtn, quizCard, sectionButtons, sectionDropdown, sectionPanel, sectionTrigger, startBtn, submitBtn } from './dom.js';
@@ -44,11 +45,11 @@ import { confirmDialog, icon, normalizeMode, safeOperation } from './util.js';
       - Always full 65-question exam (no filtering)
       - 130 minutes timer (2 hours 10 minutes)
       - No feedback until you submit/time runs out
-      - Only 50 random questions are scored (hidden from user)
+      - Only 50 random questions are scored; the other 15 are unscored (marked "Unscored" in the results)
       - Simulates real AWS exam experience
 
    SCORING RULES:
-   - TIMED: 65 questions total, 50 random scored → 1000 max (50 × 20 = 1000)
+   - TIMED: 65 questions total, 50 random scored; each scored question has its own point value (js/scoring.js, from its length and content, computed per exam) and the 50 add up to exactly 1000
    - REVIEW: All questions scored → (correct/total) × 1000
    - PASSING: 720/1000 points (72%) in both modes
 
@@ -453,7 +454,7 @@ document.addEventListener('click', async (e) => {
 initShareDialog();
 document.addEventListener('click', (e) => {
   const btn = e.target.closest('[data-share]');
-  if (btn) openShareDialog(Number(btn.dataset.share));
+  if (btn) openShareDialog();
 });
 
 /**
@@ -804,7 +805,11 @@ submitBtn.addEventListener("click", async () => {
     const choice = await submitReviewDialog(state.session);
     if (choice === 'flagged' || choice === 'unanswered') {
       const latest = normalizeStateForRuntime(loadState());
-      if (latest && latest.session && !latest.session.completed) reviewQuestions(latest, choice);
+      if (latest && latest.session && !latest.session.completed) {
+        // Going back to questions means working again: end the pause first
+        if (S.quizPausedState !== null) togglePause(latest);
+        reviewQuestions(latest, choice);
+      }
       return;
     }
     if (choice !== 'submit') {

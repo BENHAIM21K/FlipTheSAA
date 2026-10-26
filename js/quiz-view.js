@@ -1,12 +1,14 @@
 // FlipTheSAA — Rendering the question, the question map and the results
 import { isChoiceSelected, isCorrectAnswer, isMultiAnswer } from './answers.js';
+import { correctPositions, orderFromSession } from './choice-order.js';
 import { PASSING_SCORE } from './config.js';
 import { jumpGrid, metaText, nextBtn, prevBtn, progressText, questionBox, quizCard, resultBox, scoreMini, submitBtn, timerEl } from './dom.js';
 import { computeScore, ensureTimer, getCurrentQuestion, persistRuntimeState, setPauseButton, stopTimer, toggleFlag, updateTimerUI } from './exam.js';
 import { recordSessionToHistory } from './history.js';
 import { canShare } from './share.js';
 import { S } from './state.js';
-import { escapeHtml, icon } from './util.js';
+import { recordShownLayout } from './storage.js';
+import { escapeHtml, icon, safeUrl } from './util.js';
 
 /**
  * WHAT IT DOES: Renders the jump grid (question number buttons)
@@ -339,16 +341,16 @@ export function renderQuiz(state) {
 
   // Controls enable/disable
   if (isPaused) {
-    // Disable all navigation when paused
+    // Disable question navigation when paused. End exam stays available: leaving the Practice tab pauses a
+    // timed exam by itself, and a disabled End exam made it look broken
     prevBtn.disabled = true;
     nextBtn.disabled = true;
-    submitBtn.disabled = true;
   } else {
     // Normal navigation rules
     prevBtn.disabled = idx === 0;
     nextBtn.disabled = idx === session.questionIds.length - 1;
-    submitBtn.disabled = session.completed;
   }
+  submitBtn.disabled = session.completed;
 
   // Submit button logic
   submitBtn.textContent = session.mode === "timed" ? "End exam" : "Finish";
@@ -377,8 +379,14 @@ export function renderQuiz(state) {
   const canStrike = !revealAnswers && !isDisabled && !session.completed;
   const eliminated = new Set((session.eliminated && session.eliminated[q.id]) || []);
 
-  const choicesHtml = q.choices
-    .map((c, i) => {
+  // The order this session shows the choices in (older sessions have none and keep the original order).
+  // Everything stored (answers, cross-outs) stays in ORIGINAL indexes; only the letter and the position change.
+  const order = orderFromSession(session, q);
+  recordShownLayout(q.id, correctPositions(q, order)); // so the next session puts the correct answer elsewhere
+
+  const choicesHtml = order
+    .map((i, pos) => {
+      const c = q.choices[i];
       let cls = "choice";
       const isOut = !revealAnswers && eliminated.has(i);
 
@@ -403,7 +411,7 @@ export function renderQuiz(state) {
       // Add aria-disabled for accessibility
       const ariaDisabled = (session.completed || isDisabled) ? "aria-disabled='true'" : "";
       const pressed = isChoiceSelected(selected, i) ? "true" : "false";
-      const key = String.fromCharCode(65 + i); // A, B, C, D, E
+      const key = String.fromCharCode(65 + pos); // A, B, C, D, E: the position it is shown in
 
       const choiceHtml = `<div class="${cls}" data-choice="${i}" role="button" tabindex="${isDisabled ? -1 : 0}" aria-pressed="${pressed}" ${ariaDisabled}><span class="choice-key" aria-hidden="true">${key}</span><span class="choice-text">${escapeHtml(c)}${isOut ? '<span class="visually-hidden"> (crossed out)</span>' : ''}</span></div>`;
       const strikeHtml = canStrike
@@ -441,18 +449,17 @@ export function renderQuiz(state) {
         // Build enhanced explanation sections (optional fields)
         let enhancedHtml = '';
 
-        // AWS Documentation Links
+        // AWS documentation for the correct answer: plain links under the explanation (no drop-down)
+        let docsHtml = '';
         if (q.resources && Array.isArray(q.resources) && q.resources.length > 0) {
-          const resourcesHtml = q.resources.map(r =>
-            `<li><a href="${escapeHtml(r.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(r.title)}</a></li>`
+          const linksHtml = q.resources.map(r =>
+            `<li><a href="${escapeHtml(safeUrl(r.url))}" target="_blank" rel="noopener noreferrer">${escapeHtml(r.title)}</a></li>`
           ).join('');
-          enhancedHtml += `
-            <details class="exp-details resources">
-              <summary>AWS Documentation</summary>
-              <div class="exp-details-content">
-                <ul>${resourcesHtml}</ul>
-              </div>
-            </details>
+          docsHtml = `
+            <div class="exp exp-docs">
+              <span class="exp-label">AWS documentation:</span>
+              <ul class="exp-links">${linksHtml}</ul>
+            </div>
           `;
         }
 
@@ -488,7 +495,9 @@ export function renderQuiz(state) {
             <div class="feedback bad">
               <div class="status">${icon("circle-minus")} Unanswered</div>
               ${correctLine}
+              ${unscoredNoteHtml(session, q, "unanswered")}
               <div class="exp">${escapeHtml(q.explanation)}</div>
+              ${docsHtml}
               ${enhancedHtml}
             </div>
           `;
@@ -505,7 +514,9 @@ export function renderQuiz(state) {
         let choiceExplanationsHtml = '';
         if (q.choiceExplanations) {
           const wrongChoices = [];
-          Object.entries(q.choiceExplanations).forEach(([idx, explanation]) => {
+          Object.entries(q.choiceExplanations)
+            .sort((a, b) => order.indexOf(Number(a[0])) - order.indexOf(Number(b[0])))
+            .forEach(([idx, explanation]) => {
             wrongChoices.push(`
               <div class="choice-exp">
                 <strong>${escapeHtml(q.choices[idx])}:</strong> ${escapeHtml(explanation)}
@@ -528,7 +539,9 @@ export function renderQuiz(state) {
             <div class="status">${isCorrect ? `${icon("circle-check")} Correct` : `${icon("circle-x")} Incorrect`}</div>
             <div class="exp"><span class="exp-label">${yourLabel}</span> ${escapeHtml(yourValue)}</div>
             ${correctLine}
+            ${unscoredNoteHtml(session, q, isCorrect ? "correct" : "incorrect")}
             <div class="exp">${escapeHtml(q.explanation)}</div>
+            ${docsHtml}
             ${choiceExplanationsHtml}
             ${enhancedHtml}
           </div>
@@ -693,6 +706,25 @@ export function renderQuiz(state) {
   renderJumpGrid(state);
 }
 
+/**
+ * WHAT IT DOES: True when a finished timed exam did NOT count this question toward the score.
+ * A timed exam has 65 questions; 15 are unscored (like the real exam). Which ones is only revealed here, after the exam.
+ */
+function isUnscored(session, qid) {
+  return session.mode === "timed" && session.completed && session.scoredIds instanceof Set && !session.scoredIds.has(qid);
+}
+
+function unscoredText(result) {
+  const how = result === "correct" ? "You answered it correctly" : result === "incorrect" ? "You answered it incorrectly" : "You left it unanswered";
+  return `${how}. This question was unscored, so it did not count toward your score.`;
+}
+
+/** The "Unscored" line shown under a question on the question screen of a finished timed exam. */
+function unscoredNoteHtml(session, q, result) {
+  if (!isUnscored(session, q.id)) return "";
+  return `<div class="exp exp-unscored"><span class="pill pill-unscored">Unscored</span> ${escapeHtml(unscoredText(result))}</div>`;
+}
+
 export function buildTimedReviewHtml(state) {
   const { session } = state;
 
@@ -701,6 +733,8 @@ export function buildTimedReviewHtml(state) {
       const q = S.QMAP.get(qid);
       const ans = session.answers[qid];
 
+      const unscored = isUnscored(session, qid);
+      const order = orderFromSession(session, q);
       const statusPill =
         ans === undefined
           ? '<span class="pill pill-neutral">Unanswered</span>'
@@ -722,6 +756,7 @@ export function buildTimedReviewHtml(state) {
       let choiceExpsHtml = '';
       if (q.choiceExplanations) {
         const wrongChoices = Object.entries(q.choiceExplanations)
+          .sort((a, b) => order.indexOf(Number(a[0])) - order.indexOf(Number(b[0])))
           .map(([idx, exp]) => {
             const choiceText = q.choices[idx];
             return `<div><strong>${escapeHtml(choiceText)}:</strong> ${escapeHtml(exp)}</div>`;
@@ -744,11 +779,13 @@ export function buildTimedReviewHtml(state) {
             <span class="review-num">Q${idx + 1}</span>
             <span class="review-section">${escapeHtml(q.section)}</span>
             ${statusPill}
+            ${unscored ? '<span class="pill pill-unscored">Unscored</span>' : ''}
           </summary>
           <div class="review-body">
             <div class="review-q">${escapeHtml(q.question)}</div>
             <div class="review-line"><span class="exp-label">Your answer:</span> ${escapeHtml(yourAnswer)}</div>
             <div class="review-line"><span class="exp-label">Correct answer:</span> ${escapeHtml(correctAnswer)}</div>
+            ${unscored ? `<div class="review-line review-unscored">${unscoredText(ans === undefined ? "unanswered" : isCorrectAnswer(ans, q.answer) ? "correct" : "incorrect")}</div>` : ''}
             <div class="review-line">${escapeHtml(q.explanation)}</div>
             ${choiceExpsHtml}
           </div>
@@ -761,10 +798,13 @@ export function buildTimedReviewHtml(state) {
 export function showResults(state, autoEnded) {
   const { session } = state;
   session.completed = true;
+  delete session.pausedAtMs;  // an exam ended while paused is simply over
   state.session = session;
   persistRuntimeState(state);
 
   stopTimer();
+  S.quizPausedState = null;
+  quizCard.classList.remove('quiz-manually-paused');
 
   // Record this session to history for performance tracking
   recordSessionToHistory(state);
@@ -794,7 +834,7 @@ export function showResults(state, autoEnded) {
           ${s.passed ? '<span class="pill pill-positive">Passed</span>' : '<span class="pill pill-negative">Below 720</span>'}
         </div>
         <div class="result-meta">${gap >= 0 ? `${gap} points above` : `${-gap} points below`} the 720 pass mark · ${s.answeredTotal} of ${s.totalQuestions} answered</div>
-        ${canShare(session, s) ? `<div class="result-actions"><button class="btn btn-primary" type="button" data-share="${s.points}">${icon("share")} Share your achievement</button></div>` : ''}
+        ${canShare(session, s) ? `<div class="result-actions"><button class="btn btn-primary" type="button" data-share>${icon("share")} Share your achievement</button></div>` : ''}
       </div>
       ${flaggedHtml}
       <h3 class="result-review-title">Review every question</h3>
@@ -820,4 +860,13 @@ export function showResults(state, autoEnded) {
   // - timed reveals answers on the question screen too
   // - review keeps jump correctness colors consistent
   renderQuiz(state);
+
+  // The results sit below the question card, so bring them into view; otherwise ending the exam looks like
+  // nothing happened (the same question just redraws with its answer shown)
+  resultBox.setAttribute('tabindex', '-1');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  requestAnimationFrame(() => {
+    resultBox.scrollIntoView({ block: 'start', behavior: reduceMotion ? 'auto' : 'smooth' });
+    resultBox.focus({ preventScroll: true });
+  });
 }

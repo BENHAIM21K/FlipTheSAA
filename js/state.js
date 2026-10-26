@@ -31,6 +31,7 @@ export const S = {
 
   // Tab data and view state
   tryQuestionId: null,      // Question shown in Home's "Try one question"
+  tryOrder: null,           // Order its choices are shown in (see js/choice-order.js)
   studyGroupsCache: null,   // studygroups.json once loaded
   resourcesCache: null,     // resources.json once loaded
   csActiveCategory: 'all',  // Cheat sheet category filter

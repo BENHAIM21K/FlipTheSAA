@@ -369,6 +369,10 @@ a { color: inherit; }
 }
 .btn:hover { background: var(--raised); }
 .btn:active { transform: translateY(1px); }
+/* A pressed button must not move inside the exam's side panel / phone sheet. Both scroll, End exam is their last item,
+   and a 1px transform there adds a scrollbar: the panel narrows, the filter chips wrap, the button slides out from
+   under the pointer and the click is lost. Press feedback without any layout effect instead. */
+.ws-side .btn:active, .ws-map .btn:active { transform: none; opacity: 0.8; }
 .btn:disabled, .btn[disabled] { opacity: 0.55; cursor: not-allowed; transform: none; }
 .btn:disabled:hover { background: var(--surface); }
 
@@ -720,6 +724,7 @@ a { color: inherit; }
   max-height: calc(100vh - 32px);
   overflow-y: auto;
   padding-left: 24px;
+  padding-bottom: 2px;  /* room so a 1px overflow can never create a scrollbar */
   border-left: 1px solid var(--rule);
 }
 .ws-status { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
@@ -728,13 +733,13 @@ a { color: inherit; }
 .map-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .map-head h3 { font-size: 15px; font-weight: 600; line-height: 20px; }
 .map-close { display: none; }
-.map-filter { display: flex; flex-wrap: wrap; gap: 6px; }
+.map-filter { display: flex; flex-wrap: wrap; gap: 4px; }  /* "All 65 / Unanswered 65 / Flagged 0" must fit one row even beside a 15px scrollbar (260px) */
 .map-filter-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   min-height: 28px;
-  padding: 0 10px;
+  padding: 0 8px;
   border: 1px solid var(--control);
   border-radius: 999px;
   background: var(--surface);
@@ -755,7 +760,8 @@ a { color: inherit; }
 .legend-swatch.is-wrong { background: var(--pill-negative-bg); border-color: transparent; }
 .legend-flag { color: var(--warning); }
 .legend-flag .icon { width: 12px; height: 12px; fill: currentColor; }
-.map-submit { width: 100%; }
+/* The side panel scrolls when the window is short, so End exam is pinned to its foot and is always fully visible */
+.map-submit { width: 100%; position: sticky; bottom: 0; box-shadow: 0 -12px 0 var(--surface); }
 .map-toggle { display: none; }
 .ws-backdrop { display: none; }
 
@@ -946,6 +952,11 @@ a { color: inherit; }
 .exp-details p { line-height: 22px; }
 .exp-details a { color: var(--accent); text-underline-offset: 3px; }
 
+/* AWS documentation links for the correct answer, shown under the explanation */
+.exp-links { list-style: none; margin: 4px 0 0; padding: 0; }
+.exp-links li { margin: 0 0 4px; line-height: 22px; }
+.exp-links a { color: var(--accent); text-underline-offset: 3px; overflow-wrap: anywhere; }
+
 /* flag for review (timed) */
 .btn-flag { margin-bottom: 16px; }
 .btn-flag .flag-icon { color: var(--faint); }
@@ -998,7 +1009,9 @@ a { color: inherit; }
   margin-top: 24px;
   padding-top: 20px;
   border-top: 1px solid var(--rule);
+  scroll-margin-top: calc(var(--topbar-height, 0px) + 16px);  /* showResults() scrolls here after the exam ends */
 }
+.result:focus { outline: none; }
 .result-head { display: flex; flex-direction: column; gap: 4px; }
 .result-kicker { color: var(--muted); }
 .result-score { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
@@ -1048,6 +1061,10 @@ a { color: inherit; }
 .review-q { line-height: 22px; margin-bottom: 10px; white-space: pre-line; }
 .review-line { line-height: 22px; margin-top: 4px; }
 .review-line .exp-label { color: var(--muted); }
+/* Timed exam: the 15 questions that did not count toward the score */
+.pill-unscored { background: transparent; color: var(--muted); box-shadow: inset 0 0 0 1px var(--rule); }
+.exp-unscored { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; color: var(--muted); }
+.review-unscored { color: var(--muted); }
 .review-why { margin-top: 10px; }
 .review-why-title { font-weight: 600; }
 .review-why div { margin-top: 4px; line-height: 22px; }
@@ -1725,6 +1742,7 @@ a { color: inherit; }
 .share-dialog .share-status { margin-top: 8px; min-height: 21px; font-size: var(--fs-small); }
 .share-dialog .confirm-actions { margin-top: 8px; }
 @media (max-width: 640px) {
+  .exp-links a { display: inline-flex; align-items: center; min-height: 44px; }
   .share-actions .btn { flex: 1 1 100%; justify-content: center; }
 }
 

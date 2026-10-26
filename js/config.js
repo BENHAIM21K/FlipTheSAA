@@ -8,14 +8,25 @@ export const STATE_KEY = "saa_practice_state_v1"; // localStorage key for curren
 export const HISTORY_KEY = "saa_practice_history_v1"; // localStorage key for quiz history
 export const TAB_KEY = "saa_active_tab_v1"; // localStorage key for last active tab
 export const MAX_HISTORY_SESSIONS = 50; // Keep most recent 50 sessions (FIFO)
+export const CHOICE_LAYOUT_KEY = "saa_choice_layout_v1"; // localStorage: where the correct answer(s) were last time a question was shown, per question id
 
 export const EXAM_DURATION_SEC = 130 * 60; // 130 minutes = 7800 seconds (AWS exam time)
 export const EXAM_TOTAL_QUESTIONS = 65; // Standard AWS SAA exam question count
 export const EXAM_SCORED_QUESTIONS = 50; // Only 50 of 65 questions count (like real exam)
 export const REVIEW_MAX_QUESTIONS = 50; // Maximum questions in review mode
 
-export const POINTS_PER_SCORED_QUESTION = 20; // 50 questions × 20 points = 1000 max
+export const TIMED_TOTAL_POINTS = 1000; // the 50 scored questions of a timed exam share exactly 1000 points (average 20 each)
 export const PASSING_SCORE = 720; // 720/1000 = 72% passing threshold
+
+// How a scored question's point value is worked out (js/scoring.js). The values are relative to the other
+// questions of the SAME exam, so only the proportions matter. Raise a number to make that feature count more.
+export const SCORE_FEATURES = {
+  stem: 0.30,       // longer question text than the exam's average
+  choices: 0.20,    // longer answer options than the exam's average
+  lookalike: 1.0,   // options that share many words with each other (applied to the 0-1 overlap difference)
+  multi: 0.25       // a "choose two" question
+};
+export const POINT_CLAMP = { min: 0.6, max: 1.6 }; // a question is worth between 0.6x and 1.6x the average (roughly 12-36 points)
 
 // Official SAA-C03 domain weights (share of the scored exam)
 export const DOMAIN_WEIGHTS = { D1: 30, D2: 26, D3: 24, D4: 20 };
@@ -87,7 +98,8 @@ export const SECTION_FAMILIES = {
     "WAF and Shield": ["WAF", "WAF / Shield", "Shield/WAF", "Firewall Manager"],
     "Network Firewall": ["Network Firewall", "Egress Filtering"],
     "GuardDuty": ["GuardDuty"],
-    "Security Hub": ["Security Hub"]
+    "Security Hub": ["Security Hub"],
+    "Security (general)": ["Security"]
   },
   "Application integration": {
     "SQS": ["SQS", "SQS FIFO", "SQS/Lambda", "SQS/SNS", "SNS/SQS"],
@@ -109,7 +121,8 @@ export const SECTION_FAMILIES = {
     "CloudTrail": ["CloudTrail"],
     "Config": ["Config"],
     "Systems Manager": ["Systems Manager"],
-    "CloudFormation": ["CloudFormation", "Deployments"]
+    "CloudFormation": ["CloudFormation", "Deployments"],
+    "Management (general)": ["Management"]
   },
   "Resilience and migration": {
     "Disaster recovery": ["Disaster Recovery", "DR", "DR Automation"],
@@ -126,7 +139,9 @@ export const SECTION_FAMILIES = {
   "Machine learning and other": {
     "Rekognition": ["Rekognition"],
     "Polly": ["Polly"],
-    "Pinpoint": ["Pinpoint"]
+    "Pinpoint": ["Pinpoint"],
+    "Machine learning (general)": ["Machine Learning"],
+    "Other services (general)": ["Other Services"]
   }
 };
 

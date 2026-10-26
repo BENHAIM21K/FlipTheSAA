@@ -18,19 +18,7 @@ Desktop.ini
 *.bak
 *.backup
 node_modules/
-package.json
-package-lock.json
-generation-progress.json
 questions-backup.json
-questions-with-explanations.json
-questions-with-explanations-backup-before-fix.json
-new-questions-*.json
-scripts/*-backup*.json
-scripts/*-with-explanations*.json
-scripts/generation-progress.json
-scripts/questions-with-explanations-fixed.json
-scripts/aws-services-list.json
-scripts/remove-duplicates.js
 assets/presentations/
 AWS Icons/
 cohort-labs/**/students.txt
@@ -39,8 +27,10 @@ scripts/
 cohort-labs/scripts/
 cohort-labs/**/iam-policy.json
 docs/
-docs/aws-slides/
-AWS Certified Solutions Architect Slides*.pdf
 .taste-skill/
 CLAUDE.md
 REDESIGN-PROGRESS.md
+
+# Private debug mode for the owner (see js/debug-loader.js): never committed, never deployed
+js/debug.local.js
+*.local.js

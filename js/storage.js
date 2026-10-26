@@ -1,5 +1,5 @@
 // FlipTheSAA — localStorage: load / save / clear the current session
-import { HISTORY_KEY, STATE_KEY, TAB_KEY } from './config.js';
+import { CHOICE_LAYOUT_KEY, HISTORY_KEY, STATE_KEY, TAB_KEY } from './config.js';
 import { safeOperation } from './util.js';
 
 // ============================================================================
@@ -90,6 +90,37 @@ export function clearAllData() {
     localStorage.removeItem(STATE_KEY);     // Clear quiz state
     localStorage.removeItem(HISTORY_KEY);   // Clear performance history
     localStorage.removeItem(TAB_KEY);       // Clear last active tab
+    localStorage.removeItem(CHOICE_LAYOUT_KEY); // Clear where the correct answers were last shown
     console.info('[SAA Info] All data cleared from localStorage (state + history)');
   }, undefined);
+}
+
+// ============================================================================
+// CHOICE LAYOUTS - where each question's correct answer(s) were the last time it was shown
+// ============================================================================
+// Shape: { [questionId]: [display positions, ascending] }, e.g. { "SAA-113": [1] } = the correct answer was B.
+// A new session shows a question it has met before with its correct answer somewhere else (js/choice-order.js).
+
+export function loadChoiceLayouts() {
+  return safeOperation('Load choice layouts', () => {
+    const raw = localStorage.getItem(CHOICE_LAYOUT_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+  }, {});
+}
+
+export function saveChoiceLayouts(layouts) {
+  safeOperation('Save choice layouts', () => {
+    localStorage.setItem(CHOICE_LAYOUT_KEY, JSON.stringify(layouts));
+  }, undefined);
+}
+
+/** Remembers where the correct answer(s) of a question were just shown (writes only when something changed). */
+export function recordShownLayout(questionId, positions) {
+  const layouts = loadChoiceLayouts();
+  const same = Array.isArray(layouts[questionId]) && layouts[questionId].length === positions.length &&
+    layouts[questionId].every((p, i) => p === positions[i]);
+  if (same) return;
+  layouts[questionId] = positions;
+  saveChoiceLayouts(layouts);
 }

@@ -1,9 +1,10 @@
 // FlipTheSAA — Home tab
 import { isMultiAnswer } from './answers.js';
+import { correctPositions, layoutFor } from './choice-order.js';
 import { DOMAIN_WEIGHTS, PASSING_SCORE } from './config.js';
 import { getDomainPerformance, getSessionHistory } from './history.js';
 import { S } from './state.js';
-import { loadState } from './storage.js';
+import { loadChoiceLayouts, loadState, recordShownLayout } from './storage.js';
 import { escapeHtml, fetchJson, icon, safeOperation } from './util.js';
 
 // ============================================================================
@@ -205,10 +206,14 @@ export function renderTryQuestion() {
   }
   S.tryQuestionId = q.id;
 
-  const choices = q.choices.map((c, i) => `
+  // Same rule as in a session: a question seen before shows its correct answer somewhere else
+  S.tryOrder = layoutFor(q, `try::${Date.now()}::${q.id}`, loadChoiceLayouts()[q.id]);
+  recordShownLayout(q.id, correctPositions(q, S.tryOrder));
+
+  const choices = S.tryOrder.map((i, pos) => `
     <button type="button" class="choice try-choice" data-i="${i}">
-      <span class="choice-key" aria-hidden="true">${String.fromCharCode(65 + i)}</span>
-      <span class="choice-text">${escapeHtml(c)}</span>
+      <span class="choice-key" aria-hidden="true">${String.fromCharCode(65 + pos)}</span>
+      <span class="choice-text">${escapeHtml(q.choices[i])}</span>
     </button>`).join('');
 
   box.innerHTML = `
@@ -243,7 +248,7 @@ export function answerTryQuestion(choiceBtn) {
 
   const status = isCorrect
     ? `${icon('circle-check')} Correct`
-    : `${icon('circle-x')} Not quite. The answer is ${String.fromCharCode(65 + q.answer)}.`;
+    : `${icon('circle-x')} Not quite. The answer is ${String.fromCharCode(65 + (S.tryOrder ? S.tryOrder.indexOf(q.answer) : q.answer))}.`;
 
   document.getElementById('tryResult').innerHTML = `
     <div class="feedback ${isCorrect ? 'good' : 'bad'}">

@@ -1,11 +1,13 @@
 // FlipTheSAA — Exam engine: timer, sessions, flags, scoring, pause
 import { isCorrectAnswer } from './answers.js';
-import { EXAM_DURATION_SEC, EXAM_SCORED_QUESTIONS, EXAM_TOTAL_QUESTIONS, PASSING_SCORE, POINTS_PER_SCORED_QUESTION, REVIEW_MAX_QUESTIONS } from './config.js';
+import { EXAM_DURATION_SEC, EXAM_SCORED_QUESTIONS, EXAM_TOTAL_QUESTIONS, PASSING_SCORE, REVIEW_MAX_QUESTIONS, TIMED_TOTAL_POINTS } from './config.js';
+import { layoutsForSession } from './choice-order.js';
+import { examPoints } from './scoring.js';
 import { quizCard, timerEl } from './dom.js';
 import { filteredQuestions, sessionKeyFor } from './filters.js';
 import { renderQuiz, showResults } from './quiz-view.js';
 import { S } from './state.js';
-import { loadState, saveState } from './storage.js';
+import { loadChoiceLayouts, loadState, saveState } from './storage.js';
 import { icon, normalizeMode, nowMs, pickSeededSubset, safeOperation, seededShuffle } from './util.js';
 
 // ============================================================================
@@ -246,7 +248,8 @@ export function createNewSession(filters, forceFresh) {
     difficulty: filters.difficulty || "ALL", // restored on resume (see sessionDifficulty)
     seed,
     questionIds: order,
-    answers: {}, // { [id]: choiceIndex }
+    choiceOrder: layoutsForSession(order.map((id) => S.QMAP.get(id)), seed, loadChoiceLayouts()), // { [id]: [original index per display position] }
+    answers: {}, // { [id]: choiceIndex } (original index into q.choices, whatever order it was shown in)
     flaggedQuestions: [], // Array of question IDs flagged for review (Timed mode only)
     checkedQuestions: new Set(), // Question IDs where user clicked "Check Answer" (Review mode only)
     currentIndex: 0,
@@ -300,6 +303,7 @@ export function createDrillSession(questionIds) {
       difficulty: "ALL",
       seed: `drill::${created}`,
       questionIds: ids,
+      choiceOrder: layoutsForSession(ids.map((id) => S.QMAP.get(id)), `drill::${created}`, loadChoiceLayouts()),
       answers: {},
       flaggedQuestions: [],
       checkedQuestions: [],
@@ -322,6 +326,26 @@ export function normalizeStateForRuntime(state) {
   // Migrate sessionKey prefix if needed
   if (typeof state.sessionKey === "string") {
     state.sessionKey = state.sessionKey.replace(/^practice::/i, "review::");
+  }
+
+  // A session saved before questions were removed from the bank still lists their ids. Without this the exam
+  // would crash on them when it is drawn or scored (the results never appear), so they are dropped here.
+  const listed = state.session.questionIds;
+  if (Array.isArray(listed) && listed.some((id) => !S.QMAP.has(id))) {
+    const s = state.session;
+    const known = (id) => S.QMAP.has(id);
+    const keepKnown = (obj) => (obj && typeof obj === "object" && !Array.isArray(obj)) ? Object.fromEntries(Object.entries(obj).filter(([id]) => known(id))) : obj;
+    const keepKnownList = (list) => Array.isArray(list) ? list.filter(known) : list instanceof Set ? new Set([...list].filter(known)) : list;
+    s.questionIds = listed.filter(known);
+    s.answers = keepKnown(s.answers) || {};
+    s.eliminated = keepKnown(s.eliminated);
+    s.choiceOrder = keepKnown(s.choiceOrder);
+    s.flaggedQuestions = keepKnownList(s.flaggedQuestions) || [];
+    s.checkedQuestions = keepKnownList(s.checkedQuestions);
+    s.scoredIds = keepKnownList(s.scoredIds);
+    if (!s.questionIds.length) return null;
+    s.currentIndex = Math.min(Math.max(0, s.currentIndex || 0), s.questionIds.length - 1);
+    console.warn(`[SAA Warning] Dropped ${listed.length - s.questionIds.length} question(s) that are no longer in the bank from the saved session`);
   }
 
   if (state.session.mode === "timed") {
@@ -434,6 +458,13 @@ export function computeScore(state) {
   let answeredScored = 0;
   let correctScored = 0;
 
+  // Timed exam: the scored questions are worth different points (js/scoring.js), always 1000 together
+  const scoredQuestions = session.mode === "timed" && session.scoredIds
+    ? session.questionIds.filter((id) => session.scoredIds.has(id)).map((id) => S.QMAP.get(id)).filter(Boolean)
+    : [];
+  const pointValues = examPoints(scoredQuestions, TIMED_TOTAL_POINTS);
+  let earnedPoints = 0;
+
   for (const qid of session.questionIds) {
     const q = S.QMAP.get(qid);
     const ans = session.answers[qid];
@@ -452,7 +483,10 @@ export function computeScore(state) {
     if (session.mode === "timed") {
       if (session.scoredIds && session.scoredIds.has(qid)) {
         if (answered) answeredScored++;
-        if (correct) correctScored++;
+        if (correct) {
+          correctScored++;
+          earnedPoints += pointValues.get(qid) || 0;
+        }
       }
     }
   }
@@ -460,9 +494,10 @@ export function computeScore(state) {
   const totalQuestions = session.questionIds.length;
 
   if (session.mode === "timed") {
-    const points = correctScored * POINTS_PER_SCORED_QUESTION;
-    const totalPoints = EXAM_SCORED_QUESTIONS * POINTS_PER_SCORED_QUESTION; // 1000
+    const points = earnedPoints;
+    const totalPoints = TIMED_TOTAL_POINTS; // 1000
     const passed = points >= PASSING_SCORE;
+    const unscoredIds = session.questionIds.filter((id) => !(session.scoredIds && session.scoredIds.has(id)));
 
     return {
       answeredTotal,
@@ -470,6 +505,9 @@ export function computeScore(state) {
       totalQuestions,
       answeredScored,
       correctScored,
+      scoredCount: scoredQuestions.length,
+      unscoredIds,
+      pointValues,
       points,
       totalPoints,
       passed

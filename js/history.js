@@ -152,7 +152,9 @@ export function recordSessionToHistory(state) {
       questionResults.push({
         questionId: qid,
         correct: correct,
-        answered: userAnswer !== undefined
+        answered: userAnswer !== undefined,
+        // timed exams only: false for the 15 unscored questions (older records have no flag = scored)
+        ...(session.mode === "timed" && session.scoredIds ? { scored: session.scoredIds.has(qid) } : {})
       });
     }
 

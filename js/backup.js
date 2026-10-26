@@ -1,7 +1,7 @@
 // FlipTheSAA — Export / import progress (a JSON backup file)
 import { HISTORY_KEY, MAX_HISTORY_SESSIONS, STATE_KEY } from './config.js';
 import { getSessionHistory, saveSessionHistory } from './history.js';
-import { loadState, saveState } from './storage.js';
+import { loadChoiceLayouts, loadState, saveChoiceLayouts, saveState } from './storage.js';
 import { confirmDialog } from './util.js';
 
 // ============================================================================
@@ -12,6 +12,7 @@ import { confirmDialog } from './util.js';
 //   "exportedAt": "2026-10-23T14:02:11.000Z",
 //   "history": { version: 1, sessions: [...] },   ← saa_practice_history_v1, as stored
 //   "session": { sessionKey, session } | null     ← saa_practice_state_v1 (an unfinished session)
+//   "choiceLayouts": { [questionId]: [positions] } ← saa_choice_layout_v1 (optional: older backups have none)
 // }
 // The theme and last-tab preferences are left out on purpose: they belong to a device.
 
@@ -38,7 +39,8 @@ export function exportProgress() {
     version: 1,
     exportedAt: new Date().toISOString(),
     history,
-    session: state && state.session ? state : null
+    session: state && state.session ? state : null,
+    choiceLayouts: loadChoiceLayouts()
   };
 
   const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
@@ -128,6 +130,16 @@ export async function importProgress(file) {
   saveSessionHistory({ version: local.version || 1, sessions: merged });
 
   if (willRestoreSession) saveState(backupSession);
+
+  // Where the correct answers were last shown: keep what this browser knows, add what it does not
+  if (backup.choiceLayouts && typeof backup.choiceLayouts === 'object' && !Array.isArray(backup.choiceLayouts)) {
+    const here = loadChoiceLayouts();
+    const added = {};
+    for (const [qid, positions] of Object.entries(backup.choiceLayouts)) {
+      if (!(qid in here) && Array.isArray(positions) && positions.every(Number.isInteger)) added[qid] = positions;
+    }
+    if (Object.keys(added).length) saveChoiceLayouts({ ...added, ...here });
+  }
 
   const dropped = (local.sessions || []).length + fresh.length - merged.length;
   return {
