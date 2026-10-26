@@ -3,14 +3,14 @@ import './debug-loader.js';  // first, so the owner's private debug mode (git-ig
 import { exportProgress, importProgress } from './backup.js';
 import { EXAM_TOTAL_QUESTIONS, TAB_KEY } from './config.js';
 import { difficultyDropdown, difficultyPanel, difficultyTrigger, domainDropdown, domainPanel, domainTrigger, hintText, modeDropdown, modePanel, modeTrigger, newSessionBtn, nextBtn, prevBtn, quizCard, sectionButtons, sectionDropdown, sectionPanel, sectionTrigger, startBtn, submitBtn } from './dom.js';
-import { createDrillSession, createNewSession, normalizeStateForRuntime, persistRuntimeState, restorePauseFromSession, togglePause } from './exam.js';
+import { createDrillSession, createNewSession, createServiceSession, normalizeStateForRuntime, persistRuntimeState, restorePauseFromSession, togglePause } from './exam.js';
 import { buildDifficultyOptions, buildDomainOptions, buildSectionOptions, closeAllDropdowns, closeDropdown, ensureModeRulesUI, filterSectionOptions, getFiltersFromUI, getSelectedValues, openDropdown, sessionDifficulty, sessionKeyFor, syncDifficultyUI, syncDomainCheckboxes, syncModeUI, syncSectionCheckboxes } from './filters.js';
 import { getDrillQuestions, getSessionHistory } from './history.js';
 import { answerTryQuestion, renderTryQuestion } from './home.js';
 import { renderPerformanceDashboard } from './performance.js';
 import { closeMobileMenu, switchTab, switchTabDebounced } from './nav.js';
 import { closeMapSheet, openMapSheet, renderJumpGrid, renderQuiz, reviewQuestions, showResults, submitReviewDialog } from './quiz-view.js';
-import { closeServiceDrawer, showComparison } from './resources.js';
+import { closeServiceDrawer, questionIdsForService, showComparison } from './resources.js';
 import { initShareDialog, openShareDialog } from './share.js';
 import { resetAllProgress, showLoadError } from './shell.js';
 import { S } from './state.js';
@@ -369,6 +369,11 @@ document.addEventListener('click', (e) => {
   e.preventDefault();
   closeServiceDrawer();
 
+  if (link.dataset.practiceService) {
+    practiceService(link.dataset.practiceService);
+    return;
+  }
+
   if (link.dataset.practiceTopics) {
     practiceTopics(link.dataset.practiceTopics.split('|'));
     return;
@@ -407,6 +412,28 @@ async function practiceTopics(topics) {
   switchTab('practice');
   startSession(true);
   document.getElementById('practiceSection')?.scrollIntoView({ block: 'start' });
+}
+
+/**
+ * WHAT IT DOES: Starts a Review session on the questions about one cheat-sheet service
+ * (data-practice-service="<service>": the "Practice <service>" button in the cheat-sheet drawer)
+ */
+async function practiceService(service) {
+  const ids = questionIdsForService(service);
+  if (!ids.length) return;
+  if (!(await confirmReplaceUnfinished('Start practice'))) return;
+
+  safeOperation('Start service practice', () => {
+    S.selectedMode = 'review';
+    S.quizPausedState = null;
+    quizCard.classList.remove('quiz-manually-paused');
+    S.mapFilter = 'all';
+    S.setupExpanded = false;
+    syncModeUI();
+    createServiceSession(service, ids);
+    switchTab('practice');   // renders the saved session
+    document.getElementById('practiceSection')?.scrollIntoView({ block: 'start' });
+  }, undefined);
 }
 
 /**

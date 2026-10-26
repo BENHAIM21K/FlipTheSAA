@@ -276,7 +276,7 @@ function syncSetupPanel(session) {
   changeBtn.textContent = collapsed ? 'Change' : 'Hide';
   changeBtn.setAttribute('aria-expanded', String(!collapsed));
 
-  const parts = [session.mode === 'timed' ? 'Timed exam' : session.drill ? 'Mistake drill' : 'Review'];
+  const parts = [session.mode === 'timed' ? 'Timed exam' : session.drill ? 'Mistake drill' : session.service ? `Review: ${session.service}` : 'Review'];
   parts.push(`${session.questionIds.length} questions`);
   if (session.mode !== 'timed') {
     if (session.domainIds && session.domainIds.length) parts.push(session.domainIds.join(', '));

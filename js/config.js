@@ -153,37 +153,6 @@ for (const [family, topics] of Object.entries(SECTION_FAMILIES)) {
   }
 }
 
-// Cheat-sheet services whose name isn't itself a topic or an alias above.
-// A service missing here and above has no tagged questions, so it gets no practice button.
-const CHEATSHEET_TOPICS = {
-  "S3 Glacier": "S3",
-  "Aurora Serverless": "Aurora",
-  "Shield": "WAF and Shield",
-  "Certificate Manager": "Certificate Manager (ACM)",
-  "Application Migration Service": "Migration (DMS, MGN)",
-  "OpenSearch Service": "OpenSearch",
-  "Fargate": "ECS",
-  "Data Firehose": "Kinesis",
-  "Budgets": "Cost management",
-  "Cost Explorer": "Cost management",
-  "Cost & Usage Report": "Cost management"
-};
-
-/**
- * WHAT IT DOES: Returns the practice topic for a cheat-sheet service, or null
- *
- * ORDER: the entry's own practiceTopic field → a topic of the same name →
- * a raw-section alias (e.g. "PrivateLink" → "VPC endpoints") → CHEATSHEET_TOPICS
- */
-export function serviceTopic(entry) {
-  if (entry.practiceTopic) return entry.practiceTopic;
-  const name = entry.service;
-  for (const topics of Object.values(SECTION_FAMILIES)) if (topics[name]) return name;
-  const alias = SECTION_LOOKUP.get(String(name).toLowerCase());
-  if (alias) return alias.topic;
-  return CHEATSHEET_TOPICS[name] || null;
-}
-
 /**
  * WHAT IT DOES: Returns the practice topic and family for a question's raw section
  *

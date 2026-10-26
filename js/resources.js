@@ -1,6 +1,7 @@
 // FlipTheSAA — Resources tab: comparisons, cheat sheet (cards + drawer), links
-import { serviceTopic } from './config.js';
+import { REVIEW_MAX_QUESTIONS } from './config.js';
 import { topicOf } from './filters.js';
+import { questionsByService } from './service-match.js';
 import { S } from './state.js';
 import { escapeHtml, fetchJson, icon, safeUrl } from './util.js';
 
@@ -112,6 +113,15 @@ function serviceIconHtml(entry, size = '') {
     : fallback;
 }
 
+/**
+ * WHAT IT DOES: The ids of the questions about one cheat-sheet service: those that name it in a correct answer or in
+ * a short stem (js/service-match.js). Built once for every service, then kept in S.serviceIndex.
+ */
+export function questionIdsForService(service) {
+  if (!S.serviceIndex) S.serviceIndex = questionsByService((S.resourcesCache && S.resourcesCache.cheatsheet) || [], S.QUESTIONS);
+  return S.serviceIndex.get(service) || [];
+}
+
 /** Number of questions in the bank for a list of practice topics */
 function questionCount(topics) {
   return S.QUESTIONS.filter(q => topics.includes(topicOf(q))).length;
@@ -127,13 +137,14 @@ export function openServiceDrawer(entry) {
   if (!drawer || !entry) return;
 
   const keywords = Array.isArray(entry.keywords) ? entry.keywords : [];
-  const topic = serviceTopic(entry);
-  const count = topic ? questionCount([topic]) : 0;
+  const total = questionIdsForService(entry.service).length;
   const related = (S.resourcesCache.comparisons || []).filter(c => (c.cheatsheet || []).includes(entry.service));
 
-  const practice = count
-    ? `<button class="btn btn-primary" type="button" data-goto="practice" data-practice-topics="${escapeHtml(topic)}">${icon('list-checks')} Practice ${escapeHtml(topic)} <span class="num btn-count">${count} questions</span></button>`
-    : `<p class="hint">No practice questions are tagged with ${escapeHtml(entry.service)} yet.</p>`;
+  // a session holds at most REVIEW_MAX_QUESTIONS, drawn at random when there are more
+  const countText = total > REVIEW_MAX_QUESTIONS ? `${REVIEW_MAX_QUESTIONS} of ${total} questions` : `${total} ${total === 1 ? 'question' : 'questions'}`;
+  const practice = total
+    ? `<button class="btn btn-primary" type="button" data-goto="practice" data-practice-service="${escapeHtml(entry.service)}">${icon('list-checks')} Practice ${escapeHtml(entry.service)} <span class="num btn-count">${countText}</span></button>`
+    : `<p class="hint">No practice question has ${escapeHtml(entry.service)} as its answer yet.</p>`;
 
   const relatedHtml = related.length ? `
     <section class="drawer-section">

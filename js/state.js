@@ -34,6 +34,7 @@ export const S = {
   tryOrder: null,           // Order its choices are shown in (see js/choice-order.js)
   studyGroupsCache: null,   // studygroups.json once loaded
   resourcesCache: null,     // resources.json once loaded
+  serviceIndex: null,       // cheat-sheet service → ids of the questions about it (js/service-match.js), built on first use
   csActiveCategory: 'all',  // Cheat sheet category filter
   resActiveFilter: 'all'    // External links type filter
 };

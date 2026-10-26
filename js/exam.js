@@ -317,6 +317,46 @@ export function createDrillSession(questionIds) {
   return state;
 }
 
+/**
+ * WHAT IT DOES: Creates a Review session from the questions about one cheat-sheet service
+ * (the "Practice <service>" button in the cheat-sheet drawer)
+ *
+ * WHY separate from createNewSession: the questions are not a filter over topics; they are the ones that name the
+ * service in their correct answer (js/service-match.js). A random REVIEW_MAX_QUESTIONS of them when there are more.
+ * It is an ordinary Review session (it counts in Performance like any topic review); `service` only labels it.
+ */
+export function createServiceSession(service, questionIds) {
+  const valid = questionIds.filter((id) => S.QMAP.has(id));
+  if (!valid.length) throw new Error(`There are no questions about ${service} yet.`);
+  const created = nowMs();
+  const seed = `service::${service}::${created}`;
+  const ids = seededShuffle(pickSeededSubset(valid, REVIEW_MAX_QUESTIONS, seed + "::reviewSelection"), seed);
+
+  const state = {
+    sessionKey: `review::SERVICE::${service}`,
+    session: {
+      version: 1,
+      mode: "review",
+      service,
+      domainIds: [],
+      sections: [],
+      difficulty: "ALL",
+      seed,
+      questionIds: ids,
+      choiceOrder: layoutsForSession(ids.map((id) => S.QMAP.get(id)), seed, loadChoiceLayouts()),
+      answers: {},
+      flaggedQuestions: [],
+      checkedQuestions: [],
+      currentIndex: 0,
+      createdAtMs: created,
+      completed: false,
+      scoredIds: null
+    }
+  };
+  saveState(state);
+  return state;
+}
+
 export function normalizeStateForRuntime(state) {
   if (!state || !state.session) return state;
 
