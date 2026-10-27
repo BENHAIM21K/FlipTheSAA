@@ -15,6 +15,7 @@ import { initShareDialog, openShareDialog } from './share.js';
 import { resetAllProgress, showLoadError } from './shell.js';
 import { S } from './state.js';
 import { loadState } from './storage.js';
+import { queueStudyGroupLesson } from './study-groups.js';
 import { THEME_KEY, currentTheme, syncThemeToggle } from './theme.js';
 import { confirmDialog, icon, normalizeMode, safeOperation } from './util.js';
 
@@ -377,6 +378,11 @@ document.addEventListener('click', (e) => {
   if (link.dataset.practiceTopics) {
     practiceTopics(link.dataset.practiceTopics.split('|'));
     return;
+  }
+
+  if (link.dataset.sgLesson) {
+    const [cohortNumber, lessonNumber] = link.dataset.sgLesson.split(':').map(Number);
+    queueStudyGroupLesson(cohortNumber, lessonNumber);
   }
 
   const mode = link.dataset.mode;

@@ -129,19 +129,29 @@
           </div>
 
           <div class="home-grid">
-            <!-- The live thing: one real question from the bank -->
-            <section class="panel home-try" aria-labelledby="tryTitle">
-              <header class="panel-head">
-                <h2 id="tryTitle">Try one question</h2>
-                <button class="btn btn-quiet" id="tryNextBtn" type="button">
-                  <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#shuffle"/></svg>
-                  Another
-                </button>
-              </header>
-              <div id="tryQuestion" class="try-question">
-                <p class="hint">Loading a question…</p>
-              </div>
-            </section>
+            <div class="home-main">
+              <!-- The live thing: one real question from the bank -->
+              <section class="panel home-try" aria-labelledby="tryTitle">
+                <header class="panel-head">
+                  <h2 id="tryTitle">Try one question</h2>
+                  <button class="btn btn-quiet" id="tryNextBtn" type="button">
+                    <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#shuffle"/></svg>
+                    Another
+                  </button>
+                </header>
+                <div id="tryQuestion" class="try-question">
+                  <p class="hint">Loading a question…</p>
+                </div>
+              </section>
+
+              <!-- Study groups: the newest recording and a way into the rest (see renderHomeStudyGroups() in js/home.js) -->
+              <section class="panel home-sg" aria-labelledby="sgHomeTitle">
+                <header class="panel-head">
+                  <h2 id="sgHomeTitle">Study groups</h2>
+                </header>
+                <div id="homeStudyGroups" class="home-sg-body"></div>
+              </section>
+            </div>
 
             <!-- Readiness: the 720 line -->
             <section class="panel home-ready" aria-labelledby="readyTitle">
@@ -159,12 +169,11 @@
             <button class="inside-cell" type="button" data-goto="practice">
               <span class="inside-label">Question bank</span>
               <span class="inside-value num" id="insideQuestions">—</span>
-              <span class="inside-sub" id="insideQuestionsSub">across the 4 exam domains</span>
             </button>
             <button class="inside-cell" type="button" data-goto="practice" data-mode="timed">
               <span class="inside-label">Timed mock</span>
-              <span class="inside-value num">65 <small>q</small> · 130 <small>min</small></span>
-              <span class="inside-sub">50 scored, pass at 720 of 1000</span>
+              <span class="inside-value">Exam-like practice</span>
+              <span class="inside-sub">Timed and scored like the real exam</span>
             </button>
             <button class="inside-cell" type="button" data-goto="studygroups">
               <span class="inside-label">Study groups</span>

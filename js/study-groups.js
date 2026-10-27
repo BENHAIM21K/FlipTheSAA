@@ -34,6 +34,21 @@ export async function renderStudyGroups() {
   else showStudyGroupsList();
 }
 
+/**
+ * WHAT IT DOES: Picks the cohort and lesson the theater opens on the next time the
+ * Study groups tab is shown (Home's "Watch the latest lesson")
+ *
+ * WHY: renderStudyGroups() re-opens the remembered cohort and lesson, so setting them
+ * here is all the tab switch needs. Unknown numbers change nothing.
+ */
+export function queueStudyGroupLesson(cohortNumber, lessonNumber) {
+  const cohort = ((S.studyGroupsCache && S.studyGroupsCache.studyGroups) || []).find(c => c.number === cohortNumber);
+  const lesson = cohort && (cohort.lessons || []).find(l => l.number === lessonNumber);
+  if (!cohort || !lesson) return;
+  currentCohort = cohort;
+  currentLesson = lesson;
+}
+
 export function showStudyGroupsList() {
   const listView = document.querySelector('.sg-list-view');
   const detailView = document.querySelector('.sg-detail-view');

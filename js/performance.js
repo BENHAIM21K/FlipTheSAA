@@ -135,7 +135,7 @@ export function renderDomainBars(history) {
   const passPct = PASSING_SCORE / 10;
   const names = {};
   S.QUESTIONS.forEach(q => { if (!names[q.domainId]) names[q.domainId] = q.domain; });
-  const shortName = (id) => String(names[id] || id).replace(/^Design\s+/i, '').replace(/\s+Architectures$/i, '');
+  const domainName = (id) => String(names[id] || id);
 
   // Biggest weighted gap below the pass ratio = where the most points are lost
   let focus = null;
@@ -148,7 +148,7 @@ export function renderDomainBars(history) {
   if (findingEl) {
     const answeredAny = Object.values(domainPerf).some(p => p.total);
     findingEl.textContent = !answeredAny ? ''
-      : focus ? `Focus on ${focus.id} ${shortName(focus.id)}: it's ${DOMAIN_WEIGHTS[focus.id]}% of the exam and you're at ${focus.pct}%, ${passPct - focus.pct} points under the 72% pass ratio.`
+      : focus ? `Focus on ${focus.id} ${domainName(focus.id)}: it's ${DOMAIN_WEIGHTS[focus.id]}% of the exam and you're at ${focus.pct}%, ${passPct - focus.pct} points under the 72% pass ratio.`
       : 'Every domain you have answered is at or above the 72% pass ratio.';
   }
 
@@ -163,7 +163,7 @@ export function renderDomainBars(history) {
     return `
       <div class="domain-bar">
         <div class="domain-bar-header">
-          <div class="domain-bar-name">${escapeHtml(id)} · ${escapeHtml(shortName(id))} <span class="domain-weight">${DOMAIN_WEIGHTS[id]}% of the exam</span></div>
+          <div class="domain-bar-name">${escapeHtml(id)} · ${escapeHtml(domainName(id))} <span class="domain-weight">${DOMAIN_WEIGHTS[id]}% of the exam</span></div>
           <div class="domain-bar-stat">${stat}</div>
         </div>
         <div class="domain-bar-track" role="img" aria-label="${escapeHtml(id)}: ${has ? `${pct}% correct` : 'no answers yet'}, pass ratio 72%">

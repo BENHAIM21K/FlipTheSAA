@@ -5,7 +5,8 @@ import { DOMAIN_WEIGHTS, PASSING_SCORE } from './config.js';
 import { getDomainPerformance, getSessionHistory } from './history.js';
 import { S } from './state.js';
 import { loadChoiceLayouts, loadState, recordShownLayout } from './storage.js';
-import { escapeHtml, fetchJson, icon, safeOperation } from './util.js';
+import { embedUrl, thumbnailUrl } from './study-groups.js';
+import { escapeHtml, fetchJson, icon, safeOperation, safeUrl } from './util.js';
 
 // ============================================================================
 // HOME - Readiness, resume, what's inside, and one live question
@@ -47,14 +48,11 @@ export async function renderHomeCounts() {
 
   if (S.QUESTIONS.length) {
     setText('insideQuestions', S.QUESTIONS.length.toLocaleString('en-US'));
-    const byDomain = {};
-    S.QUESTIONS.forEach(q => { byDomain[q.domainId] = (byDomain[q.domainId] || 0) + 1; });
-    const breakdown = Object.keys(byDomain).sort().map(d => `${d} ${byDomain[d]}`).join(' · ');
-    setText('insideQuestionsSub', breakdown);
   }
 
   try {
     if (!S.studyGroupsCache) S.studyGroupsCache = await fetchJson('studygroups.json');
+    renderHomeStudyGroups();
     const cohorts = S.studyGroupsCache.studyGroups || [];
     const recorded = cohorts.reduce((sum, c) =>
       sum + (c.lessons || []).filter(l => l.recording && l.recording.url).length, 0);
@@ -72,6 +70,67 @@ export async function renderHomeCounts() {
   } catch (e) {
     console.warn('[SAA Warning] Could not count cheat sheet services', e);
   }
+}
+
+/**
+ * WHAT IT DOES: Finds the newest recorded lesson: the highest-numbered lesson with a
+ * recording, in the highest-numbered cohort that has one. Null when nothing is recorded.
+ */
+function latestRecordedLesson(cohorts) {
+  const withRecording = (c) => (c.lessons || []).filter(l => l.recording && l.recording.url);
+  const cohort = [...cohorts].sort((a, b) => b.number - a.number).find(c => withRecording(c).length);
+  if (!cohort) return null;
+  const lesson = withRecording(cohort).sort((a, b) => b.number - a.number)[0];
+  return { cohort, lesson };
+}
+
+/**
+ * WHAT IT DOES: Fills the Home "Study groups" card: the newest recording with its
+ * still frame, and buttons that open it or the whole list
+ *
+ * WHY: Recordings are the course's main value, so Home asks the visitor to watch one.
+ * The still frame is only an image: the video loads when they press Play in the theater.
+ */
+export function renderHomeStudyGroups() {
+  const box = document.getElementById('homeStudyGroups');
+  if (!box || !S.studyGroupsCache) return;
+
+  const latest = latestRecordedLesson(S.studyGroupsCache.studyGroups || []);
+  if (!latest) {
+    box.innerHTML = `
+      <p class="home-sg-pitch">Recordings from our study groups are added as lessons run.</p>
+      <div class="home-sg-actions"><button class="btn" type="button" data-goto="studygroups">View study groups ${icon('arrow-right')}</button></div>`;
+    return;
+  }
+
+  const { cohort, lesson } = latest;
+  const thumb = thumbnailUrl(embedUrl(safeUrl(lesson.recording.url)));
+  const target = `${cohort.number}:${lesson.number}`;
+  box.innerHTML = `
+    <p class="home-sg-pitch">Watch past study-group recordings to help you master the exam.</p>
+    <div class="home-sg-latest">
+      <button class="home-sg-thumb${thumb ? ' has-thumb' : ''}" type="button" data-goto="studygroups" data-sg-lesson="${escapeHtml(target)}" aria-label="Watch lesson ${escapeHtml(lesson.number)}: ${escapeHtml(lesson.topic || 'recording')}">
+        ${thumb ? `<img class="home-sg-thumb-img" src="${escapeHtml(thumb)}" alt="" decoding="async" loading="lazy" referrerpolicy="no-referrer" />` : ''}
+        <svg class="home-sg-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.6v14.8a1 1 0 0 0 1.52.85l12.1-7.4a1 1 0 0 0 0-1.7L8.52 3.75A1 1 0 0 0 7 4.6z" fill="currentColor"/></svg>
+      </button>
+      <div class="home-sg-text">
+        <span class="home-sg-label">Latest lesson</span>
+        <span class="home-sg-lesson" dir="auto">Lesson ${escapeHtml(lesson.number)}${lesson.topic ? ` · ${escapeHtml(lesson.topic)}` : ''}</span>
+        <span class="home-sg-meta">${escapeHtml(cohort.name)}${lesson.date ? ` · ${escapeHtml(lesson.date)}` : ''}</span>
+      </div>
+    </div>
+    <div class="home-sg-actions">
+      <button class="btn btn-primary" type="button" data-goto="studygroups" data-sg-lesson="${escapeHtml(target)}">Watch the latest lesson</button>
+      <button class="btn btn-quiet" type="button" data-goto="studygroups">Browse all recordings ${icon('arrow-right')}</button>
+    </div>`;
+
+  // Some recordings have no thumbnail (Drive answers 404): keep the plain tile with the play mark
+  const img = box.querySelector('.home-sg-thumb-img');
+  img?.addEventListener('load', () => img.classList.add('is-loaded'));
+  img?.addEventListener('error', () => {
+    img.remove();
+    box.querySelector('.home-sg-thumb')?.classList.remove('has-thumb');
+  });
 }
 
 /**
@@ -112,10 +171,9 @@ export function domainWeightsHtml(history) {
   S.QUESTIONS.forEach(q => { if (!names[q.domainId]) names[q.domainId] = q.domain; });
 
   const rows = Object.keys(DOMAIN_WEIGHTS).map(id => {
-    const shortName = String(names[id] || id).replace(/^Design\s+/i, '').replace(/\s+Architectures$/i, '');
     const p = perf[id];
     const yours = p && p.total ? `${Math.round(p.percentage)}%` : '<span class="muted-dash">—</span>';
-    return `<div class="ready-domain"><span>${escapeHtml(id)} · ${escapeHtml(shortName)}</span><span class="num">${DOMAIN_WEIGHTS[id]}%</span><span class="num">${yours}</span></div>`;
+    return `<div class="ready-domain"><span>${escapeHtml(id)} · ${escapeHtml(names[id] || id)}</span><span class="num">${DOMAIN_WEIGHTS[id]}%</span><span class="num">${yours}</span></div>`;
   }).join('');
 
   return `

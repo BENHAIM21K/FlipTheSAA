@@ -403,6 +403,35 @@ a { color: inherit; }
   align-items: start;
 }
 .home-grid .panel + .panel { margin-top: 0; }
+.home-main { display: flex; flex-direction: column; gap: var(--gap); min-width: 0; }
+.home-main .panel + .panel { margin-top: 0; }
+
+/* Home: Study groups card. The tile is a still frame of the newest recording (never a live frame). */
+.home-sg-pitch { color: var(--muted); line-height: 20px; max-width: 60ch; }
+.home-sg-latest { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 16px; align-items: center; margin-top: 16px; }
+.home-sg-thumb {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 16 / 9;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  overflow: hidden;
+  background: #0b0c0e;   /* same dark as the player poster: it is video, so it stays dark in both themes */
+  color: #f1f3f4;
+  cursor: pointer;
+}
+.home-sg-thumb-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity var(--t-ui) var(--ease-out); }
+.home-sg-thumb-img.is-loaded { opacity: 0.8; }
+.home-sg-play { position: relative; width: 28px; height: 28px; }
+.home-sg-thumb:hover .home-sg-thumb-img.is-loaded { opacity: 0.95; }
+.home-sg-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.home-sg-label { color: var(--faint); font-size: var(--fs-small); }
+.home-sg-lesson { font-weight: 600; line-height: 20px; overflow-wrap: anywhere; }
+.home-sg-meta { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+.home-sg-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 16px; }
 
 .try-meta {
   display: flex;
@@ -492,6 +521,7 @@ a { color: inherit; }
   display: grid;
   grid-template-columns: minmax(0, 1fr) 56px 44px;
   gap: 8px;
+  align-items: start;
   padding: 6px 0;
   line-height: 20px;
 }
@@ -522,6 +552,7 @@ a { color: inherit; }
 .inside-cell {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 4px;
   padding: 18px 20px;
   border: 0;
@@ -1651,12 +1682,12 @@ a { color: inherit; }
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--gap);
-  align-items: start;
+  align-items: stretch;   /* both cards take the taller one's height, so they always match */
 }
 .contact-options .panel + .panel { margin-top: 0; }
 .contact-card { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
 .contact-card p { color: var(--muted); line-height: 20px; max-width: 60ch; }
-.contact-card .btn { margin-top: 4px; }
+.contact-card .btn { margin-top: auto; }   /* the buttons share one baseline at the bottom */
 
 /* ============================================================================
    LOADING, DIALOG
@@ -1928,6 +1959,8 @@ a { color: inherit; }
   .title-actions, .title-actions .btn { width: 100%; }
   .setup-panel .grid { grid-template-columns: minmax(0, 1fr); }
   .actions .btn { flex: 1 1 100%; }
+  .home-sg-latest { grid-template-columns: minmax(0, 1fr); }
+  .home-sg-actions .btn { flex: 1 1 100%; }
 
   .choice { font-size: 16px; padding: 14px; }
 
